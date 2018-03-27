@@ -1,0 +1,49 @@
+
+# This function is executed every time you press the 'execute' button
+function init() {
+   # put your code here
+}
+
+function in_range(val, min, max) {
+  return val >= min and val<=max
+}
+
+function log_rab(robot_id, data) {
+  log("S: ",in_range(data.azimuth, 	-15*3.1415/180, 15*3.1415/180), "B: ", data.azimuth )
+}
+
+# This function is executed at each time step
+# It must contain the logic of your controller
+function step() {
+  # put your code here
+  if(id==0) {
+    # Only move if you are robot 0 to test range and bearing
+    # conversion to binary sensor value
+
+    # Just spin in circles for this test
+    set_wheels(1.0, -1.0)
+
+    # Log the range and bearing info
+    foreach (neighbors.data, log_rab)    
+  }
+}
+
+
+
+
+# This function is executed every time you press the 'reset'
+# button in the GUI. It is supposed to restore the state
+# of the controller to whatever it was right after init() was
+# called. The state of sensors and actuators is reset
+# automatically by ARGoS.
+function reset() {
+   # put your code here
+}
+
+
+
+# This function is executed only once, when the robot is removed
+# from the simulation
+function destroy() {
+   # put your code here
+}
