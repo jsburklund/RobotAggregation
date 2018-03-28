@@ -1,0 +1,88 @@
+# Attempts to reproduce the aggregation behavior with a
+# binary sensor like in Gaucci's paper.
+# TODO add logging capabilities
+# TODO add parameter modifcation/loading
+
+# Hand tuning results: l0,r0,l1,r1,l2,r2
+# - -10,10,8,10,10,8 : robots just clump and don't segregate at all
+# - -10,10,5,10,10,5 : similar behavior with robots clumping.  They seemto foloow the wrong class due to the no robot value
+# - -10,10,5,10,-10,10 : Works pretty well!
+
+
+kSENSE_ANGLE = 15*math.pi/180
+
+# Checks to see if a value is within a certain bound
+function in_range(val, min, max) {
+  return val>=min and val<= max
+}
+
+function filter_camera(rid, data) {
+  return in_range(data.azimuth, -kSENSE_ANGLE, kSENSE_ANGLE)
+}
+
+function filter_nearest(rid, data, closest_robot) {
+  if (data.distance < closest_robot.distance) {
+    if ((id%2) == (rid%2)) {
+      return {.val=1, .distance=data.distance, .rid=rid}
+    } else {
+      return {.val=2, .distance=data.distance, .rid=rid}
+    }
+  }
+  return closest_robot
+}
+
+# This function is executed every time you press the 'execute' button
+function init() {
+  var filepath = string.concat("./logs/robot_",string.tostring(id),".log")
+  f = io.fopen(filepath, "w")
+  t = 0
+  s1 = swarm.create(1)
+  s1.select(id%2 == 0)
+  s2 = s1.others(2)
+
+  s1.exec(set_red)
+  s2.exec(set_green)
+}
+
+function set_red() {
+  set_leds(255,0,0)
+}
+function set_green() {
+  set_leds(0,255,0)
+}
+
+
+# This function is executed at each time step
+# It must contain the logic of your controller
+function step() {
+  #var robot_sensor_val = neighbors.map(sense_robot).reduce(sees_any_robot, false)
+  robot_sensor = neighbors.filter(filter_camera).reduce(filter_nearest, {.val=0, .distance=1000})
+
+  # Spin in place if a robot is not detected, otherwise approach it
+  if (robot_sensor.val==0) {
+    # No robots seen
+    set_wheels(-10.0, 10.0)
+  }
+  if (robot_sensor.val==1) {
+    # Same cluster
+    set_wheels(5.0, 10.0)
+  }
+  if (robot_sensor.val==2) {
+    # Different cluster
+    set_wheels(-10.0,10.0)
+  }
+}
+
+
+
+# This function is executed every time you press the 'reset'
+# button in the GUI. It is supposed to restore the state
+# of the controller to whatever it was right after init() was
+# called. The state of sensors and actuators is reset
+# automatically by ARGoS.
+function reset() {
+}
+
+# This function is executed only once, when the robot is removed
+# from the simulation
+function destroy() {}
