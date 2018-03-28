@@ -20,9 +20,10 @@ function filter_camera(rid, data) {
   return in_range(data.azimuth, -kSENSE_ANGLE, kSENSE_ANGLE)
 }
 
+# Should implement this as map-reduce with kin/nonkin for better generalization, but it works well as is.
 function filter_nearest(rid, data, closest_robot) {
   if (data.distance < closest_robot.distance) {
-    if ((id%2) == (rid%2)) {
+    if ((id%3) == (rid%3)) {
       return {.val=1, .distance=data.distance, .rid=rid}
     } else {
       return {.val=2, .distance=data.distance, .rid=rid}
@@ -37,11 +38,15 @@ function init() {
   f = io.fopen(filepath, "w")
   t = 0
   s1 = swarm.create(1)
-  s1.select(id%2 == 0)
-  s2 = s1.others(2)
+  s2 = swarm.create(2)
+  s3 = swarm.create(3)
+  s1.select(id%3 == 0)
+  s2.select(id%3 == 1)
+  s3.select(id%3 == 2)
 
   s1.exec(set_red)
   s2.exec(set_green)
+  s3.exec(set_blue)
 }
 
 function set_red() {
@@ -49,6 +54,9 @@ function set_red() {
 }
 function set_green() {
   set_leds(0,255,0)
+}
+function set_blue() {
+  set_leds(0,0,255)
 }
 
 
