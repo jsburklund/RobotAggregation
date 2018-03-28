@@ -23,7 +23,7 @@ function filter_camera(rid, data) {
 # Should implement this as map-reduce with kin/nonkin for better generalization, but it works well as is.
 function filter_nearest(rid, data, closest_robot) {
   if (data.distance < closest_robot.distance) {
-    if ((id%3) == (rid%3)) {
+    if ((id%5) == (rid%5)) {
       return {.val=1, .distance=data.distance, .rid=rid}
     } else {
       return {.val=2, .distance=data.distance, .rid=rid}
@@ -40,13 +40,19 @@ function init() {
   s1 = swarm.create(1)
   s2 = swarm.create(2)
   s3 = swarm.create(3)
-  s1.select(id%3 == 0)
-  s2.select(id%3 == 1)
-  s3.select(id%3 == 2)
+  s4 = swarm.create(4)
+  s5 = swarm.create(5)
+  s1.select(id%5 == 0)
+  s2.select(id%5 == 1)
+  s3.select(id%5 == 2)
+  s4.select(id%5 == 3)
+  s5.select(id%5 == 4)
 
   s1.exec(set_red)
   s2.exec(set_green)
   s3.exec(set_blue)
+  s4.exec(set_purple)
+  s5.exec(set_cyan)
 }
 
 function set_red() {
@@ -57,6 +63,12 @@ function set_green() {
 }
 function set_blue() {
   set_leds(0,0,255)
+}
+function set_purple() {
+  set_leds(127,0,255)
+}
+function set_cyan() {
+  set_leds(0,255,255)
 }
 
 
