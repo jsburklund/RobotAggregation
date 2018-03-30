@@ -1,7 +1,5 @@
 # Attempts to reproduce the aggregation behavior with a
 # binary sensor like in Gaucci's paper.
-# TODO add logging capabilities
-# TODO add parameter modifcation/loading
 
 kSENSE_ANGLE = 15*math.pi/180
 
@@ -23,7 +21,12 @@ function sees_any_robot(rid, data, sees_robot) {
 # This function is executed every time you press the 'execute' button
 function init() {
   var filepath = string.concat("./logs/robot_",string.tostring(id),".log")
+  var params_filename = "./params"
   f = io.fopen(filepath, "w")
+  #params_file = io.fopen(params_filename, "r")
+  #params_file.fforeach(function (line) {
+    #return 0
+  #})
   t = 0
 }
 
@@ -40,7 +43,7 @@ function step() {
     set_leds(255,0,0)
   }
   #log(id,",",pose.position.x,",",pose.position.y)
-  io.fwrite(f, t,",",pose.position.x,",",pose.position.y)
+  io.fwrite(f, pose.position.x,",",pose.position.y)
   t = t+1
 }
 

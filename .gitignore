@@ -1,6 +1,9 @@
 ## Ignore Compiled Buzz stuff ##
 *.bdb
 *.bo
-logs
 venv
 .idea
+
+params
+*.dat
+logs
