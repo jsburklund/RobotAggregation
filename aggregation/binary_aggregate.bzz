@@ -1,3 +1,5 @@
+include "aggregation/logs/params.bzz"
+
 # Attempts to reproduce the aggregation behavior with a
 # binary sensor like in Gaucci's paper.
 
@@ -20,29 +22,23 @@ function sees_any_robot(rid, data, sees_robot) {
 
 # This function is executed every time you press the 'execute' button
 function init() {
-  var filepath = string.concat("./logs/robot_",string.tostring(id),".log")
-  var params_filename = "./params"
+  var filepath = string.concat("./aggregation/logs/robot_",string.tostring(id),".log")
   f = io.fopen(filepath, "w")
-  #params_file = io.fopen(params_filename, "r")
-  #params_file.fforeach(function (line) {
-    #return 0
-  #})
   t = 0
 }
 
 # This function is executed at each time step
-# It must contain the logic of your controller
+# It must contain the logic of your params
 function step() {
   var robot_sensor_val = neighbors.map(sense_robot).reduce(sees_any_robot, false)
   # Spin in place if a robot is not detected, otherwise approach it
   if (robot_sensor_val) {
-    set_wheels(7.0, 10.0)
+    set_wheels(params.vl0, params.vr0)
     set_leds(0,255,0)
   } else {
-    set_wheels(-10.0, 10.0)
+    set_wheels(params.vl1, params.vr1)
     set_leds(255,0,0)
   }
-  #log(id,",",pose.position.x,",",pose.position.y)
   io.fwrite(f, pose.position.x,",",pose.position.y)
   t = t+1
 }
@@ -51,7 +47,7 @@ function step() {
 
 # This function is executed every time you press the 'reset'
 # button in the GUI. It is supposed to restore the state
-# of the controller to whatever it was right after init() was
+# of the params to whatever it was right after init() was
 # called. The state of sensors and actuators is reset
 # automatically by ARGoS.
 function reset() {
