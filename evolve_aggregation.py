@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 import argparse
+import sys
+import time
+
 import numpy as np
 import re
 from xml.etree import ElementTree
@@ -28,7 +31,7 @@ def main():
     parser.add_argument('buzz_file', help='bzz file that implements the controller')
     parser.add_argument('log_dir', help='directory that will contain log files and the intermediate params.bzz file')
     parser.add_argument('--sigma0', help='initial standard deviation of population', type=float, default=0.72)
-    parser.add_argument('--population-size', help='number of controllers in each population', type=int, default=10)
+    parser.add_argument('--population-size', help='number of controllers in each population', type=int, default=5)
     parser.add_argument('-q', '--quiet', help='hide standard output from argos', action="store_true")
 
     args = parser.parse_args()
@@ -39,18 +42,17 @@ def main():
         print("[{:s}] is not a directory".format(args.log_dir))
         return
 
-    initial_params = np.array([0, 0, 0, 0])
-
-    es = cma.CMAEvolutionStrategy(initial_params, args.sigma0, {'popsize': args.population_size})
+    es = cma.CMAEvolutionStrategy(np.zeros(4), args.sigma0, {'popsize': args.population_size})
 
     while not es.stop():
         population = es.ask()
         fitnesses = np.empty(args.population_size)
         for i, individual_params in enumerate(population):
+            t0 = time.time()
             # write the params buzz file
             params_filename = os.path.join(args.log_dir, "params.bzz")
             params_file = open(params_filename, 'w')
-            params_table = "params={{.vl0={:f},.vr0={:f},.vl1={:f},.vr1={:f}}}\n".format(*initial_params)
+            params_table = "params={{.vl0={:f},.vr0={:f},.vl1={:f},.vr1={:f}}}\n".format(*individual_params)
             params_file.write(params_table)
             params_file.close()
 
@@ -63,6 +65,8 @@ def main():
             # set the buzz controller path
             tree = ElementTree.parse(args.argos_file)
             root = tree.getroot()
+            experiment = root.find("framework").find("experiment")
+            experiment.attrib["random_seed"] = str(np.random.randint(0, 4096))
             buzz_controller_params = root.find('controllers').find("buzz_controller_kheperaiv").find("params")
             buzz_controller_params.attrib['bytecode_file'] = bytecode_filename
             buzz_controller_params.attrib['debug_file'] = debug_filename
@@ -88,6 +92,9 @@ def main():
             poses = np.transpose(poses, [1, 0, 2])
             fitness = compute_fitness(poses)
             fitnesses[i] = fitness
+
+            dt = time.time() - t0
+            print("dt=", dt, "fitness=", fitness, "params=", individual_params)
 
         print("mean fitness = ", np.mean(fitnesses))
         es.tell(population, fitnesses)

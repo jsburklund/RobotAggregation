@@ -1,7 +1,7 @@
 <argos-configuration>
   <framework>
     <system threads="0" />
-    <experiment length="100" random_seed="90" ticks_per_second="10" />
+    <experiment length="10" random_seed="1439" ticks_per_second="10" />
   </framework>
   <controllers>
     <buzz_controller_kheperaiv id="obsAvoid">
