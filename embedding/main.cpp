@@ -5,8 +5,8 @@
 
 #include <iostream>
 #include <fstream>
-#include <loop_functions/mpga_loop_functions/mpga.h>
-#include <loop_functions/mpga_loop_functions/mpga_phototaxis_loop_functions.h>
+#include <loop_functions/mpga.h>
+#include <loop_functions/mpga_phototaxis_loop_functions.h>
 
 /*
  * Flush best individual
@@ -26,12 +26,8 @@ void FlushIndividual(const CMPGA::SIndividual& s_ind,
    cOFS << std::endl;
 }
 
-/*
- * The function used to aggregate the scores of each trial.  In this
- * experiment, the score is the distance of the robot from the
- * light. We take the maximum value as aggregated score.
- */
-Real ScoreAggregator(const std::vector<Real>& vec_scores) {
+
+Real RobotAggregationScorer(const std::vector<Real>& vec_scores) {
    Real fScore = vec_scores[0];
    for(size_t i = 1; i < vec_scores.size(); ++i) {
       fScore = Max(fScore, vec_scores[i]);
@@ -40,7 +36,7 @@ Real ScoreAggregator(const std::vector<Real>& vec_scores) {
 }
 
 int main() {
-   CMPGA cGA(CRange<Real>(-10.0,10.0),            // Allele range
+   CMPGA cGA(CRange<Real>(-1.0,1.0),            // Allele range
              GENOME_SIZE,                         // Genome size
              5,                                   // Population size
              0.05,                                // Mutation probability
@@ -48,7 +44,7 @@ int main() {
              100,                                 // Number of generations
              false,                               // Minimize score
              "experiments/mpga.argos",            // .argos conf file
-             &ScoreAggregator,                    // The score aggregator
+             &RobotAggregationScorer,             // The score aggregator
              12345                                // Random seed
       );
    cGA.Evaluate();
