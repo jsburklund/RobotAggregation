@@ -13,11 +13,6 @@
 /****************************************/
 /****************************************/
 
-/*
- * The size of the genome.
- */
-static const size_t GENOME_SIZE = 98;
-
 /****************************************/
 /****************************************/
 
@@ -25,34 +20,37 @@ using namespace argos;
 
 class CMPGAPhototaxisLoopFunctions : public CMPGALoopFunctions {
 
-public:
+ public:
 
-   CMPGAPhototaxisLoopFunctions();
-   virtual ~CMPGAPhototaxisLoopFunctions();
+  static const size_t GENOME_SIZE = 98;
 
-   virtual void Init(TConfigurationNode& t_node);
-   virtual void Reset();
+  CMPGAPhototaxisLoopFunctions();
 
-   /* Configures the robot controller from the genome */
-   virtual void ConfigureFromGenome(const Real* pf_genome);
+  virtual ~CMPGAPhototaxisLoopFunctions();
 
-   /* Calculates the performance of the robot in a trial */
-   virtual Real Score();
+  virtual void Init(TConfigurationNode &t_node);
 
-private:
+  virtual void Reset();
 
-   /* The initial setup of a trial */
-   struct SInitSetup {
-      CVector3 Position;
-      CQuaternion Orientation;
-   };
+  /* Configures the robot controller from the genome */
+  virtual void ConfigureFromGenome(const Real *pf_genome);
 
-   std::vector<SInitSetup> m_vecInitSetup;
-   CFootBotEntity* m_pcFootBot;
-   CFootBotNNController* m_pcController;
-   Real* m_pfControllerParams;
-   CRandom::CRNG* m_pcRNG;
+  /* Calculates the performance of the robot in a trial */
+  virtual Real Score();
 
+ private:
+
+  /* The initial setup of a trial */
+  struct SInitSetup {
+    CVector3 Position;
+    CQuaternion Orientation;
+  };
+
+  std::vector<SInitSetup> m_vecInitSetup;
+  CFootBotEntity *m_pcFootBot;
+  CFootBotNNController *m_pcController;
+  Real *m_pfControllerParams;
+  CRandom::CRNG *m_pcRNG;
 
 };
 

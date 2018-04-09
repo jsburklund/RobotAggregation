@@ -205,10 +205,10 @@ void CMPGA::LaunchARGoS(UInt32 un_slave_id) {
    ::signal(SIGTERM, SlaveHandleSIGTERM);
    /* Initialize ARGoS */
    /* Redirect LOG and LOGERR to dedicated files to prevent clutter on the screen */
-   std::ofstream cLOGFile(std::string("ARGoS_LOG_" + ToString(::getpid())).c_str(), std::ios::out);
+   std::ofstream cLOGFile(std::string(".ARGoS_LOG_" + ToString(::getpid())).c_str(), std::ios::out);
    LOG.DisableColoredOutput();
    LOG.GetStream().rdbuf(cLOGFile.rdbuf());
-   std::ofstream cLOGERRFile(std::string("ARGoS_LOGERR_" + ToString(::getpid())).c_str(), std::ios::out);
+   std::ofstream cLOGERRFile(std::string(".ARGoS_LOGERR_" + ToString(::getpid())).c_str(), std::ios::out);
    LOGERR.DisableColoredOutput();
    LOGERR.GetStream().rdbuf(cLOGERRFile.rdbuf());
    /* The CSimulator class of ARGoS is a singleton. Therefore, to

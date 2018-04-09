@@ -79,7 +79,7 @@ void CMPGAAggregationLoopFunctions::ConfigureFromGenome(const Real *pf_genome) {
 }
 
 Real CMPGAAggregationLoopFunctions::Score() {
-  /* The performance is simply the distance of the robot to the origin */
+  // compute the centroid based on the position of all the robots
   return m_pcFootBot->GetEmbodiedEntity().GetOriginAnchor().Position.Length();
 }
 
