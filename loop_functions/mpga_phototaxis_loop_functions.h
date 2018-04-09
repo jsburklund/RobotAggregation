@@ -15,18 +15,6 @@
 
 /*
  * The size of the genome.
- * 
- * The genome is the set of NN weights. The NN is a simple
- * 2-layer perceptron. The inputs are 24 proximity readings and
- * 24 light readings. The outputs are 2 wheels speeds. The total
- * number of weights is therefore:
- *
- * W = (I + 1) * O = (24 + 24 + 1) * 2 = 98
- *
- * where:
- *   W = number of weights
- *   I = number of inputs
- *   O = number of outputs
  */
 static const size_t GENOME_SIZE = 98;
 

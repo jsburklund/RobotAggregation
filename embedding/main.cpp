@@ -14,7 +14,7 @@
 void FlushIndividual(const CMPGA::SIndividual& s_ind,
                      UInt32 un_generation) {
    std::ostringstream cOSS;
-   cOSS << "best_" << un_generation << ".dat";
+   cOSS << ".best_" << un_generation << ".dat";
    std::ofstream cOFS(cOSS.str().c_str(), std::ios::out | std::ios::trunc);
    /* First write the number of values to dump */
    cOFS << GENOME_SIZE;
