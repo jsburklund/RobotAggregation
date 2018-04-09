@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
@@ -12,21 +14,16 @@ class CFootBotBinaryController : public CCI_Controller {
 
   CFootBotBinaryController();
 
-  virtual ~CFootBotBinaryController();
+  void Init(TConfigurationNode &t_node) override;
 
-  void Init(TConfigurationNode &t_node);
+  void ControlStep() override;
 
-  void ControlStep();
-
-  void Reset();
-
-  void Destroy();
+  void SetParameters(size_t i, const Real *pDouble);
 
  private:
 
   CCI_DifferentialSteeringActuator *m_pcWheels;
-  CCI_FootBotProximitySensor *m_pcProximity;
-  Real m_fLeftSpeed, m_fRightSpeed;
+  std::array<Real, 4> params;
 
 };
 
