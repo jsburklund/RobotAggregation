@@ -1,3 +1,6 @@
+#include <numeric>
+#include <iterator>
+
 #include "aggregation_loop_functions.h"
 
 CMPGAAggregationLoopFunctions::CMPGAAggregationLoopFunctions() :
@@ -81,18 +84,23 @@ void CMPGAAggregationLoopFunctions::ConfigureFromGenome(const Real *pf_genome) {
 Real CMPGAAggregationLoopFunctions::Score() {
   CSpace::TMapPerType &tFBMap = GetSpace().GetEntitiesByType("foot-bot");
 
-  auto accum_position = [](CVector3 value, const CSpace::TMapPerType::value_type &p) {
+  auto accum_position = [](CVector3 sum, const CSpace::TMapPerType::value_type &p) {
     CFootBotEntity *pcFB = any_cast<CFootBotEntity *>(p.second);
     auto robot_position = pcFB->GetEmbodiedEntity().GetOriginAnchor().Position;
-    return value + robot_position;
+    return sum + robot_position;
   };
 
   auto centroid = std::accumulate(std::begin(tFBMap), std::end(tFBMap), CVector3::ZERO, accum_position) / tFBMap.size();
 
-  for (auto &kv : tFBMap) {
-    CFootBotEntity *pcFB = any_cast<CFootBotEntity *>(kv.second);
+  auto accum_cost = [](double cost, const CSpace::TMapPerType::value_type &p) {
+    CFootBotEntity *pcFB = any_cast<CFootBotEntity *>(p.second);
     auto robot_position = pcFB->GetEmbodiedEntity().GetOriginAnchor().Position;
-  }
+    return cost + (robot_position - centroid).SquareLength();
+  };
+
+  auto cost = std::accumulate(std::begin(tFBMap), std::end(tFBMap), 0, accum_position) / tFBMap.size();
+  constexpr double ROBOT_RADIUS = 0.17;
+  cost *= 1 / (4 * std::pow(ROBOT_RADIUS, 2));
 }
 
 REGISTER_LOOP_FUNCTIONS(CMPGAAggregationLoopFunctions, "aggregation_loop_functions")
