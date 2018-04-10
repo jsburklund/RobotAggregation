@@ -65,8 +65,7 @@ int main() {
     if (cGA.GetGeneration() % 5 == 0) {
       argos::LOG << " [Flushing genome... ";
       /* Flush scores of best individual */
-      FlushIndividual(*cGA.GetPopulation()[0],
-                      cGA.GetGeneration());
+      FlushIndividual(*cGA.GetPopulation()[0], cGA.GetGeneration());
       argos::LOG << "done.]";
     }
     LOG << std::endl;

@@ -79,8 +79,20 @@ void CMPGAAggregationLoopFunctions::ConfigureFromGenome(const Real *pf_genome) {
 }
 
 Real CMPGAAggregationLoopFunctions::Score() {
-  // compute the centroid based on the position of all the robots
-  return m_pcFootBot->GetEmbodiedEntity().GetOriginAnchor().Position.Length();
+  CSpace::TMapPerType &tFBMap = GetSpace().GetEntitiesByType("foot-bot");
+
+  auto accum_position = [](CVector3 value, const CSpace::TMapPerType::value_type &p) {
+    CFootBotEntity *pcFB = any_cast<CFootBotEntity *>(p.second);
+    auto robot_position = pcFB->GetEmbodiedEntity().GetOriginAnchor().Position;
+    return value + robot_position;
+  };
+
+  auto centroid = std::accumulate(std::begin(tFBMap), std::end(tFBMap), CVector3::ZERO, accum_position) / tFBMap.size();
+
+  for (auto &kv : tFBMap) {
+    CFootBotEntity *pcFB = any_cast<CFootBotEntity *>(kv.second);
+    auto robot_position = pcFB->GetEmbodiedEntity().GetOriginAnchor().Position;
+  }
 }
 
 REGISTER_LOOP_FUNCTIONS(CMPGAAggregationLoopFunctions, "aggregation_loop_functions")
