@@ -56,19 +56,19 @@ function init() {
 }
 
 function set_red() {
-  set_leds(255,0,0)
+  #set_leds(255,0,0)
 }
 function set_green() {
-  set_leds(0,255,0)
+  #set_leds(0,255,0)
 }
 function set_blue() {
-  set_leds(0,0,255)
+  #set_leds(0,0,255)
 }
 function set_purple() {
-  set_leds(127,0,255)
+  #set_leds(127,0,255)
 }
 function set_cyan() {
-  set_leds(0,255,255)
+  #set_leds(0,255,255)
 }
 
 
