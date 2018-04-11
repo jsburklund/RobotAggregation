@@ -92,13 +92,13 @@ Real CMPGAAggregationLoopFunctions::Score() {
 
   auto centroid = std::accumulate(std::begin(tFBMap), std::end(tFBMap), CVector3::ZERO, accum_position) / tFBMap.size();
 
-  auto accum_cost = [](double cost, const CSpace::TMapPerType::value_type &p) {
+  auto accum_cost = [centroid](double cost, const CSpace::TMapPerType::value_type &p) {
     CFootBotEntity *pcFB = any_cast<CFootBotEntity *>(p.second);
     auto robot_position = pcFB->GetEmbodiedEntity().GetOriginAnchor().Position;
     return cost + (robot_position - centroid).SquareLength();
   };
 
-  auto cost = std::accumulate(std::begin(tFBMap), std::end(tFBMap), 0, accum_position) / tFBMap.size();
+  auto cost = std::accumulate(std::begin(tFBMap), std::end(tFBMap), 0, accum_cost) / tFBMap.size();
   constexpr double ROBOT_RADIUS = 0.17;
   cost *= 1 / (4 * std::pow(ROBOT_RADIUS, 2));
 }

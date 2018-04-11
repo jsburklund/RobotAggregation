@@ -6,7 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <loop_functions/mpga.h>
-#include <loop_functions/aggregation_loop_functions.h>
+#include <loop_functions/mpga_phototaxis_loop_functions.h>
 
 /*
  * Flush best individual
@@ -17,9 +17,9 @@ void FlushIndividual(const CMPGA::SIndividual &s_ind,
   cOSS << ".best_" << un_generation << ".dat";
   std::ofstream cOFS(cOSS.str().c_str(), std::ios::out | std::ios::trunc);
   /* First write the number of values to dump */
-  cOFS << CMPGAAggregationLoopFunctions::GENOME_SIZE;
+  cOFS << CMPGAPhototaxisLoopFunctions::GENOME_SIZE;
   /* Then dump the genome */
-  for (UInt32 i = 0; i < CMPGAAggregationLoopFunctions::GENOME_SIZE; ++i) {
+  for (UInt32 i = 0; i < CMPGAPhototaxisLoopFunctions::GENOME_SIZE; ++i) {
     cOFS << " " << s_ind.Genome[i];
   }
   /* End line */
@@ -36,13 +36,13 @@ Real RobotAggregationScorer(const std::vector<Real> &vec_scores) {
 
 int main() {
   CMPGA cGA(CRange<Real>(-1.0, 1.0),            // Allele range
-            CMPGAAggregationLoopFunctions::GENOME_SIZE,                         // Genome size
+            CMPGAPhototaxisLoopFunctions::GENOME_SIZE,                         // Genome size
             5,                                   // Population size
             0.05,                                // Mutation probability
             5,                                   // Number of trials
             100,                                 // Number of generations
             false,                               // Minimize score
-            "experiments/aggregation.argos",            // .argos conf file
+            "experiments/mpga.argos",            // .argos conf file
             &RobotAggregationScorer,             // The score aggregator
             12345                                // Random seed
   );

@@ -9,11 +9,11 @@
 
 using namespace argos;
 
-static const size_t GENOME_SIZE = 6;
-
 class CMPGAAggregationLoopFunctions : public CMPGALoopFunctions {
 
  public:
+
+  static const size_t GENOME_SIZE = 6;
 
   CMPGAAggregationLoopFunctions();
 
