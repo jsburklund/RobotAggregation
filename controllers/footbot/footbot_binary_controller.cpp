@@ -16,6 +16,8 @@ void CFootBotBinaryController::Init(TConfigurationNode &t_node) {
 
 void CFootBotBinaryController::ControlStep() {
   unsigned int I; // TODO: figure this out from other robots or mock sensor
+  m_pcWheels->SetLinearVelocity(-0.7, -1.0);
+  return;
   switch (I) {
     case 0: {
       m_pcWheels->SetLinearVelocity(params[0], params[1]);

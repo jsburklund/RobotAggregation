@@ -4,7 +4,7 @@
 #include "aggregation_loop_functions.h"
 
 CMPGAAggregationLoopFunctions::CMPGAAggregationLoopFunctions() :
-    m_vecInitSetup(5),
+    m_vecInitSetup(NUM_TRIALS),
     m_pcFootBot(nullptr),
     m_pcController(nullptr),
     m_pcRNG(nullptr) {}
@@ -12,10 +12,7 @@ CMPGAAggregationLoopFunctions::CMPGAAggregationLoopFunctions() :
 void CMPGAAggregationLoopFunctions::Init(TConfigurationNode &t_node) {
   m_pcRNG = CRandom::CreateRNG("argos");
 
-  m_pcFootBot = new CFootBotEntity(
-      "fb",    // entity id
-      "fbbinary"    // controller id as set in the XML
-  );
+  m_pcFootBot = new CFootBotEntity("0", "fb_binary");
   AddEntity(*m_pcFootBot);
   m_pcController = &dynamic_cast<CFootBotBinaryController &>(m_pcFootBot->GetControllableEntity().GetController());
 

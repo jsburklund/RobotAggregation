@@ -1,6 +1,6 @@
 #pragma once
 
-#include <controllers/footbot_nn/footbot_binary_controller.h>
+#include <controllers/footbot/footbot_binary_controller.h>
 
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
@@ -14,6 +14,8 @@ class CMPGAAggregationLoopFunctions : public CMPGALoopFunctions {
  public:
 
   static const size_t GENOME_SIZE = 6;
+
+  static const UInt32 NUM_TRIALS = 5;
 
   CMPGAAggregationLoopFunctions();
 
@@ -38,6 +40,5 @@ class CMPGAAggregationLoopFunctions : public CMPGALoopFunctions {
   CFootBotEntity *m_pcFootBot;
   CFootBotBinaryController *m_pcController;
   CRandom::CRNG *m_pcRNG;
-
 };
 

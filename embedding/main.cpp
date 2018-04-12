@@ -36,10 +36,10 @@ Real RobotAggregationScorer(const std::vector<Real> &vec_scores) {
 
 int main() {
   CMPGA cGA(CRange<Real>(-1.0, 1.0),            // Allele range
-            CMPGAAggregationLoopFunctions::GENOME_SIZE,                         // Genome size
+            CMPGAAggregationLoopFunctions::GENOME_SIZE, // Genome size
             5,                                   // Population size
             0.05,                                // Mutation probability
-            5,                                   // Number of trials
+            CMPGAAggregationLoopFunctions::NUM_TRIALS, // Number of trials
             100,                                 // Number of generations
             false,                               // Minimize score
             "experiments/aggregation.argos",            // .argos conf file

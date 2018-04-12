@@ -2,7 +2,7 @@
 #define MPGA_PHOTOTAXIS_LOOP_FUNCTIONS_H
 
 /* The NN controller */
-#include <controllers/footbot_nn/footbot_nn_controller.h>
+#include <controllers/footbot/footbot_nn_controller.h>
 
 /* ARGoS-related headers */
 #include <argos3/core/utility/math/rng.h>
