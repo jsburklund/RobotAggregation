@@ -13,7 +13,6 @@ class CMPGAAggregationLoopFunctions : public CMPGALoopFunctions {
 
  public:
 
-  static const size_t GENOME_SIZE = 6;
   static constexpr auto XML_CONTROLLER_ID = "fb_binary";
 
   CMPGAAggregationLoopFunctions();

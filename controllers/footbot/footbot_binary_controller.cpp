@@ -2,7 +2,7 @@
 
 static CRange<Real> WHEEL_ACTUATION_RANGE(-5.0f, 5.0f);
 
-CFootBotBinaryController::CFootBotBinaryController() : m_pcWheels(nullptr), params{0, 0, 0, 0} {
+CFootBotBinaryController::CFootBotBinaryController() : m_pcWheels(nullptr), m_params{0, 0, 0, 0} {
 }
 
 void CFootBotBinaryController::Init(TConfigurationNode &t_node) {
@@ -20,11 +20,11 @@ void CFootBotBinaryController::ControlStep() {
   return;
   switch (I) {
     case 0: {
-      m_pcWheels->SetLinearVelocity(params[0], params[1]);
+      m_pcWheels->SetLinearVelocity(m_params[0], m_params[1]);
       break;
     }
     case 1: {
-      m_pcWheels->SetLinearVelocity(params[2], params[3]);
+      m_pcWheels->SetLinearVelocity(m_params[2], m_params[3]);
       break;
     }
     default: {
@@ -33,16 +33,18 @@ void CFootBotBinaryController::ControlStep() {
   }
 }
 
-void CFootBotBinaryController::SetParameters(const size_t i, const Real *pDouble) {
-  if (i != 4) {
-    THROW_ARGOSEXCEPTION("Number of parameter mismatch: '"
-                             << "passed "
-                             << i
-                             << " parameters, while "
-                             << 4
-                             << " were expected from the XML configuration file");
+void CFootBotBinaryController::SetParameters(const size_t num_params, const Real *params) {
+  if (num_params != m_params.size()) {
+    THROW_ARGOSEXCEPTION("Number of parameter mismatch: passed "
+                             << num_params
+                             << " parameters, while GENE_SIZE is "
+                             << m_params.size());
+    return;
   }
 
+  for (size_t i = 0; i < num_params; ++i) {
+    m_params[i] = params[i];
+  }
 }
 
 REGISTER_CONTROLLER(CFootBotBinaryController, "footbot_binary_controller")

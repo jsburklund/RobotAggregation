@@ -151,7 +151,7 @@ void CMPGAAggregationLoopFunctions::PlaceCluster(const CVector2 &c_center,
 void CMPGAAggregationLoopFunctions::ConfigureFromGenome(const Real *genome) {
   /* Set the Binary parameters */
   for (const auto &robot_controller: m_controllers) {
-    robot_controller->SetParameters(GENOME_SIZE, genome);
+    robot_controller->SetParameters(CFootBotBinaryController::GENOME_SIZE, genome);
   }
 }
 
@@ -169,10 +169,11 @@ Real CMPGAAggregationLoopFunctions::Score() {
   auto accum_cost = [centroid](double cost, const CSpace::TMapPerType::value_type &p) {
     CFootBotEntity *pcFB = any_cast<CFootBotEntity *>(p.second);
     auto robot_position = pcFB->GetEmbodiedEntity().GetOriginAnchor().Position;
-    return cost + (robot_position - centroid).SquareLength();
+    auto c = (robot_position - centroid).SquareLength();
+    return cost + c;
   };
 
-  auto cost = std::accumulate(std::begin(tFBMap), std::end(tFBMap), 0, accum_cost) / tFBMap.size();
+  auto cost = std::accumulate(std::begin(tFBMap), std::end(tFBMap), 0.0, accum_cost);
   constexpr double ROBOT_RADIUS = 0.17;
   cost *= 1 / (4 * std::pow(ROBOT_RADIUS, 2));
 
