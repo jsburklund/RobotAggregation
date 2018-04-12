@@ -39,13 +39,14 @@ int main() {
             CMPGAAggregationLoopFunctions::GENOME_SIZE, // Genome size
             5,                                   // Population size
             0.05,                                // Mutation probability
-            CMPGAAggregationLoopFunctions::NUM_TRIALS, // Number of trials
+            5, // Number of trials
             100,                                 // Number of generations
             false,                               // Minimize score
             "experiments/aggregation.argos",            // .argos conf file
             &RobotAggregationScorer,             // The score aggregator
             12345                                // Random seed
   );
+  argos::LOG << "Evaluating\n";
   cGA.Evaluate();
   argos::LOG << "Generation #" << cGA.GetGeneration() << "...";
   argos::LOG << " scores:";

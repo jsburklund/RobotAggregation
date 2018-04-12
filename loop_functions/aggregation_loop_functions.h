@@ -14,8 +14,7 @@ class CMPGAAggregationLoopFunctions : public CMPGALoopFunctions {
  public:
 
   static const size_t GENOME_SIZE = 6;
-
-  static const UInt32 NUM_TRIALS = 5;
+  static constexpr auto XML_CONTROLLER_ID = "fb_binary";
 
   CMPGAAggregationLoopFunctions();
 
@@ -31,29 +30,12 @@ class CMPGAAggregationLoopFunctions : public CMPGALoopFunctions {
 
  private:
 
-   void PlaceLine(const CVector2& c_center,
-                  UInt32 un_robots,
-                  Real f_distance,
-                  UInt32 un_id_start);
+   void PlaceLine(const CVector2& c_center, UInt32 un_robots, Real f_distance, UInt32 un_id_start);
 
-   void PlaceCluster(const CVector2& c_center,
-                     UInt32 un_robots,
-                     Real f_density,
-                     UInt32 un_id_start);
+   void PlaceCluster(const CVector2& c_center, UInt32 un_robots, Real f_density, UInt32 un_id_start);
 
-   void PlaceScaleFree(const CVector2& c_center,
-                       UInt32 un_robots,
-                       Real f_range,
-                       UInt32 un_id_start);
-
-  struct SInitSetup {
-    CVector3 Position;
-    CQuaternion Orientation;
-  };
-
-  std::vector<SInitSetup> m_vecInitSetup;
-  CFootBotEntity *m_pcFootBot;
-  CFootBotBinaryController *m_pcController;
-  CRandom::CRNG *m_pcRNG;
+  CRandom::CRNG *m_rng;
+  std::vector<CFootBotBinaryController *> m_controllers;
+  std::vector<CFootBotEntity *> m_robots;
 };
 

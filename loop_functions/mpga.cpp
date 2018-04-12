@@ -70,10 +70,9 @@ CMPGA::CMPGA(const CRange<Real>& c_allele_range,
    CRandom::CreateCategory("ga", un_random_seed);
    m_pcRNG = CRandom::CreateRNG("ga");
    /* Create initial population */
-   SIndividual* psInd;
    for(size_t p = 0; p < m_unPopSize; ++p) {
       /* Create individual */
-      psInd = new SIndividual;
+      SIndividual* psInd = new SIndividual;
       psInd->Score = -1.0;
       /* Create random genome */
       for(size_t g = 0; g < m_unGenomeSize; ++g) {

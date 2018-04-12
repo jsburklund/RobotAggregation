@@ -23,8 +23,7 @@
   <!-- *************** -->
   <controllers>
 
-    <footbot_binary_controller id="fb_binary"
-                           library="build/controllers/footbot/libfootbot_binary">
+    <footbot_binary_controller id="fb_binary" library="build/controllers/footbot/libfootbot_binary">
       <actuators>
         <differential_steering implementation="default" />
       </actuators>
@@ -44,8 +43,7 @@
   <loop_functions library="build/loop_functions/libaggregation_loop_functions"
                   label="aggregation_loop_functions"
                   trial="0">
-
-  <line      LineEnd="1,1" robot_num="3" robot_distance="0.5" />
+    <line LineEnd="1,1" robot_num="3" robot_distance="0.5" />
   </loop_functions>
 
   <!-- *********************** -->
