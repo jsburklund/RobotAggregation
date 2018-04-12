@@ -31,6 +31,21 @@ class CMPGAAggregationLoopFunctions : public CMPGALoopFunctions {
 
  private:
 
+   void PlaceLine(const CVector2& c_center,
+                  UInt32 un_robots,
+                  Real f_distance,
+                  UInt32 un_id_start);
+
+   void PlaceCluster(const CVector2& c_center,
+                     UInt32 un_robots,
+                     Real f_density,
+                     UInt32 un_id_start);
+
+   void PlaceScaleFree(const CVector2& c_center,
+                       UInt32 un_robots,
+                       Real f_range,
+                       UInt32 un_id_start);
+
   struct SInitSetup {
     CVector3 Position;
     CQuaternion Orientation;

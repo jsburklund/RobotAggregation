@@ -43,7 +43,10 @@
   <!-- Attribute 'trial' contains which trial to run (values: [0-4]) -->
   <loop_functions library="build/loop_functions/libaggregation_loop_functions"
                   label="aggregation_loop_functions"
-                  trial="0" />
+                  trial="0">
+
+  <line      LineEnd="1,1" robot_num="3" robot_distance="0.5" />
+  </loop_functions>
 
   <!-- *********************** -->
   <!-- * Arena configuration * -->
