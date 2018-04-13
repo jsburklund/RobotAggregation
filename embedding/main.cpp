@@ -46,7 +46,6 @@ int main() {
             &RobotAggregationScorer,             // The score aggregator
             12345                                // Random seed
   );
-  argos::LOG << "Evaluating\n";
   cGA.Evaluate();
   argos::LOG << "Generation #" << cGA.GetGeneration() << "...";
   argos::LOG << " scores:";

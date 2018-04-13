@@ -1,3 +1,4 @@
+#include <argos3/core/utility/logging/argos_log.h>
 #include "footbot_binary_controller.h"
 
 static CRange<Real> WHEEL_ACTUATION_RANGE(-5.0f, 5.0f);
@@ -39,7 +40,6 @@ void CFootBotBinaryController::SetParameters(const size_t num_params, const Real
                              << num_params
                              << " parameters, while GENE_SIZE is "
                              << m_params.size());
-    return;
   }
 
   for (size_t i = 0; i < num_params; ++i) {

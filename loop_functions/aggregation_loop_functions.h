@@ -29,12 +29,18 @@ class CMPGAAggregationLoopFunctions : public CMPGALoopFunctions {
 
  private:
 
-   void PlaceLine(const CVector2& c_center, UInt32 un_robots, Real f_distance, UInt32 un_id_start);
+  void PlaceLine(const CVector2 &c_center, UInt32 un_robots, Real f_distance, UInt32 un_id_start);
 
-   void PlaceCluster(const CVector2& c_center, UInt32 un_robots, Real f_density, UInt32 un_id_start);
+  void PlaceCluster(const CVector2 &c_center, UInt32 un_robots, Real f_density, UInt32 un_id_start);
+
+  struct RobotAndInitialPose {
+    CFootBotEntity *robot;
+    CVector3 position;
+    CQuaternion orientation;
+  };
 
   CRandom::CRNG *m_rng;
   std::vector<CFootBotBinaryController *> m_controllers;
-  std::vector<CFootBotEntity *> m_robots;
+  std::vector<RobotAndInitialPose> m_robots;
 };
 

@@ -1,26 +1,12 @@
 <?xml version="1.0" ?>
 
-<!-- *************************************************** -->
-<!-- * A fully commented XML is diffusion_1.xml. Refer * -->
-<!-- * to it to have full information about what       * -->
-<!-- * these options mean.                             * -->
-<!-- *************************************************** -->
-
 <argos-configuration>
 
-  <!-- ************************* -->
-  <!-- * General configuration * -->
-  <!-- ************************* -->
   <framework>
     <system threads="0" />
-    <experiment length="120"
-                ticks_per_second="10"
-                random_seed="312" />
+    <experiment length="100" ticks_per_second="10" random_seed="0" />
   </framework>
 
-  <!-- *************** -->
-  <!-- * Controllers * -->
-  <!-- *************** -->
   <controllers>
 
     <footbot_binary_controller id="fb_binary" library="build/controllers/footbot/libfootbot_binary">
@@ -36,26 +22,12 @@
 
   </controllers>
 
-  <!-- ****************** -->
-  <!-- * Loop functions * -->
-  <!-- ****************** -->
   <!-- Attribute 'trial' contains which trial to run (values: [0-4]) -->
-  <loop_functions library="build/loop_functions/libaggregation_loop_functions"
-                  label="aggregation_loop_functions"
-                  trial="0">
-    <line LineEnd="1,1" robot_num="3" robot_distance="0.5" />
+  <loop_functions library="build/loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" trial="0">
+    <line center="1,1" robot_num="3" robot_distance="0.5" />
   </loop_functions>
 
-  <!-- *********************** -->
-  <!-- * Arena configuration * -->
-  <!-- *********************** -->
   <arena size="6, 6, 2" center="2.5,2.5,1">
-
-    <!--
-        Here we just put the static elements of the environment
-        The dynamic ones, in this case the foot-bot, are placed by the
-        loop functions at the beginning of each experimental run.
-    -->
 
     <box id="wall_north" size="5,0.1,0.5" movable="false">
       <body position="2.5,5,0" orientation="0,0,0" />
@@ -75,23 +47,14 @@
 
   </arena>
 
-  <!-- ******************* -->
-  <!-- * Physics engines * -->
-  <!-- ******************* -->
   <physics_engines>
     <dynamics2d id="dyn2d" />
   </physics_engines>
 
-  <!-- ********* -->
-  <!-- * Media * -->
-  <!-- ********* -->
   <media>
     <led id="leds" />
   </media>
 
-  <!-- ****************** -->
-  <!-- * Visualization * -->
-  <!-- ****************** -->
   <visualization>
     <qt-opengl>
       <camera>

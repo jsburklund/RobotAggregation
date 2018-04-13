@@ -40,7 +40,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="build/loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions">
-    <line LineEnd="1,1" robot_num="3" robot_distance="0.5" />
+    <line center="1,1" robot_num="3" robot_distance="0.5" />
   </loop_functions>
 
   <!-- *********************** -->
