@@ -89,7 +89,7 @@ CMPGA::CMPGA(const CRange<Real> &c_allele_range,
   /* The master sleeps to give enough time to the slaves to
    * initialize and suspend properly. If not enough time is given
    * here, the master will hang later on. */
-  ::sleep(3);
+  ::sleep(1);
 }
 
 /****************************************/

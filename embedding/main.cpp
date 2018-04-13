@@ -3,7 +3,9 @@
  * uses multiple processes to parallelize the optimization process.
  */
 
+#include <algorithm>
 #include <iostream>
+#include <functional>
 #include <fstream>
 #include <loop_functions/mpga.h>
 #include <loop_functions/aggregation_loop_functions.h>
@@ -27,11 +29,8 @@ void FlushIndividual(const CMPGA::SIndividual &s_ind,
 }
 
 Real RobotAggregationScorer(const std::vector<Real> &vec_scores) {
-  Real fScore = vec_scores[0];
-  for (size_t i = 1; i < vec_scores.size(); ++i) {
-    fScore = Max(fScore, vec_scores[i]);
-  }
-  return fScore;
+  auto max = std::max_element(begin(vec_scores), end(vec_scores));
+  return *max;
 }
 
 int main() {

@@ -6,13 +6,14 @@
 CMPGAAggregationLoopFunctions::CMPGAAggregationLoopFunctions() : m_rng(nullptr) {}
 
 void CMPGAAggregationLoopFunctions::Init(TConfigurationNode &t_node) {
-  m_rng = CRandom::CreateRNG("argos");
-
   try {
-    /*
-     * Parse the configuration file
-     */
+    UInt32 seed;
+    GetNodeAttribute(t_node, "random_seed", seed);
+    CRandom::CreateCategory("aggregation_loop_function", seed);
+    m_rng = CRandom::CreateRNG("aggregation_loop_function");
+
     UInt32 unPlacedRobots = 0;
+
     /* Go through the nodes */
     TConfigurationNodeIterator itDistr;
     for (itDistr = itDistr.begin(&t_node); itDistr != itDistr.end(); ++itDistr) {
@@ -32,7 +33,6 @@ void CMPGAAggregationLoopFunctions::Init(TConfigurationNode &t_node) {
 
       /* Number of robots to place */
       UInt32 unRobots;
-
       GetNodeAttribute(tDistr, "robot_num", unRobots);
       /* Parse distribution-specific attributes and place robots */
       if (itDistr->Value() == "line") {
@@ -60,9 +60,9 @@ void CMPGAAggregationLoopFunctions::Init(TConfigurationNode &t_node) {
    * Process trial information, if any
    */
   try {
-    UInt32 unTrial;
-    GetNodeAttribute(t_node, "trial", unTrial);
-    SetTrial(unTrial);
+    UInt32 trial;
+    GetNodeAttribute(t_node, "trial", trial);
+    SetTrial(trial);
     Reset();
   }
   catch (CARGoSException &ex) {}
@@ -75,9 +75,10 @@ void CMPGAAggregationLoopFunctions::Reset() {
     // TODO: orientation noise? better way to construct CVector3 of gaussian noise?
     CVector3 position_noise{m_rng->Gaussian(0.1, 0.0), m_rng->Gaussian(0.1, 0.0), m_rng->Gaussian(0.1, 0.0)};
     auto position = position_noise + robot_and_initial_pose.position;
+    LOG << position << "\n";
     auto success = MoveEntity(entity, position, robot_and_initial_pose.orientation, false);
     if (!success) {
-      LOGERR << "Can't move robot " << entity.GetId() << "\n";
+      LOGERR << "Can't move robot " << entity.GetId() << " to " << position << "\n";
     }
   }
 }
