@@ -37,6 +37,7 @@ class CFootBotBinaryController : public CCI_Controller {
   /* Pointer to the range-and-bearing sensor */
   CCI_RangeAndBearingSensor* m_pcRABSens;
   // Robot Id number 0-N
-  int my_id;
+  unsigned int my_id;
+  unsigned int my_group;
 };
 
