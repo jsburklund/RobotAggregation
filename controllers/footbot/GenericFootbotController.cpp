@@ -1,13 +1,11 @@
 #include <argos3/core/utility/logging/argos_log.h>
-#include "footbot_binary_controller.h"
+#include "GenericFootbotController.h"
 
 #include <cstdio>
 
-static CRange<Real> WHEEL_ACTUATION_RANGE(-5.0, 5.0);
-
-CFootBotBinaryController::CFootBotBinaryController()
-    : m_pcWheels(nullptr),
-      m_params{0, 0, 0, 0},
+GenericFootbotController::GenericFootbotController()
+    : m_params{0, 0, 0, 0},
+      m_pcWheels(nullptr),
       m_pcRABAct(nullptr),
       m_pcRABSens(nullptr),
       m_pcLEDs(nullptr),
@@ -15,7 +13,7 @@ CFootBotBinaryController::CFootBotBinaryController()
       my_group(0ul) {
 }
 
-void CFootBotBinaryController::Init(TConfigurationNode &t_node) {
+void GenericFootbotController::Init(TConfigurationNode &t_node) {
   try {
     m_pcWheels = GetActuator<CCI_DifferentialSteeringActuator>("differential_steering");
     m_pcRABAct = GetActuator<CCI_RangeAndBearingActuator>("range_and_bearing");
@@ -67,8 +65,9 @@ void CFootBotBinaryController::Init(TConfigurationNode &t_node) {
   my_id = std::stoul(my_idstr, &pos);
 
   // Set group based on ID modulo some number
-  // TODO: make this modulo a parameter
-  my_group = my_id % 2;
+  UInt8 num_classes;
+  GetNodeAttributeOrDefault(t_node, "num_classes ", num_classes, 1);
+  my_group = my_id % num_classes;
 
   switch (my_group) {
     case 0: m_pcLEDs->SetAllColors(CColor::BLUE);
@@ -88,24 +87,12 @@ void CFootBotBinaryController::Init(TConfigurationNode &t_node) {
   Reset();
 }
 
-void CFootBotBinaryController::Reset() {
-  // Setup the robot and group id data to send
-  m_pcRABAct->SetData(0, (uint8_t) my_group);  //TODO Only supports 256 groups for now
+void GenericFootbotController::Reset() {
+  // not this only supports 256 groups
+  m_pcRABAct->SetData(0, (uint8_t) my_group);
 }
 
-void CFootBotBinaryController::ControlStep() {
-  bool sens_state = GetKinSensorVal();
-
-  if (sens_state) {
-    // Saw a robot of the same type
-    m_pcWheels->SetLinearVelocity(20 * m_params[0], 20 * m_params[1]);
-  } else {
-    // Saw nothing or a robot of different type
-    m_pcWheels->SetLinearVelocity(20 * m_params[2], 20 * m_params[3]);
-  }
-}
-
-void CFootBotBinaryController::SetParameters(const size_t num_params, const Real *params) {
+void GenericFootbotController::SetParameters(const size_t num_params, const Real *params) {
   if (num_params != m_params.size()) {
     THROW_ARGOSEXCEPTION("Number of parameter mismatch: passed "
                              << num_params
@@ -121,36 +108,25 @@ void CFootBotBinaryController::SetParameters(const size_t num_params, const Real
 
 }
 
-/* Simulate a kin/nothing/non-kin type sensor with limited viewing range
- * Returns true if a robot in the same group is the closest thing within
- * the viewing angle.
- */
-bool CFootBotBinaryController::GetKinSensorVal() {
-  // Get the other robots range and bearing
+GenericFootbotController::SensorState GenericFootbotController::GetKinSensorVal() {
   const CCI_RangeAndBearingSensor::TReadings &tMsgs = m_pcRABSens->GetReadings();
-  // Look at all robots that have sent a message
-  if (!tMsgs.empty()) {
-    Real closest_range = INFINITY;  // Closest robot detected so far
-    bool sens_state = false;        // Assume that a robot is in view of the camera
 
-    // Parse all of the other robots detected
+  auto sens_state = SensorState::NOTHING;
+  if (!tMsgs.empty()) {
+    Real closest_range = INFINITY;
+
     for (const auto &tMsg : tMsgs) {
-      // Check if the neighbor is in view of the camera
       Real bearing = tMsg.HorizontalBearing.GetValue();
       Real range = tMsg.Range;
       if (bearing < kCAM_VIEW_ANG && bearing > -kCAM_VIEW_ANG) {
-        //Robot is in view of the camera, check to see if it is the closest
         if (range < closest_range) {
           closest_range = range;
           uint8_t robot_group = tMsg.Data[0];
-          sens_state = (my_group == robot_group);
+          sens_state = (my_group == robot_group) ? SensorState::KIN : SensorState::NONKIN;
         }
       }
     }
-    return sens_state;
   }
 
-  return false;
+  return sens_state;
 }
-
-REGISTER_CONTROLLER(CFootBotBinaryController, "footbot_binary_controller")

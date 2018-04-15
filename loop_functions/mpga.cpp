@@ -312,7 +312,7 @@ void CMPGA::Mutation() {
   for (UInt32 i = 2; i < m_unPopSize; ++i) {
     for (UInt32 a = 0; a < m_unGenomeSize; ++a) {
       if (m_pcRNG->Bernoulli(m_fMutationProb))
-        m_tPopulation[i]->Genome[a] = m_pcRNG->Uniform(m_cAlleleRange);
+        m_tPopulation[i]->Genome[a] += m_pcRNG->Uniform(m_cAlleleRange) * 0.05;
     }
   }
 }
@@ -320,8 +320,7 @@ void CMPGA::Mutation() {
 /****************************************/
 /****************************************/
 
-CMPGA::CSharedMem::CSharedMem(UInt32 un_genome_size,
-                              UInt32 un_pop_size) :
+CMPGA::CSharedMem::CSharedMem(UInt32 un_genome_size, UInt32 un_pop_size) :
     m_unGenomeSize(un_genome_size),
     m_unPopSize(un_pop_size) {
   /* Create shared memory area for master-slave communication */

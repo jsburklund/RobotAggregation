@@ -10,35 +10,39 @@
 
 using namespace argos;
 
-class CFootBotBinaryController : public CCI_Controller {
+class GenericFootbotController : public CCI_Controller {
 
  public:
 
+  enum class SensorState : unsigned int {
+    NOTHING = 0,
+    KIN = 1,
+    NONKIN = 2
+  };
+
   static const size_t GENOME_SIZE = 6;
 
-  CFootBotBinaryController();
+  GenericFootbotController();
 
   void Init(TConfigurationNode &t_node) override;
 
   void Reset() override;
 
-  void ControlStep() override;
+  void ControlStep() override = 0;
 
   void SetParameters(size_t num_params, const Real *params);
 
-  bool GetKinSensorVal();
+  SensorState GetKinSensorVal();
 
- private:
-
-  CCI_DifferentialSteeringActuator *m_pcWheels;
   std::array<Real, GENOME_SIZE> m_params;
-  CCI_RangeAndBearingActuator* m_pcRABAct;
-  CCI_RangeAndBearingSensor* m_pcRABSens;
-  CCI_LEDsActuator* m_pcLEDs;
+  CCI_DifferentialSteeringActuator *m_pcWheels;
+  CCI_RangeAndBearingActuator *m_pcRABAct;
+  CCI_RangeAndBearingSensor *m_pcRABSens;
+  CCI_LEDsActuator *m_pcLEDs;
 
   // Robot Id number 0-N
   unsigned long my_id;
   unsigned long my_group;
-  Real kCAM_VIEW_ANG = 15 * 3.141593/180.0;
+  Real kCAM_VIEW_ANG = 15 * 3.141593 / 180.0;
 };
 

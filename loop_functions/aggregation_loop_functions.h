@@ -1,6 +1,6 @@
 #pragma once
 
-#include <controllers/footbot/footbot_binary_controller.h>
+#include <controllers/footbot/GenericFootbotController.h>
 
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
@@ -13,7 +13,7 @@ class CMPGAAggregationLoopFunctions : public CMPGALoopFunctions {
 
  public:
 
-  static constexpr auto XML_CONTROLLER_ID = "fb_binary";
+  static constexpr auto XML_CONTROLLER_ID = "fb_aggregation";
 
   CMPGAAggregationLoopFunctions();
 
@@ -40,7 +40,7 @@ class CMPGAAggregationLoopFunctions : public CMPGALoopFunctions {
   };
 
   CRandom::CRNG *m_rng;
-  std::vector<CFootBotBinaryController *> m_controllers;
+  std::vector<GenericFootbotController *> m_controllers;
   std::vector<RobotAndInitialPose> m_robots;
 };
 

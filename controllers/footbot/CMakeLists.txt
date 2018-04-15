@@ -12,8 +12,9 @@ target_link_libraries(footbot_nn
                       argos3plugin_simulator_footbot
                       argos3plugin_simulator_genericrobot)
 
-add_library(footbot_binary SHARED footbot_binary_controller.cpp)
-target_link_libraries(footbot_binary
+add_library(footbot_aggregation SHARED AggregationController.cpp GenericFootbotController.cpp)
+
+target_link_libraries(footbot_aggregation
                       argos3core_simulator
                       argos3plugin_simulator_footbot
                       argos3plugin_simulator_genericrobot)

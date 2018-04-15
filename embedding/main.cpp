@@ -19,9 +19,9 @@ void FlushIndividual(const CMPGA::SIndividual &s_ind,
   cOSS << ".best_" << un_generation << ".dat";
   std::ofstream cOFS(cOSS.str().c_str(), std::ios::out | std::ios::trunc);
   /* First write the number of values to dump */
-  cOFS << CFootBotBinaryController::GENOME_SIZE;
+  cOFS << GenericFootbotController::GENOME_SIZE;
   /* Then dump the genome */
-  for (UInt32 i = 0; i < CFootBotBinaryController::GENOME_SIZE; ++i) {
+  for (UInt32 i = 0; i < GenericFootbotController::GENOME_SIZE; ++i) {
     cOFS << " " << s_ind.Genome[i];
   }
   /* End line */
@@ -35,11 +35,11 @@ Real RobotAggregationScorer(const std::vector<Real> &vec_scores) {
 
 int main() {
   CMPGA cGA(CRange<Real>(-1.0, 1.0),            // Allele range
-            CFootBotBinaryController::GENOME_SIZE, // Genome size
+            GenericFootbotController::GENOME_SIZE, // Genome size
             10,                                   // Population size
             0.05,                                // Mutation probability
-            10, // Number of trials
-            20,                                 // Number of generations
+            5, // Number of trials
+            1,                                 // Number of generations
             false,                               // Minimize score
             "experiments/aggregation.argos",            // .argos conf file
             &RobotAggregationScorer,             // The score aggregator

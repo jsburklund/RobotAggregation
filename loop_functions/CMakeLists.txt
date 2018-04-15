@@ -4,7 +4,7 @@ target_link_libraries(mpga argos3core_simulator rt)
 add_library(aggregation_loop_functions SHARED aggregation_loop_functions.cpp)
 
 target_link_libraries(aggregation_loop_functions
-                      footbot_binary
+                      footbot_aggregation
                       argos3core_simulator
                       argos3plugin_simulator_dynamics2d
                       argos3plugin_simulator_entities

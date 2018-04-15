@@ -99,7 +99,7 @@ void CMPGAAggregationLoopFunctions::PlaceLine(const CVector2 &c_center,
       auto robot =
           new CFootBotEntity(cFBId.str(), XML_CONTROLLER_ID, position, orientation);
       AddEntity(*robot);
-      auto controller = &dynamic_cast<CFootBotBinaryController &>(robot->GetControllableEntity().GetController());
+      auto controller = &dynamic_cast<GenericFootbotController &>(robot->GetControllableEntity().GetController());
       m_controllers.emplace_back(controller);
       m_robots.emplace_back(RobotAndInitialPose{robot, position, orientation});
     }
@@ -124,7 +124,7 @@ void CMPGAAggregationLoopFunctions::PlaceCluster(const CVector2 &c_center,
       /* Create the robot in the origin and add it to ARGoS space */
       auto robot = new CFootBotEntity(cFBId.str(), XML_CONTROLLER_ID);
       AddEntity(*robot);
-      auto controller = &dynamic_cast<CFootBotBinaryController &>(robot->GetControllableEntity().GetController());
+      auto controller = &dynamic_cast<GenericFootbotController &>(robot->GetControllableEntity().GetController());
       m_controllers.emplace_back(controller);
 
       /* Try to place it in the arena */
@@ -155,7 +155,7 @@ void CMPGAAggregationLoopFunctions::PlaceCluster(const CVector2 &c_center,
 void CMPGAAggregationLoopFunctions::ConfigureFromGenome(const Real *genome) {
   /* Set the Binary parameters */
   for (const auto &robot_controller: m_controllers) {
-    robot_controller->SetParameters(CFootBotBinaryController::GENOME_SIZE, genome);
+    robot_controller->SetParameters(GenericFootbotController::GENOME_SIZE, genome);
   }
 }
 
@@ -183,7 +183,7 @@ Real CMPGAAggregationLoopFunctions::Score() {
   constexpr double ROBOT_RADIUS = 0.17;
   cost *= 1 / (4 * std::pow(ROBOT_RADIUS, 2));
 
-  return cost;
+  return -cost;
 }
 
 REGISTER_LOOP_FUNCTIONS(CMPGAAggregationLoopFunctions, "aggregation_loop_functions")
