@@ -6,7 +6,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-def compute_dispersion(poses_over_time, robot_radius=0.07):
+def compute_dispersion(poses_over_time, robot_radius):
     centroid = poses_over_time.mean(axis=0)
     dispersion = 1 / (4 * robot_radius ** 2) * np.sum(np.linalg.norm(poses_over_time - centroid, axis=2) ** 2, axis=1)
     return dispersion
@@ -16,6 +16,7 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('log_directories', nargs='+')
+    parser.add_argument('--robot-radius', type=float, default=0.0704)
 
     args = parser.parse_args()
 
@@ -37,14 +38,18 @@ def main():
 
         poses = np.array(poses)[:, :, 1:]
         poses = np.transpose(poses, [1, 0, 2])
-        dispersion_over_time = compute_dispersion(poses)
+        dispersion_over_time = compute_dispersion(poses, args.robot_radius)
         dispersion_by_trial.append(dispersion_over_time)
         plt.plot(dispersion_over_time, color='black', alpha=0.2)
 
     mean_dispersion = np.mean(dispersion_by_trial, axis=0)
 
+    opt_pack =  0.1482 / (4 * args.robot_radius ** 2)
+    print("minimum dispersion from trials, optimal dispersion")
+    print(np.min(dispersion_by_trial), opt_pack)
+
     plt.plot(mean_dispersion, color='red', label='mean')
-    plt.plot([0, mean_dispersion.shape[0]], [7.5612244898, 7.5612244898], label='optimal', color='green')
+    plt.plot([0, mean_dispersion.shape[0]], [opt_pack, opt_pack], label='optimal', color='green')
     plt.title("Robot Dispersion over Time")
     plt.xlabel("Time, t (s)")
     plt.ylabel("Robot dispersion, u(t)")
