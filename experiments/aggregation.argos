@@ -27,9 +27,11 @@
     <footbot_binary_controller id="fb_binary" library="build/controllers/footbot/libfootbot_binary">
       <actuators>
         <differential_steering implementation="default" />
+        <range_and_bearing implementation="default" />
       </actuators>
       <sensors>
         <footbot_proximity implementation="default" show_rays="false" />
+        <range_and_bearing implementation="medium" medium="rab" />
       </sensors>
       <params parameter_file="embedding/mpga/best_100.dat" />
     </footbot_binary_controller>
@@ -84,6 +86,7 @@
   <!-- ********* -->
   <media>
     <led id="leds" />
+    <range_and_bearing id="rab" />
   </media>
 
   <!-- ****************** -->
