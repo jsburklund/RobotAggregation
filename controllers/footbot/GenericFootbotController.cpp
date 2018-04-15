@@ -66,22 +66,24 @@ void GenericFootbotController::Init(TConfigurationNode &t_node) {
 
   // Set group based on ID modulo some number
   UInt8 num_classes;
-  GetNodeAttributeOrDefault(t_node, "num_classes ", num_classes, 1);
+  GetNodeAttributeOrDefault(t_node, "num_classes", num_classes, 1);
   my_group = my_id % num_classes;
 
-  switch (my_group) {
-    case 0: m_pcLEDs->SetAllColors(CColor::BLUE);
-      break;
-    case 1: m_pcLEDs->SetAllColors(CColor::GREEN);
-      break;
-    case 2: m_pcLEDs->SetAllColors(CColor::PURPLE);
-      break;
-    case 3: m_pcLEDs->SetAllColors(CColor::YELLOW);
-      break;
-    case 5: m_pcLEDs->SetAllColors(CColor::ORANGE);
-      break;
-    default: m_pcLEDs->SetAllColors(CColor::RED);
-      break;
+  for (UInt32 led_id = 0; led_id < m_pcLEDs->GetNumLEDs()/2; ++led_id) {
+    switch (my_group) {
+      case 0: m_pcLEDs->SetSingleColor(led_id, CColor::ORANGE);
+        break;
+      case 1: m_pcLEDs->SetSingleColor(led_id, CColor::GREEN);
+        break;
+      case 2: m_pcLEDs->SetSingleColor(led_id, CColor::PURPLE);
+        break;
+      case 3: m_pcLEDs->SetSingleColor(led_id, CColor::YELLOW);
+        break;
+      case 4: m_pcLEDs->SetSingleColor(led_id, CColor::BLUE);
+        break;
+      default: m_pcLEDs->SetSingleColor(led_id, CColor::RED);
+        break;
+    }
   }
 
   Reset();
@@ -125,6 +127,17 @@ GenericFootbotController::SensorState GenericFootbotController::GetKinSensorVal(
           sens_state = (my_group == robot_group) ? SensorState::KIN : SensorState::NONKIN;
         }
       }
+    }
+  }
+
+  for (UInt32 led_id = static_cast<UInt32>(m_pcLEDs->GetNumLEDs()/2); led_id < m_pcLEDs->GetNumLEDs(); ++led_id) {
+    switch (sens_state) {
+      case SensorState::KIN: m_pcLEDs->SetSingleColor(led_id, CColor::BLUE);
+        break;
+      case SensorState::NONKIN: m_pcLEDs->SetSingleColor(led_id, CColor::RED);
+        break;
+      case SensorState::NOTHING: m_pcLEDs->SetSingleColor(led_id, CColor::WHITE);
+        break;
     }
   }
 

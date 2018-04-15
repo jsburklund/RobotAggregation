@@ -4,26 +4,28 @@
 
   <framework>
     <system threads="0" />
-    <experiment length="120" ticks_per_second="10" random_seed="312" />
+    <experiment length="100" ticks_per_second="10" random_seed="0" />
   </framework>
 
   <controllers>
 
-    <footbot_aggregation_controller id="fb_aggregation" library="build/controllers/footbot/libfootbot_aggregation">
+    <footbot_segregation_controller id="fb_aggregation" library="build/controllers/footbot/libfootbot_segregation">
       <actuators>
         <differential_steering implementation="default" />
         <range_and_bearing implementation="default" />
         <leds implementation="default" medium="leds" />
       </actuators>
       <sensors>
-        <range_and_bearing implementation="medium" medium="rab" show_rays="false"/>
+        <range_and_bearing implementation="medium" medium="rab" show_rays="false" />
       </sensors>
-      <params num_classes="1" />
-    </footbot_aggregation_controller>
+      <params parameter_file="embedding/test_params.dat" num_classes="3" />
+    </footbot_segregation_controller>
 
   </controllers>
 
-  <loop_functions library="build/loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" random_seed="0">
+  <loop_functions library="build/loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" trial="0" random_seed="0">
+    <!--<line center="2.5,2.5" robot_num="10" robot_distance="0.5" />-->
+    <cluster center="2.5,2.5" robot_num="10" robot_density="0.1" />
   </loop_functions>
 
   <arena size="6, 6, 2" center="2.5,2.5,1">
@@ -55,7 +57,12 @@
     <range_and_bearing id="rab" />
   </media>
 
-  <!-- We don't want nor need a visualization during evolution -->
-  <visualization />
+  <visualization>
+    <qt-opengl>
+      <camera>
+        <placement idx="0" position="2.5,2.5,6" look_at="2.5,2.5,0" lens_focal_length="30" />
+      </camera>
+    </qt-opengl>
+  </visualization>
 
 </argos-configuration>

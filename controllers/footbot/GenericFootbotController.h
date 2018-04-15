@@ -21,6 +21,7 @@ class GenericFootbotController : public CCI_Controller {
   };
 
   static const size_t GENOME_SIZE = 6;
+  constexpr static auto SCALE = 20.0;
 
   GenericFootbotController();
 

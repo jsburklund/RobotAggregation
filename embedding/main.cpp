@@ -10,6 +10,8 @@
 #include <loop_functions/mpga.h>
 #include <loop_functions/aggregation_loop_functions.h>
 
+#include "args.h"
+
 /*
  * Flush best individual
  */
@@ -33,17 +35,32 @@ Real RobotAggregationScorer(const std::vector<Real> &vec_scores) {
   return *max;
 }
 
-int main() {
-  CMPGA cGA(CRange<Real>(-1.0, 1.0),            // Allele range
+int main(int argc, const char **argv) {
+  args::ArgumentParser parser("main");
+  args::Positional<std::string> argos_filename(parser, "argos_filename", "", args::Options::Required);
+
+  try {
+    parser.ParseCLI(argc, argv);
+  }
+  catch (args::Help &e) {
+    std::cout << parser;
+    return 0;
+  }
+  catch (args::RequiredError &e) {
+    std::cout << parser;
+    return 0;
+  }
+
+  CMPGA cGA(CRange<Real>(-1.0, 1.0),               // Allele range
             GenericFootbotController::GENOME_SIZE, // Genome size
-            10,                                   // Population size
-            0.05,                                // Mutation probability
-            5, // Number of trials
-            1,                                 // Number of generations
-            false,                               // Minimize score
-            "experiments/aggregation.argos",            // .argos conf file
-            &RobotAggregationScorer,             // The score aggregator
-            12345                                // Random seed
+            10,                                    // Population size
+            0.05,                                  // Mutation probability
+            5,                                     // Number of trials
+            1,                                     // Number of generations
+            false,                                 // Minimize score
+            args::get(argos_filename),             // .argos conf file
+            &RobotAggregationScorer,               // The score aggregator
+            12345                                  // Random seed
   );
   cGA.Evaluate();
   argos::LOG << "Generation #" << cGA.GetGeneration() << "...";

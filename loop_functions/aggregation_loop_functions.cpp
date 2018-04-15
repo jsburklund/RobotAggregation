@@ -95,9 +95,8 @@ void CMPGAAggregationLoopFunctions::PlaceLine(const CVector2 &c_center,
 
       /* Create the robot in the origin and add it to ARGoS space */
       auto position = CVector3{f_distance * j + c_center.GetX(), f_distance * j + c_center.GetY(), 0};
-      CQuaternion orientation;
-      auto robot =
-          new CFootBotEntity(cFBId.str(), XML_CONTROLLER_ID, position, orientation);
+      CQuaternion orientation = CQuaternion{m_rng->Uniform(CRadians::UNSIGNED_RANGE), CVector3::Z};
+      auto robot = new CFootBotEntity(cFBId.str(), XML_CONTROLLER_ID, position, orientation);
       AddEntity(*robot);
       auto controller = &dynamic_cast<GenericFootbotController &>(robot->GetControllableEntity().GetController());
       m_controllers.emplace_back(controller);
@@ -114,7 +113,9 @@ void CMPGAAggregationLoopFunctions::PlaceCluster(const CVector2 &c_center,
                                                  Real f_density,
                                                  UInt32 un_id_start) {
   try {
-    CRange<Real> cAreaRange(-4, 4);
+    Real fHalfSide = Sqrt((M_PI * Square(0.085036758f) * n_robots) / f_density) / 2.0f;
+    CRange<Real> cAreaRange(-fHalfSide, fHalfSide);
+
     std::ostringstream cFBId;
 
     for (size_t i = 0; i < n_robots; ++i) {

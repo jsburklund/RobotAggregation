@@ -1,6 +1,5 @@
 add_executable(mpga_aggregation main.cpp)
 target_link_libraries(mpga_aggregation
-                      footbot_aggregation
                       aggregation_loop_functions
                       argos3core_simulator)
 

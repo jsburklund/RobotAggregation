@@ -13,8 +13,13 @@ target_link_libraries(footbot_nn
                       argos3plugin_simulator_genericrobot)
 
 add_library(footbot_aggregation SHARED AggregationController.cpp GenericFootbotController.cpp)
-
 target_link_libraries(footbot_aggregation
+                      argos3core_simulator
+                      argos3plugin_simulator_footbot
+                      argos3plugin_simulator_genericrobot)
+
+add_library(footbot_segregation SHARED SegregationController.cpp GenericFootbotController.cpp)
+target_link_libraries(footbot_segregation
                       argos3core_simulator
                       argos3plugin_simulator_footbot
                       argos3plugin_simulator_genericrobot)
