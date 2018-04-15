@@ -1,7 +1,6 @@
-include "aggregation/logs/params.bzz"
-
 # Attempts to reproduce the aggregation behavior with a
 # binary sensor like in Gaucci's paper.
+params = {.vl0=0.7, .vr0=1.0, .vl1=-1.0, .vr1=1.0}
 
 kSENSE_ANGLE = 15*math.pi/180
 
@@ -22,9 +21,8 @@ function sees_any_robot(rid, data, sees_robot) {
 
 # This function is executed every time you press the 'execute' button
 function init() {
-  var filepath = string.concat("./aggregation/logs/robot_",string.tostring(id),".log")
+  var filepath = string.concat("./logs/robot_",string.tostring(id),".log")
   f = io.fopen(filepath, "w")
-  t = 0
 }
 
 # This function is executed at each time step
@@ -32,15 +30,15 @@ function init() {
 function step() {
   var robot_sensor_val = neighbors.map(sense_robot).reduce(sees_any_robot, false)
   # Spin in place if a robot is not detected, otherwise approach it
+  scale = 20
   if (robot_sensor_val) {
-    set_wheels(params.vl0, params.vr0)
+    set_wheels(scale * params.vl0, scale * params.vr0)
     set_leds(0,255,0)
   } else {
-    set_wheels(params.vl1, params.vr1)
+    set_wheels(scale * params.vl1, scale * params.vr1)
     set_leds(255,0,0)
   }
-  io.fwrite(f, pose.position.x,",",pose.position.y)
-  t = t+1
+  f.fwrite()
 }
 
 
@@ -51,7 +49,6 @@ function step() {
 # called. The state of sensors and actuators is reset
 # automatically by ARGoS.
 function reset() {
-  io.close(f)
 }
 
 # This function is executed only once, when the robot is removed
