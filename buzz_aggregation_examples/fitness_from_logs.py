@@ -43,10 +43,12 @@ def main():
 
     mean_dispersion = np.mean(dispersion_by_trial, axis=0)
 
-    plt.plot(mean_dispersion, color='red')
+    plt.plot(mean_dispersion, color='red', label='mean')
+    plt.plot([0, mean_dispersion.shape[0]], [7.5612244898, 7.5612244898], label='optimal', color='green')
     plt.title("Robot Dispersion over Time")
     plt.xlabel("Time, t (s)")
     plt.ylabel("Robot dispersion, u(t)")
+    plt.legend()
     plt.show()
 
 
