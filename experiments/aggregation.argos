@@ -28,12 +28,12 @@
       <actuators>
         <differential_steering implementation="default" />
         <range_and_bearing implementation="default" />
+        <leds implementation="default" medium="leds" />
       </actuators>
       <sensors>
-        <footbot_proximity implementation="default" show_rays="false" />
-        <range_and_bearing implementation="medium" medium="rab" />
+        <range_and_bearing implementation="medium" medium="rab" show_rays="false"/>
       </sensors>
-      <params parameter_file="embedding/mpga/best_100.dat" />
+      <params/>
     </footbot_binary_controller>
 
   </controllers>

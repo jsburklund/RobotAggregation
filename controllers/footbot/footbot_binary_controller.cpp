@@ -6,7 +6,13 @@
 static CRange<Real> WHEEL_ACTUATION_RANGE(-5.0, 5.0);
 
 CFootBotBinaryController::CFootBotBinaryController()
-    : m_pcWheels(nullptr), m_params{0, 0, 0, 0}, m_pcRABAct(nullptr), m_pcRABSens(nullptr), my_id(0ul), my_group(0ul) {
+    : m_pcWheels(nullptr),
+      m_params{0, 0, 0, 0},
+      m_pcRABAct(nullptr),
+      m_pcRABSens(nullptr),
+      m_pcLEDs(nullptr),
+      my_id(0ul),
+      my_group(0ul) {
 }
 
 void CFootBotBinaryController::Init(TConfigurationNode &t_node) {
@@ -14,39 +20,44 @@ void CFootBotBinaryController::Init(TConfigurationNode &t_node) {
     m_pcWheels = GetActuator<CCI_DifferentialSteeringActuator>("differential_steering");
     m_pcRABAct = GetActuator<CCI_RangeAndBearingActuator>("range_and_bearing");
     m_pcRABSens = GetSensor<CCI_RangeAndBearingSensor>("range_and_bearing");
+    m_pcLEDs = GetActuator<CCI_LEDsActuator>("leds");
+
   }
   catch (CARGoSException &ex) {
     THROW_ARGOSEXCEPTION_NESTED("Error initializing sensors/actuators", ex);
   }
 
   std::string params_filename;
-  GetNodeAttributeOrDefault(t_node, "parameter_file", params_filename, std::string("params.dat"));
-  std::ifstream cIn(params_filename.c_str());
-  if( !cIn ) {
-    THROW_ARGOSEXCEPTION("Cannot open parameter file '" << params_filename << "' for reading");
-  }
+  GetNodeAttributeOrDefault(t_node, "parameter_file", params_filename, std::string());
 
-  // first parameter is the number of real-valued weights
-  UInt32 params_length = 0;
-  if( !(cIn >> params_length) ) {
-    THROW_ARGOSEXCEPTION("Cannot read data from file '" << params_filename << "'");
-  }
+  if (!params_filename.empty()) {
+    std::ifstream cIn(params_filename.c_str());
+    if (!cIn) {
+      THROW_ARGOSEXCEPTION("Cannot open parameter file '" << params_filename << "' for reading");
+    }
 
-  // check consistency between parameter file and xml declaration
-  if(params_length != m_params.size()) {
-    THROW_ARGOSEXCEPTION("Number of parameter mismatch: '"
-                             << params_filename
-                             << "' contains "
-                             << params_length
-                             << " parameters, while "
-                             << m_params.size()
-                             << " were expected from the XML configuration file");
-  }
-
-  // create weights vector and load it from file
-  for(size_t i = 0; i < params_length ; ++i) {
-    if( !(cIn >> m_params[i] ) ) {
+    // first parameter is the number of real-valued weights
+    UInt32 params_length = 0;
+    if (!(cIn >> params_length)) {
       THROW_ARGOSEXCEPTION("Cannot read data from file '" << params_filename << "'");
+    }
+
+    // check consistency between parameter file and xml declaration
+    if (params_length != m_params.size()) {
+      THROW_ARGOSEXCEPTION("Number of parameter mismatch: '"
+                               << params_filename
+                               << "' contains "
+                               << params_length
+                               << " parameters, while "
+                               << m_params.size()
+                               << " were expected from the XML configuration file");
+    }
+
+    // create weights vector and load it from file
+    for (size_t i = 0; i < params_length; ++i) {
+      if (!(cIn >> m_params[i])) {
+        THROW_ARGOSEXCEPTION("Cannot read data from file '" << params_filename << "'");
+      }
     }
   }
 
@@ -59,14 +70,27 @@ void CFootBotBinaryController::Init(TConfigurationNode &t_node) {
   // TODO: make this modulo a parameter
   my_group = my_id % 2;
 
+  switch (my_group) {
+    case 0: m_pcLEDs->SetAllColors(CColor::BLUE);
+      break;
+    case 1: m_pcLEDs->SetAllColors(CColor::GREEN);
+      break;
+    case 2: m_pcLEDs->SetAllColors(CColor::PURPLE);
+      break;
+    case 3: m_pcLEDs->SetAllColors(CColor::YELLOW);
+      break;
+    case 5: m_pcLEDs->SetAllColors(CColor::ORANGE);
+      break;
+    default: m_pcLEDs->SetAllColors(CColor::RED);
+      break;
+  }
+
   Reset();
 }
 
 void CFootBotBinaryController::Reset() {
   // Setup the robot and group id data to send
-  m_pcRABAct->SetData(0, (uint8_t) my_id);
-  m_pcRABAct->SetData(1, (uint8_t) (((uint16_t) my_id) >> 8u));
-  m_pcRABAct->SetData(2, (uint8_t) my_group);  //TODO Only supports 256 groups for now
+  m_pcRABAct->SetData(0, (uint8_t) my_group);  //TODO Only supports 256 groups for now
 }
 
 void CFootBotBinaryController::ControlStep() {
@@ -74,10 +98,10 @@ void CFootBotBinaryController::ControlStep() {
 
   if (sens_state) {
     // Saw a robot of the same type
-    m_pcWheels->SetLinearVelocity(m_params[0], m_params[1]);
+    m_pcWheels->SetLinearVelocity(20 * m_params[0], 20 * m_params[1]);
   } else {
     // Saw nothing or a robot of different type
-    m_pcWheels->SetLinearVelocity(m_params[2], m_params[3]);
+    m_pcWheels->SetLinearVelocity(20 * m_params[2], 20 * m_params[3]);
   }
 }
 
@@ -97,6 +121,10 @@ void CFootBotBinaryController::SetParameters(const size_t num_params, const Real
 
 }
 
+/* Simulate a kin/nothing/non-kin type sensor with limited viewing range
+ * Returns true if a robot in the same group is the closest thing within
+ * the viewing angle.
+ */
 bool CFootBotBinaryController::GetKinSensorVal() {
   // Get the other robots range and bearing
   const CCI_RangeAndBearingSensor::TReadings &tMsgs = m_pcRABSens->GetReadings();
@@ -114,7 +142,7 @@ bool CFootBotBinaryController::GetKinSensorVal() {
         //Robot is in view of the camera, check to see if it is the closest
         if (range < closest_range) {
           closest_range = range;
-          uint8_t robot_group = tMsg.Data[2];
+          uint8_t robot_group = tMsg.Data[0];
           sens_state = (my_group == robot_group);
         }
       }

@@ -51,6 +51,10 @@ int main() {
   for (auto i : cGA.GetPopulation()) {
     argos::LOG << " " << i->Score;
   }
+  argos::LOG << " [Flushing genome... ";
+  /* Flush scores of best individual */
+  FlushIndividual(*cGA.GetPopulation()[0], cGA.GetGeneration());
+  argos::LOG << "done.]";
   LOG << std::endl;
   LOG.Flush();
   while (!cGA.Done()) {

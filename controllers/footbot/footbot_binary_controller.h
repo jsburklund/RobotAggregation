@@ -4,7 +4,7 @@
 
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
-#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
+#include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
 
@@ -20,7 +20,7 @@ class CFootBotBinaryController : public CCI_Controller {
 
   void Init(TConfigurationNode &t_node) override;
 
-  void Reset();
+  void Reset() override;
 
   void ControlStep() override;
 
@@ -32,10 +32,10 @@ class CFootBotBinaryController : public CCI_Controller {
 
   CCI_DifferentialSteeringActuator *m_pcWheels;
   std::array<Real, GENOME_SIZE> m_params;
-  /* Pointer to the range-and-bearing actuator */
   CCI_RangeAndBearingActuator* m_pcRABAct;
-  /* Pointer to the range-and-bearing sensor */
   CCI_RangeAndBearingSensor* m_pcRABSens;
+  CCI_LEDsActuator* m_pcLEDs;
+
   // Robot Id number 0-N
   unsigned long my_id;
   unsigned long my_group;

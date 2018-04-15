@@ -13,10 +13,10 @@
       <actuators>
         <differential_steering implementation="default" />
         <range_and_bearing implementation="default" />
+        <leds implementation="default" medium="leds" />
       </actuators>
       <sensors>
-        <footbot_proximity implementation="default"    show_rays="false" />
-        <range_and_bearing implementation="medium" medium="rab" show_rays="true" />
+        <range_and_bearing implementation="medium" medium="rab" show_rays="false" />
       </sensors>
       <params parameter_file="embedding/test_params.dat" />
     </footbot_binary_controller>
@@ -59,7 +59,7 @@
   <visualization>
     <qt-opengl>
       <camera>
-        <placement idx="0" position="2.5,2.5,6" look_at="2.5,2.5,0" lens_focal_length="20" />
+        <placement idx="0" position="2.5,2.5,6" look_at="2.5,2.5,0" lens_focal_length="35" />
       </camera>
     </qt-opengl>
   </visualization>
