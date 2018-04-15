@@ -22,6 +22,8 @@ void CFootBotBinaryController::Init(TConfigurationNode &t_node) {
   std::string my_idstr = GetId();
   std::sscanf(my_idstr.c_str(), "fb%d", &my_id);
 
+  // Set the group
+  my_group = 0;
 
   // Finish setup
   Reset();
@@ -31,10 +33,9 @@ void CFootBotBinaryController::Init(TConfigurationNode &t_node) {
 void CFootBotBinaryController::Reset() {
   argos::LOG <<"Called Reset\n";
   m_pcRABAct->Reset();
-  my_id = my_id+1000;
   m_pcRABAct->SetData(0, (uint8_t) my_id);
   m_pcRABAct->SetData(1, (uint8_t) (((uint16_t) my_id)>>8));
-  my_id = my_id-1000;
+  m_pcRABAct->SetData(2, (uint8_t) my_group);  //TODO Only supports 256 groups for now
 }
 
 void CFootBotBinaryController::ControlStep() {
@@ -84,7 +85,7 @@ unsigned int CFootBotBinaryController::GetKinSensorVal() {
       Real range  = tMsgs[i].Range;
       uint16_t rid =  ((uint16_t) tMsgs[i].Data[1])<<8 | ((uint16_t) tMsgs[i].Data[0]);
       Real bearing = tMsgs[i].HorizontalBearing.GetValue();
-      if (my_id == 0) {
+      if (my_id == 0 && my_group == tMsgs[i].Data[2]) {
         argos::LOG << "RID ["<<rid<<"]: dist "<<range<<"ang "<<bearing<<"\n";
       }
     }
