@@ -1,7 +1,7 @@
 <argos-configuration>
   <framework>
     <system threads="0" />
-    <experiment length="180" random_seed="1439" ticks_per_second="10" />
+    <experiment length="180" random_seed="0" ticks_per_second="10" />
   </framework>
   <controllers>
     <buzz_controller_kheperaiv id="obsAvoid">
@@ -34,7 +34,7 @@
     <distribute>
       <position max="2,2,0" method="uniform" min="-2,-2,0" />
       <orientation mean="0,0,0" method="gaussian" std_dev="360,0,0" />
-      <entity max_trials="100" quantity="20">
+      <entity max_trials="100" quantity="10">
         <kheperaiv id="kiv">
           <controller config="obsAvoid" />
         </kheperaiv>

@@ -23,6 +23,7 @@ function sees_any_robot(rid, data, sees_robot) {
 function init() {
   var filepath = string.concat("./logs/robot_",string.tostring(id),".log")
   f = io.fopen(filepath, "w")
+  t = 0
 }
 
 # This function is executed at each time step
@@ -38,7 +39,9 @@ function step() {
     set_wheels(scale * params.vl1, scale * params.vr1)
     set_leds(255,0,0)
   }
-  f.fwrite()
+  io.fwrite(f, t,",",pose.position.x,",",pose.position.y)
+  t = t+1
+
 }
 
 
@@ -49,6 +52,7 @@ function step() {
 # called. The state of sensors and actuators is reset
 # automatically by ARGoS.
 function reset() {
+  io.close(f)
 }
 
 # This function is executed only once, when the robot is removed
