@@ -18,15 +18,13 @@
         <footbot_proximity implementation="default"    show_rays="false" />
         <range_and_bearing implementation="medium" medium="rab" show_rays="true" />
       </sensors>
-      <!--  put here the network data (best_*.dat files) -->
-      <params parameter_file="embedding/mpga/best_100.dat" />
+      <params parameter_file="embedding/test_params.dat" />
     </footbot_binary_controller>
 
   </controllers>
 
-  <!-- Attribute 'trial' contains which trial to run (values: [0-4]) -->
   <loop_functions library="build/loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" trial="0" random_seed="0">
-    <line center="1,1" robot_num="3" robot_distance="0.5" />
+    <line center="2.5,2.5" robot_num="9" robot_distance="0.4" />
   </loop_functions>
 
   <arena size="6, 6, 2" center="2.5,2.5,1">

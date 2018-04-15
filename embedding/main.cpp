@@ -36,10 +36,10 @@ Real RobotAggregationScorer(const std::vector<Real> &vec_scores) {
 int main() {
   CMPGA cGA(CRange<Real>(-1.0, 1.0),            // Allele range
             CFootBotBinaryController::GENOME_SIZE, // Genome size
-            5,                                   // Population size
+            10,                                   // Population size
             0.05,                                // Mutation probability
-            5, // Number of trials
-            5,                                 // Number of generations
+            10, // Number of trials
+            20,                                 // Number of generations
             false,                               // Minimize score
             "experiments/aggregation.argos",            // .argos conf file
             &RobotAggregationScorer,             // The score aggregator

@@ -3,37 +3,69 @@
 
 #include <cstdio>
 
-static CRange<Real> WHEEL_ACTUATION_RANGE(-5.0f, 5.0f);
+static CRange<Real> WHEEL_ACTUATION_RANGE(-5.0, 5.0);
 
-CFootBotBinaryController::CFootBotBinaryController() : m_pcWheels(nullptr), m_params{0, 0, 0, 0} {//}, m_pcRABAct(NULL), m_pcRABSens(NULL) {
+CFootBotBinaryController::CFootBotBinaryController()
+    : m_pcWheels(nullptr), m_params{0, 0, 0, 0}, m_pcRABAct(nullptr), m_pcRABSens(nullptr), my_id(0ul), my_group(0ul) {
 }
 
 void CFootBotBinaryController::Init(TConfigurationNode &t_node) {
   try {
     m_pcWheels = GetActuator<CCI_DifferentialSteeringActuator>("differential_steering");
-    m_pcRABAct = GetActuator<CCI_RangeAndBearingActuator  >("range_and_bearing" );
-    m_pcRABSens = GetSensor <CCI_RangeAndBearingSensor >("range_and_bearing" );
+    m_pcRABAct = GetActuator<CCI_RangeAndBearingActuator>("range_and_bearing");
+    m_pcRABSens = GetSensor<CCI_RangeAndBearingSensor>("range_and_bearing");
   }
   catch (CARGoSException &ex) {
     THROW_ARGOSEXCEPTION_NESTED("Error initializing sensors/actuators", ex);
   }
 
+  std::string params_filename;
+  GetNodeAttributeOrDefault(t_node, "parameter_file", params_filename, std::string("params.dat"));
+  std::ifstream cIn(params_filename.c_str());
+  if( !cIn ) {
+    THROW_ARGOSEXCEPTION("Cannot open parameter file '" << params_filename << "' for reading");
+  }
+
+  // first parameter is the number of real-valued weights
+  UInt32 params_length = 0;
+  if( !(cIn >> params_length) ) {
+    THROW_ARGOSEXCEPTION("Cannot read data from file '" << params_filename << "'");
+  }
+
+  // check consistency between parameter file and xml declaration
+  if(params_length != m_params.size()) {
+    THROW_ARGOSEXCEPTION("Number of parameter mismatch: '"
+                             << params_filename
+                             << "' contains "
+                             << params_length
+                             << " parameters, while "
+                             << m_params.size()
+                             << " were expected from the XML configuration file");
+  }
+
+  // create weights vector and load it from file
+  for(size_t i = 0; i < params_length ; ++i) {
+    if( !(cIn >> m_params[i] ) ) {
+      THROW_ARGOSEXCEPTION("Cannot read data from file '" << params_filename << "'");
+    }
+  }
+
   // Parse the ID number
-  std::string my_idstr = GetId();
-  std::sscanf(my_idstr.c_str(), "fb%d", &my_id);
+  const std::string my_idstr = GetId();
+  size_t pos;
+  my_id = std::stoul(my_idstr, &pos);
 
-  // Set the group
-  my_group = 0;  // Currently all robots are in the same group
-                 // TODO add some parameter for this...
+  // Set group based on ID modulo some number
+  // TODO: make this modulo a parameter
+  my_group = my_id % 2;
 
-  // Finish setup
   Reset();
 }
 
 void CFootBotBinaryController::Reset() {
   // Setup the robot and group id data to send
   m_pcRABAct->SetData(0, (uint8_t) my_id);
-  m_pcRABAct->SetData(1, (uint8_t) (((uint16_t) my_id)>>8));
+  m_pcRABAct->SetData(1, (uint8_t) (((uint16_t) my_id) >> 8u));
   m_pcRABAct->SetData(2, (uint8_t) my_group);  //TODO Only supports 256 groups for now
 }
 
@@ -47,7 +79,6 @@ void CFootBotBinaryController::ControlStep() {
     // Saw nothing or a robot of different type
     m_pcWheels->SetLinearVelocity(m_params[2], m_params[3]);
   }
-  return;
 }
 
 void CFootBotBinaryController::SetParameters(const size_t num_params, const Real *params) {
@@ -59,29 +90,31 @@ void CFootBotBinaryController::SetParameters(const size_t num_params, const Real
   }
 
   for (size_t i = 0; i < num_params; ++i) {
+    LOG << params[i] << ", ";
     m_params[i] = params[i];
   }
+  LOG << "\n";
 
 }
 
 bool CFootBotBinaryController::GetKinSensorVal() {
   // Get the other robots range and bearing
-  const CCI_RangeAndBearingSensor::TReadings& tMsgs = m_pcRABSens->GetReadings();
+  const CCI_RangeAndBearingSensor::TReadings &tMsgs = m_pcRABSens->GetReadings();
   // Look at all robots that have sent a message
-  if(! tMsgs.empty()) {
+  if (!tMsgs.empty()) {
     Real closest_range = INFINITY;  // Closest robot detected so far
     bool sens_state = false;        // Assume that a robot is in view of the camera
 
     // Parse all of the other robots detected
-    for (size_t i=0; i<tMsgs.size(); i++) {
+    for (const auto &tMsg : tMsgs) {
       // Check if the neighbor is in view of the camera
-      Real bearing = tMsgs[i].HorizontalBearing.GetValue();
-      Real range  = tMsgs[i].Range;
+      Real bearing = tMsg.HorizontalBearing.GetValue();
+      Real range = tMsg.Range;
       if (bearing < kCAM_VIEW_ANG && bearing > -kCAM_VIEW_ANG) {
         //Robot is in view of the camera, check to see if it is the closest
         if (range < closest_range) {
           closest_range = range;
-          uint8_t robot_group = tMsgs[i].Data[2];
+          uint8_t robot_group = tMsg.Data[2];
           sens_state = (my_group == robot_group);
         }
       }
@@ -90,27 +123,6 @@ bool CFootBotBinaryController::GetKinSensorVal() {
   }
 
   return false;
-}
-
-unsigned int CFootBotBinaryController::GetKinSensorVal() {
-  // Get the other robots range and bearing
-  const CCI_RangeAndBearingSensor::TReadings& tMsgs = m_pcRABSens->GetReadings();
-  // Look at all robots that have sent a message
-  if(! tMsgs.empty()) {
-    if (my_id == 0) {
-      argos::LOG<<"Num neighbors: "<<tMsgs.size()<<"\n";
-    }
-    for (size_t i=0; i<tMsgs.size(); i++) {
-      Real range  = tMsgs[i].Range;
-      uint16_t rid =  ((uint16_t) tMsgs[i].Data[1])<<8 | ((uint16_t) tMsgs[i].Data[0]);
-      Real bearing = tMsgs[i].HorizontalBearing.GetValue();
-      if (my_id == 0 && my_group == tMsgs[i].Data[2]) {
-        argos::LOG << "RID ["<<rid<<"]: dist "<<range<<"ang "<<bearing<<"\n";
-      }
-    }
-  }
-
-  return 0;
 }
 
 REGISTER_CONTROLLER(CFootBotBinaryController, "footbot_binary_controller")

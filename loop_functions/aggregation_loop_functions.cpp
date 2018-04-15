@@ -75,7 +75,6 @@ void CMPGAAggregationLoopFunctions::Reset() {
     // TODO: orientation noise? better way to construct CVector3 of gaussian noise?
     CVector3 position_noise{m_rng->Gaussian(0.1, 0.0), m_rng->Gaussian(0.1, 0.0), m_rng->Gaussian(0.1, 0.0)};
     auto position = position_noise + robot_and_initial_pose.position;
-    LOG << position << "\n";
     auto success = MoveEntity(entity, position, robot_and_initial_pose.orientation, false);
     if (!success) {
       LOGERR << "Can't move robot " << entity.GetId() << " to " << position << "\n";
@@ -89,12 +88,13 @@ void CMPGAAggregationLoopFunctions::PlaceLine(const CVector2 &c_center,
                                               UInt32 un_id_start) {
   try {
     std::ostringstream cFBId;
-    for (size_t i = 0; i < n_robots; ++i) {
+    int j = -static_cast<int>(n_robots/2);
+    for (size_t i = 0; i < n_robots; ++i, ++j) {
       cFBId.str("");
-      cFBId << "fb" << (i + un_id_start);
+      cFBId << (i + un_id_start);
 
       /* Create the robot in the origin and add it to ARGoS space */
-      auto position = CVector3{i + c_center.GetX(), i + c_center.GetY(), 0};
+      auto position = CVector3{f_distance * j + c_center.GetX(), f_distance * j + c_center.GetY(), 0};
       CQuaternion orientation;
       auto robot =
           new CFootBotEntity(cFBId.str(), XML_CONTROLLER_ID, position, orientation);
@@ -119,7 +119,7 @@ void CMPGAAggregationLoopFunctions::PlaceCluster(const CVector2 &c_center,
 
     for (size_t i = 0; i < n_robots; ++i) {
       cFBId.str("");
-      cFBId << "fb" << (i + un_id_start);
+      cFBId << (i + un_id_start);
 
       /* Create the robot in the origin and add it to ARGoS space */
       auto robot = new CFootBotEntity(cFBId.str(), XML_CONTROLLER_ID);
