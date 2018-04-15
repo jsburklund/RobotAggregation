@@ -27,7 +27,6 @@ void CFootBotBinaryController::Init(TConfigurationNode &t_node) {
 
   // Finish setup
   Reset();
-  Reset();
 }
 
 void CFootBotBinaryController::Reset() {
@@ -36,28 +35,27 @@ void CFootBotBinaryController::Reset() {
   m_pcRABAct->SetData(0, (uint8_t) my_id);
   m_pcRABAct->SetData(1, (uint8_t) (((uint16_t) my_id)>>8));
   m_pcRABAct->SetData(2, (uint8_t) my_group);  //TODO Only supports 256 groups for now
+
+  //TODO temporarily set known good constants for testing
+  m_params[0] = 8;
+  m_params[1] = 10;
+  m_params[2] = -5;
+  m_params[3] = 5;
 }
 
 void CFootBotBinaryController::ControlStep() {
   unsigned int I; // TODO: figure this out from other robots or mock sensor
 
-  GetKinSensorVal();
+  bool sens_state = GetKinSensorVal();
 
-  m_pcWheels->SetLinearVelocity(-7, -10);
-  return;
-  switch (I) {
-    case 0: {
-      m_pcWheels->SetLinearVelocity(m_params[0], m_params[1]);
-      break;
-    }
-    case 1: {
-      m_pcWheels->SetLinearVelocity(m_params[2], m_params[3]);
-      break;
-    }
-    default: {
-      THROW_ARGOSEXCEPTION("Invalid sensor state. Must be 0 or 1.");
-    }
+  if (sens_state) {
+    // Saw a robot of the same type
+    m_pcWheels->SetLinearVelocity(m_params[0], m_params[1]);
+  } else {
+    // Saw nothing or a robot of different type
+    m_pcWheels->SetLinearVelocity(m_params[2], m_params[3]);
   }
+  return;
 }
 
 void CFootBotBinaryController::SetParameters(const size_t num_params, const Real *params) {
@@ -71,27 +69,35 @@ void CFootBotBinaryController::SetParameters(const size_t num_params, const Real
   for (size_t i = 0; i < num_params; ++i) {
     m_params[i] = params[i];
   }
+
 }
 
-unsigned int CFootBotBinaryController::GetKinSensorVal() {
+bool CFootBotBinaryController::GetKinSensorVal() {
   // Get the other robots range and bearing
   const CCI_RangeAndBearingSensor::TReadings& tMsgs = m_pcRABSens->GetReadings();
   // Look at all robots that have sent a message
   if(! tMsgs.empty()) {
-    if (my_id == 0) {
-      argos::LOG<<"Num neighbors: "<<tMsgs.size()<<"\n";
-    }
+    Real closest_range = INFINITY;  // Closest robot detected so far
+    bool sens_state = false;        // Assume that a robot is in view of the camera
+
+    // Parse all of the other robots detected
     for (size_t i=0; i<tMsgs.size(); i++) {
-      Real range  = tMsgs[i].Range;
-      uint16_t rid =  ((uint16_t) tMsgs[i].Data[1])<<8 | ((uint16_t) tMsgs[i].Data[0]);
+      // Check if the neighbor is in view of the camera
       Real bearing = tMsgs[i].HorizontalBearing.GetValue();
-      if (my_id == 0 && my_group == tMsgs[i].Data[2]) {
-        argos::LOG << "RID ["<<rid<<"]: dist "<<range<<"ang "<<bearing<<"\n";
+      Real range  = tMsgs[i].Range;
+      if (bearing < kCAM_VIEW_ANG && bearing > -kCAM_VIEW_ANG) {
+        //Robot is in view of the camera, check to see if it is the closest
+        if (range < closest_range) {
+          closest_range = range;
+          uint8_t robot_group = tMsgs[i].Data[2];
+          sens_state = (my_group == robot_group);
+        }
       }
     }
+    return sens_state;
   }
 
-  return 0;
+  return false;
 }
 
 REGISTER_CONTROLLER(CFootBotBinaryController, "footbot_binary_controller")

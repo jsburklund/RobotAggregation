@@ -26,7 +26,7 @@ class CFootBotBinaryController : public CCI_Controller {
 
   void SetParameters(size_t num_params, const Real *params);
 
-  unsigned int GetKinSensorVal();
+  bool GetKinSensorVal();
 
  private:
 
@@ -39,5 +39,6 @@ class CFootBotBinaryController : public CCI_Controller {
   // Robot Id number 0-N
   unsigned int my_id;
   unsigned int my_group;
+  Real kCAM_VIEW_ANG = 15 * 3.141593/180.0;
 };
 
