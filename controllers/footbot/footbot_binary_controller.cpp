@@ -23,29 +23,21 @@ void CFootBotBinaryController::Init(TConfigurationNode &t_node) {
   std::sscanf(my_idstr.c_str(), "fb%d", &my_id);
 
   // Set the group
-  my_group = 0;
+  my_group = 0;  // Currently all robots are in the same group
+                 // TODO add some parameter for this...
 
   // Finish setup
   Reset();
 }
 
 void CFootBotBinaryController::Reset() {
-  argos::LOG <<"Called Reset\n";
-  m_pcRABAct->Reset();
+  // Setup the robot and group id data to send
   m_pcRABAct->SetData(0, (uint8_t) my_id);
   m_pcRABAct->SetData(1, (uint8_t) (((uint16_t) my_id)>>8));
   m_pcRABAct->SetData(2, (uint8_t) my_group);  //TODO Only supports 256 groups for now
-
-  //TODO temporarily set known good constants for testing
-  m_params[0] = 8;
-  m_params[1] = 10;
-  m_params[2] = -5;
-  m_params[3] = 5;
 }
 
 void CFootBotBinaryController::ControlStep() {
-  unsigned int I; // TODO: figure this out from other robots or mock sensor
-
   bool sens_state = GetKinSensorVal();
 
   if (sens_state) {
