@@ -24,8 +24,8 @@
   </controllers>
 
   <loop_functions library="build/loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" trial="0" random_seed="0">
-    <!--<line center="2.5,2.5" robot_num="10" robot_distance="0.5" />-->
-    <cluster center="2.5,2.5" robot_num="10" robot_density="0.5" />
+    <!--<line center="2.5,2.5" robot_num="10" robot_distance="0.3" />-->
+    <cluster center="2.5,2.5" robot_num="10" robot_density="0.05" />
   </loop_functions>
 
   <arena size="6, 6, 2" center="2.5,2.5,1">

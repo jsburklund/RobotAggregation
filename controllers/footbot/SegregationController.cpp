@@ -3,7 +3,6 @@
 
 void SegregationController::ControlStep() {
   auto sensor_state = GetKinSensorVal();
-  LOGERR << static_cast<unsigned int>(sensor_state) << "\n";
   switch (sensor_state) {
     case SensorState::KIN: {
       m_pcWheels->SetLinearVelocity(SCALE * m_params[0], SCALE * m_params[1]);

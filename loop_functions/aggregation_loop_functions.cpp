@@ -72,13 +72,14 @@ void CMPGAAggregationLoopFunctions::Reset() {
   for (const auto &robot_and_initial_pose: m_robots) {
     auto &entity = robot_and_initial_pose.robot->GetEmbodiedEntity();
 
-    // TODO: orientation noise? better way to construct CVector3 of gaussian noise?
-    CVector3 position_noise{m_rng->Gaussian(0.1, 0.0), m_rng->Gaussian(0.1, 0.0), m_rng->Gaussian(0.1, 0.0)};
-    auto position = position_noise + robot_and_initial_pose.position;
-    auto success = MoveEntity(entity, position, robot_and_initial_pose.orientation, false);
-    if (!success) {
-      LOGERR << "Can't move robot " << entity.GetId() << " to " << position << "\n";
-    }
+    bool success;
+    auto i = 0;
+    do {
+      CVector3 position_noise{m_rng->Gaussian(0.05, 0.0), m_rng->Gaussian(0.05, 0.0), 0};
+      auto position = position_noise + robot_and_initial_pose.position;
+      success = MoveEntity(entity, position, robot_and_initial_pose.orientation, false);
+      ++i;
+    } while (!success and i < 10);
   }
 }
 
@@ -88,7 +89,7 @@ void CMPGAAggregationLoopFunctions::PlaceLine(const CVector2 &c_center,
                                               UInt32 un_id_start) {
   try {
     std::ostringstream cFBId;
-    int j = -static_cast<int>(n_robots/2);
+    int j = -static_cast<int>(n_robots / 2);
     for (size_t i = 0; i < n_robots; ++i, ++j) {
       cFBId.str("");
       cFBId << (i + un_id_start);
@@ -137,7 +138,9 @@ void CMPGAAggregationLoopFunctions::PlaceCluster(const CVector2 &c_center,
         /* Choose a random position and orientation */
         ++unTrials;
         position =
-            CVector3(m_rng->Uniform(cAreaRange) + c_center.GetX(), m_rng->Uniform(cAreaRange) + c_center.GetY(), 0.0f);
+            CVector3(m_rng->Uniform(cAreaRange) + c_center.GetX(),
+                     m_rng->Uniform(cAreaRange) + c_center.GetY(),
+                     0.0f);
         orientation = CQuaternion{m_rng->Uniform(CRadians::UNSIGNED_RANGE), CVector3::Z};
         bDone = MoveEntity(robot->GetEmbodiedEntity(), position, orientation);
       } while (!bDone && unTrials <= 20);

@@ -69,7 +69,7 @@ void GenericFootbotController::Init(TConfigurationNode &t_node) {
   GetNodeAttributeOrDefault(t_node, "num_classes", num_classes, 1);
   my_group = my_id % num_classes;
 
-  for (UInt32 led_id = 0; led_id < m_pcLEDs->GetNumLEDs()/2; ++led_id) {
+  for (UInt32 led_id = 0; led_id < m_pcLEDs->GetNumLEDs() / 2; ++led_id) {
     switch (my_group) {
       case 0: m_pcLEDs->SetSingleColor(led_id, CColor::ORANGE);
         break;
@@ -130,7 +130,7 @@ GenericFootbotController::SensorState GenericFootbotController::GetKinSensorVal(
     }
   }
 
-  for (UInt32 led_id = static_cast<UInt32>(m_pcLEDs->GetNumLEDs()/2); led_id < m_pcLEDs->GetNumLEDs(); ++led_id) {
+  for (auto led_id = static_cast<UInt32>(m_pcLEDs->GetNumLEDs() / 2); led_id < m_pcLEDs->GetNumLEDs(); ++led_id) {
     switch (sens_state) {
       case SensorState::KIN: m_pcLEDs->SetSingleColor(led_id, CColor::BLUE);
         break;
