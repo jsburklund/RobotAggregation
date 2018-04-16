@@ -9,6 +9,7 @@ Real NClassLoopFunction::CostAtStep(unsigned long step) {
   // split up the map into containers for each robot group
   for (const auto &p : robot_map) {
     auto id = p.first;
+    auto group_id = id_string_group_map.at(id);
     auto robot = any_cast<CFootBotEntity *>(p.second);
   }
 
