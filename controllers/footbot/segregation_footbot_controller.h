@@ -35,6 +35,8 @@ class SegregationFootbotController : public CCI_Controller {
 
   void SetParameters(size_t num_params, const Real *params);
 
+  void SetGroup(unsigned long group);
+
   SensorState GetKinSensorVal();
 
   std::array<Real, GENOME_SIZE> m_params;
@@ -43,9 +45,9 @@ class SegregationFootbotController : public CCI_Controller {
   CCI_RangeAndBearingSensor *m_pcRABSens;
   CCI_LEDsActuator *m_pcLEDs;
 
-  // Robot Id number 0-N
-  unsigned long my_id;
-  unsigned long my_group;
   Real kCAM_VIEW_ANG = 15 * 3.141593 / 180.0;
+
+ private:
+  unsigned long m_group = 0;
 };
 

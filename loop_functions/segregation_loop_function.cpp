@@ -6,7 +6,7 @@ void SegregationLoopFunction::Init(TConfigurationNode &t_node) {
   try {
     UInt32 seed;
     GetNodeAttribute(t_node, "random_seed", seed);
-    GetNodeAttributeOrDefault(t_node, "n_classes", n_classes, 1);
+    GetNodeAttributeOrDefault(t_node, "num_classes", n_classes, 1);
     CRandom::CreateCategory("aggregation_loop_function", seed);
     m_rng = CRandom::CreateRNG("aggregation_loop_function");
 
@@ -94,7 +94,7 @@ void SegregationLoopFunction::PlaceLine(const CVector2 &center, UInt32 n_robots,
       auto &generic_controller = robot->GetControllableEntity().GetController();
       auto controller = &dynamic_cast<SegregationFootbotController &>(generic_controller);
       m_controllers.emplace_back(controller);
-      controller->my_group = group_id;
+      controller->SetGroup(group_id);
       m_robots.emplace_back(RobotAndInitialPose{robot, position, orientation});
     }
   }
@@ -122,7 +122,7 @@ void SegregationLoopFunction::PlaceCluster(const CVector2 &center, UInt32 n_robo
       AddEntity(*robot);
       auto &generic_controller = robot->GetControllableEntity().GetController();
       auto controller = &dynamic_cast<SegregationFootbotController &>(generic_controller);
-      controller->my_group = group_id;
+      controller->SetGroup(group_id);
       m_controllers.emplace_back(controller);
 
       /* Try to place it in the arena */

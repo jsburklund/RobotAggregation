@@ -56,7 +56,7 @@ int main(int argc, const char **argv) {
     Real score = loop_function.Score();
     if (args::get(verbose_flag)) {
     } else {
-      printf("trial: %x, score: %0.6f\r\n", i, score);
+      printf("trial: %u, score: %0.6f\r\n", i, score);
     }
   }
 }

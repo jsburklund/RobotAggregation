@@ -9,8 +9,7 @@ SegregationFootbotController::SegregationFootbotController()
       m_pcRABAct(nullptr),
       m_pcRABSens(nullptr),
       m_pcLEDs(nullptr),
-      my_id(0ul),
-      my_group(0ul) {
+      m_group(0ul) {
 }
 
 void SegregationFootbotController::Init(TConfigurationNode &t_node) {
@@ -32,18 +31,13 @@ void SegregationFootbotController::Init(TConfigurationNode &t_node) {
     LoadFromFile(params_filename);
   }
 
-  // Parse the ID number
-  const std::string my_idstr = GetId();
-  size_t pos;
-  my_id = std::stoul(my_idstr, &pos);
-
   for (UInt32 led_id = 0; led_id < m_pcLEDs->GetNumLEDs() / 2; ++led_id) {
-    switch (my_group) {
-      case 0: m_pcLEDs->SetSingleColor(led_id, CColor::ORANGE);
+    switch (m_group) {
+      case 0: m_pcLEDs->SetSingleColor(led_id, CColor::GREEN);
         break;
-      case 1: m_pcLEDs->SetSingleColor(led_id, CColor::GREEN);
+      case 1: m_pcLEDs->SetSingleColor(led_id, CColor::PURPLE);
         break;
-      case 2: m_pcLEDs->SetSingleColor(led_id, CColor::PURPLE);
+      case 2: m_pcLEDs->SetSingleColor(led_id, CColor::ORANGE);
         break;
       case 3: m_pcLEDs->SetSingleColor(led_id, CColor::YELLOW);
         break;
@@ -59,7 +53,7 @@ void SegregationFootbotController::Init(TConfigurationNode &t_node) {
 
 void SegregationFootbotController::Reset() {
   // not this only supports 256 groups
-  m_pcRABAct->SetData(0, (uint8_t) my_group);
+  m_pcRABAct->SetData(0, (uint8_t) m_group);
 }
 
 void SegregationFootbotController::LoadFromFile(const std::string &params_filename) {
@@ -107,7 +101,7 @@ SegregationFootbotController::SensorState SegregationFootbotController::GetKinSe
         if (range < closest_range) {
           closest_range = range;
           uint8_t robot_group = tMsg.Data[0];
-          sens_state = (my_group == robot_group) ? SensorState::KIN : SensorState::NONKIN;
+          sens_state = (m_group == robot_group) ? SensorState::KIN : SensorState::NONKIN;
         }
       }
     }
@@ -156,6 +150,28 @@ void SegregationFootbotController::SetParameters(const size_t num_params, const 
 
   for (size_t i = 0; i < num_params; ++i) {
     m_params[i] = params[i];
+  }
+}
+
+void SegregationFootbotController::SetGroup(unsigned long group) {
+  m_group = group;
+  m_pcRABAct->SetData(0, (uint8_t) m_group);
+
+  for (UInt32 led_id = 0; led_id < m_pcLEDs->GetNumLEDs() / 2; ++led_id) {
+    switch (m_group) {
+      case 0: m_pcLEDs->SetSingleColor(led_id, CColor::GREEN);
+        break;
+      case 1: m_pcLEDs->SetSingleColor(led_id, CColor::RED);
+        break;
+      case 2: m_pcLEDs->SetSingleColor(led_id, CColor::BLUE);
+        break;
+      case 3: m_pcLEDs->SetSingleColor(led_id, CColor::GREEN);
+        break;
+      case 4: m_pcLEDs->SetSingleColor(led_id, CColor::RED);
+        break;
+      default: m_pcLEDs->SetSingleColor(led_id, CColor::BLUE);
+        break;
+    }
   }
 }
 
