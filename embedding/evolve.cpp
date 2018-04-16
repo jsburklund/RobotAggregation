@@ -38,6 +38,14 @@ Real MeanScoreAggregator(const std::vector<Real> &vec_scores) {
 int main(int argc, const char **argv) {
   args::ArgumentParser parser("main");
   args::Positional<std::string> argos_filename(parser, "argos_filename", "", args::Options::Required);
+  args::ValueFlag<unsigned int>
+      population_size_flag(parser, "population size", "population size", {'p', "population"}, 10);
+  args::ValueFlag<double> mutation_flag(parser, "mutation", "probability of a gene mutating", {'m', "mutation"}, 0.05);
+  args::ValueFlag<unsigned int>
+      num_trials_flag(parser, "trials", "number of trials each genome undergoes", {'t', "trials"}, 10);
+  args::ValueFlag<unsigned int>
+      num_generations_flag(parser, "generations", "number of generations", {'g', "generations"}, 10);
+  args::ValueFlag<unsigned int> random_seed_flag(parser, "seed", "seed for the genetic algorithm", {'s', "seed"}, 0);
 
   try {
     parser.ParseCLI(argc, argv);
@@ -51,17 +59,18 @@ int main(int argc, const char **argv) {
     return 0;
   }
 
-  CMPGA cGA(CRange<Real>(-1.0, 1.0),                   // Allele range
-            SegregationFootbotController::GENOME_SIZE, // Genome size
-            10,                                        // Population size
-            0.15,                                      // Mutation probability
-            5,                                         // Number of trials
-            1000,                                        // Number of generations
-            false,                                     // Maximize score?
-            args::get(argos_filename),                 // .argos conf file
-            &MeanScoreAggregator,                      // The score aggregator
-            0                                          // Random seed
-  );
+  auto pop_size = args::get(population_size_flag);
+
+  CMPGA cGA(CRange<Real>(-1.0, 1.0),
+            SegregationFootbotController::GENOME_SIZE,
+            pop_size,
+            args::get(mutation_flag),
+            args::get(num_trials_flag),
+            args::get(num_generations_flag),
+            false,
+            args::get(argos_filename),
+            &MeanScoreAggregator,
+            args::get(random_seed_flag));
   cGA.Evaluate();
   argos::LOG << "Generation #" << cGA.GetGeneration() << "...";
   argos::LOG << " scores:";

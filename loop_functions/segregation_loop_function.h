@@ -37,7 +37,7 @@ class SegregationLoopFunction : public CLoopFunctions {
   virtual Real CostAtStep(unsigned long step) = 0;
 
   /* Calculates the performance of the robot in a trial */
-  Real Score();
+  Real Cost();
 
  protected:
   std::unordered_map<std::string, unsigned long> id_string_group_map;

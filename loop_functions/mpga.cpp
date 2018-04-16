@@ -253,7 +253,7 @@ void CMPGA::LaunchARGoS(UInt32 un_slave_id) {
     for (size_t i = 0; i < m_unNumTrials; ++i) {
       cSimulator.Reset();
       cSimulator.Execute();
-      vecScores[i] = cLoopFunctions.Score();
+      vecScores[i] = cLoopFunctions.Cost();
       LOG.Flush();
       LOGERR.Flush();
     };
@@ -336,7 +336,7 @@ CMPGA::CSharedMem::CSharedMem(UInt32 un_genome_size, UInt32 un_pop_size) :
    * - The area must contain m_unPopSize elements
    * - Each element must have space for the data of an individual
    *   - Genome: m_unGenomeSize * sizeof(Real)
-   *   - Score: sizeof(Real)
+   *   - Cost: sizeof(Real)
    */
   size_t unShareMemSize = m_unPopSize * (m_unGenomeSize + 1) * sizeof(Real);
   ::ftruncate(m_nSharedMemFD, unShareMemSize);

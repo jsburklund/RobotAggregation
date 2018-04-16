@@ -49,14 +49,19 @@ int main(int argc, const char **argv) {
   auto &loop_function = dynamic_cast<SegregationLoopFunction &>(simulator.GetLoopFunctions());
   loop_function.LoadFromFile(args::get(params_filename_flag));
 
-  for (unsigned int i = 0u; i < args::get(trials_flag); ++i) {
+  unsigned int N = args::get(trials_flag);
+  Real sum = 0;
+  for (unsigned int i = 0u; i < N; ++i) {
     simulator.Reset();
     loop_function.Reset();
     simulator.Execute();
-    Real score = loop_function.Score();
+    Real cost = loop_function.Cost();
+    sum += cost;
     if (args::get(verbose_flag)) {
     } else {
-      printf("trial: %u, score: %0.6f\r\n", i, score);
+      printf("trial: %u, cost: %.0f\r\n", i, cost);
     }
   }
+  auto mean =  sum / N;
+  printf("mean: %.4e\r\n", mean);
 }

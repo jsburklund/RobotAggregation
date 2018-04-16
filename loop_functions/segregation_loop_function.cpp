@@ -162,7 +162,7 @@ void SegregationLoopFunction::LoadFromFile(const std::string &params_filename) {
   }
 }
 
-Real SegregationLoopFunction::Score() {
+Real SegregationLoopFunction::Cost() {
   return m_cost;
 }
 
