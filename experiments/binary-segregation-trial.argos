@@ -4,7 +4,7 @@
 
   <framework>
     <system threads="0"/>
-    <experiment length="180" ticks_per_second="10" random_seed="312"/>
+    <experiment length="180" ticks_per_second="10" random_seed="0"/>
   </framework>
 
   <controllers>
@@ -19,15 +19,15 @@
       <sensors>
         <range_and_bearing implementation="medium" medium="rab" show_rays="false"/>
       </sensors>
-      <params num_classes="1"/>
+      <params parameter_file="params/test_segregation.dat" num_classes="2"/>
     </footbot_segregation_controller>
 
   </controllers>
 
   <loop_functions library="build/loop_functions/libgauci_segregation_loop_function"
-                  label="gauci_segregation_loop_function" random_seed="0">
+                  label="gauci_segregation_loop_function" trial="0" random_seed="0">
     <!--<line center="2.5,2.5" robot_num="10" robot_distance="0.3" />-->
-    <cluster center="2.5,2.5" robot_num="10" robot_density="0.05"/>
+    <cluster center="2.5,2.5" robot_num="10" robot_density="0.01"/>
   </loop_functions>
 
   <arena size="6, 6, 2" center="2.5,2.5,1">
@@ -59,7 +59,12 @@
     <range_and_bearing id="rab"/>
   </media>
 
-  <!-- We don't want nor need a visualization during evolution -->
-  <visualization/>
+  <visualization>
+    <qt-opengl>
+      <camera>
+        <placement idx="0" position="2.5,2.5,6" look_at="2.5,2.5,0" lens_focal_length="30"/>
+      </camera>
+    </qt-opengl>
+  </visualization>
 
 </argos-configuration>

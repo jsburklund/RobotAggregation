@@ -8,7 +8,7 @@
 #include <functional>
 #include <fstream>
 #include <loop_functions/mpga.h>
-#include <loop_functions/aggregation_loop_functions.h>
+#include <loop_functions/gauci_segregation_loop_function.h>
 
 #include "args.h"
 
@@ -21,9 +21,9 @@ void FlushIndividual(const CMPGA::SIndividual &s_ind,
   cOSS << ".best_" << un_generation << ".dat";
   std::ofstream cOFS(cOSS.str().c_str(), std::ios::out | std::ios::trunc);
   /* First write the number of values to dump */
-  cOFS << GenericFootbotController::GENOME_SIZE;
+  cOFS << SegregationFootbotController::GENOME_SIZE;
   /* Then dump the genome */
-  for (UInt32 i = 0; i < GenericFootbotController::GENOME_SIZE; ++i) {
+  for (UInt32 i = 0; i < SegregationFootbotController::GENOME_SIZE; ++i) {
     cOFS << " " << s_ind.Genome[i];
   }
   /* End line */
@@ -51,16 +51,16 @@ int main(int argc, const char **argv) {
     return 0;
   }
 
-  CMPGA cGA(CRange<Real>(-1.0, 1.0),               // Allele range
-            GenericFootbotController::GENOME_SIZE, // Genome size
-            10,                                    // Population size
-            0.05,                                  // Mutation probability
-            5,                                     // Number of trials
-            1,                                     // Number of generations
-            false,                                 // Minimize score
-            args::get(argos_filename),             // .argos conf file
-            &RobotAggregationScorer,               // The score aggregator
-            12345                                  // Random seed
+  CMPGA cGA(CRange<Real>(-1.0, 1.0),                   // Allele range
+            SegregationFootbotController::GENOME_SIZE, // Genome size
+            10,                                        // Population size
+            0.05,                                      // Mutation probability
+            5,                                         // Number of trials
+            25,                                        // Number of generations
+            true,                                      // Minimize score
+            args::get(argos_filename),                 // .argos conf file
+            &RobotAggregationScorer,                   // The score aggregator
+            12345                                      // Random seed
   );
   cGA.Evaluate();
   argos::LOG << "Generation #" << cGA.GetGeneration() << "...";

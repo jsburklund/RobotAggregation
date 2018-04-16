@@ -1,10 +1,6 @@
-add_executable(mpga_aggregation main.cpp)
-target_link_libraries(mpga_aggregation
-                      aggregation_loop_functions
-                      argos3core_simulator)
+add_executable(evolve evolve.cpp)
+target_link_libraries(evolve mpga segregation_loop_function argos3core_simulator)
 
-add_executable(photoaxis_main photoaxis_main.cpp)
-target_link_libraries(photoaxis_main
-                      footbot_nn
-                      mpga_phototaxis_loop_functions
-                      argos3core_simulator)
+add_executable(evaluate evaluate.cpp)
+target_link_libraries(evaluate segregation_loop_function argos3core_simulator)
+

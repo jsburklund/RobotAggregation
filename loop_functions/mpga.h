@@ -31,7 +31,7 @@ using namespace argos;
  * every trial.
  *
  * To use this class, your loop functions must inherit from
- * CMPGALoopFunctions.
+ * SeggregationLoopFunction.
  */
 class CMPGA {
    

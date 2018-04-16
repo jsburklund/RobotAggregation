@@ -9,7 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <argos3/core/simulator/simulator.h>
-#include "mpga_loop_functions.h"
+#include "segregation_loop_function.h"
 
 /****************************************/
 /****************************************/
@@ -234,7 +234,7 @@ void CMPGA::LaunchARGoS(UInt32 un_slave_id) {
     ::raise(SIGTERM);
   }
   /* Get a reference to the loop functions */
-  CMPGALoopFunctions &cLoopFunctions = dynamic_cast<CMPGALoopFunctions &>(cSimulator.GetLoopFunctions());
+  SegregationLoopFunction &cLoopFunctions = dynamic_cast<SegregationLoopFunction &>(cSimulator.GetLoopFunctions());
   /* Create vector of scores */
   std::vector<Real> vecScores(m_unNumTrials, 0.0);
   /* Continue working until killed by parent */
@@ -246,10 +246,8 @@ void CMPGA::LaunchARGoS(UInt32 un_slave_id) {
     cLoopFunctions.ConfigureFromGenome(m_pcSharedMem->GetGenome(un_slave_id));
     /* Run the trials */
     for (size_t i = 0; i < m_unNumTrials; ++i) {
-      /* Tell the loop functions to get ready for the i-th trial */
-      cLoopFunctions.SetTrial(i);
       /* Reset the experiment.
-       * This internally calls also CMPGALoopFunctions::Reset(). */
+       * This internally calls also SeggregationLoopFunction::Reset(). */
       cSimulator.Reset();
       /* Run the experiment */
       cSimulator.Execute();

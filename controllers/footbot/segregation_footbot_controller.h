@@ -10,7 +10,7 @@
 
 using namespace argos;
 
-class GenericFootbotController : public CCI_Controller {
+class SegregationFootbotController : public CCI_Controller {
 
  public:
 
@@ -23,13 +23,15 @@ class GenericFootbotController : public CCI_Controller {
   static const size_t GENOME_SIZE = 6;
   constexpr static auto SCALE = 20.0;
 
-  GenericFootbotController();
+  SegregationFootbotController();
 
   void Init(TConfigurationNode &t_node) override;
 
   void Reset() override;
 
-  void ControlStep() override = 0;
+  void ControlStep() override;
+
+  void LoadFromFile(const std::string &params_filename);
 
   void SetParameters(size_t num_params, const Real *params);
 

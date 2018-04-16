@@ -1,11 +1,8 @@
-#include <numeric>
-#include <iterator>
+#include "segregation_loop_function.h"
 
-#include "aggregation_loop_functions.h"
+SegregationLoopFunction::SegregationLoopFunction() : m_rng(nullptr) {}
 
-CMPGAAggregationLoopFunctions::CMPGAAggregationLoopFunctions() : m_rng(nullptr) {}
-
-void CMPGAAggregationLoopFunctions::Init(TConfigurationNode &t_node) {
+void SegregationLoopFunction::Init(TConfigurationNode &t_node) {
   try {
     UInt32 seed;
     GetNodeAttribute(t_node, "random_seed", seed);
@@ -56,37 +53,31 @@ void CMPGAAggregationLoopFunctions::Init(TConfigurationNode &t_node) {
     THROW_ARGOSEXCEPTION_NESTED("Error initializing the loop functions", ex);
   }
 
-  /*
-   * Process trial information, if any
-   */
-  try {
-    UInt32 trial;
-    GetNodeAttribute(t_node, "trial", trial);
-    SetTrial(trial);
-    Reset();
-  }
-  catch (CARGoSException &ex) {}
+  Reset();
 }
 
-void CMPGAAggregationLoopFunctions::Reset() {
+void SegregationLoopFunction::Reset() {
+  m_step = 0;
+  m_cost = 0;
+
   for (const auto &robot_and_initial_pose: m_robots) {
     auto &entity = robot_and_initial_pose.robot->GetEmbodiedEntity();
 
     bool success;
-    auto i = 0;
+    auto attempts = 0;
     do {
       CVector3 position_noise{m_rng->Gaussian(0.05, 0.0), m_rng->Gaussian(0.05, 0.0), 0};
       auto position = position_noise + robot_and_initial_pose.position;
       success = MoveEntity(entity, position, robot_and_initial_pose.orientation, false);
-      ++i;
-    } while (!success and i < 10);
+      ++attempts;
+    } while (!success and attempts < 10);
   }
 }
 
-void CMPGAAggregationLoopFunctions::PlaceLine(const CVector2 &c_center,
-                                              UInt32 n_robots,
-                                              Real f_distance,
-                                              UInt32 un_id_start) {
+void SegregationLoopFunction::PlaceLine(const CVector2 &c_center,
+                                        UInt32 n_robots,
+                                        Real f_distance,
+                                        UInt32 un_id_start) {
   try {
     std::ostringstream cFBId;
     int j = -static_cast<int>(n_robots / 2);
@@ -99,7 +90,8 @@ void CMPGAAggregationLoopFunctions::PlaceLine(const CVector2 &c_center,
       CQuaternion orientation = CQuaternion{m_rng->Uniform(CRadians::UNSIGNED_RANGE), CVector3::Z};
       auto robot = new CFootBotEntity(cFBId.str(), XML_CONTROLLER_ID, position, orientation);
       AddEntity(*robot);
-      auto controller = &dynamic_cast<GenericFootbotController &>(robot->GetControllableEntity().GetController());
+      auto &generic_controller = robot->GetControllableEntity().GetController();
+      auto controller = &dynamic_cast<SegregationFootbotController &>(generic_controller);
       m_controllers.emplace_back(controller);
       m_robots.emplace_back(RobotAndInitialPose{robot, position, orientation});
     }
@@ -109,10 +101,10 @@ void CMPGAAggregationLoopFunctions::PlaceLine(const CVector2 &c_center,
   }
 }
 
-void CMPGAAggregationLoopFunctions::PlaceCluster(const CVector2 &c_center,
-                                                 UInt32 n_robots,
-                                                 Real f_density,
-                                                 UInt32 un_id_start) {
+void SegregationLoopFunction::PlaceCluster(const CVector2 &c_center,
+                                           UInt32 n_robots,
+                                           Real f_density,
+                                           UInt32 un_id_start) {
   try {
     Real fHalfSide = Sqrt((M_PI * Square(0.085036758f) * n_robots) / f_density) / 2.0f;
     CRange<Real> cAreaRange(-fHalfSide, fHalfSide);
@@ -126,24 +118,25 @@ void CMPGAAggregationLoopFunctions::PlaceCluster(const CVector2 &c_center,
       /* Create the robot in the origin and add it to ARGoS space */
       auto robot = new CFootBotEntity(cFBId.str(), XML_CONTROLLER_ID);
       AddEntity(*robot);
-      auto controller = &dynamic_cast<GenericFootbotController &>(robot->GetControllableEntity().GetController());
+      auto &generic_controller = robot->GetControllableEntity().GetController();
+      auto controller = &dynamic_cast<SegregationFootbotController &>(generic_controller);
       m_controllers.emplace_back(controller);
 
       /* Try to place it in the arena */
-      auto unTrials = 0;
+      auto attempts = 0;
       bool bDone;
       CVector3 position;
       CQuaternion orientation;
       do {
         /* Choose a random position and orientation */
-        ++unTrials;
+        ++attempts;
         position =
             CVector3(m_rng->Uniform(cAreaRange) + c_center.GetX(),
                      m_rng->Uniform(cAreaRange) + c_center.GetY(),
                      0.0f);
         orientation = CQuaternion{m_rng->Uniform(CRadians::UNSIGNED_RANGE), CVector3::Z};
         bDone = MoveEntity(robot->GetEmbodiedEntity(), position, orientation);
-      } while (!bDone && unTrials <= 20);
+      } while (!bDone && attempts <= 10);
       if (!bDone) {
         THROW_ARGOSEXCEPTION("Can't place " << cFBId.str());
       }
@@ -156,38 +149,24 @@ void CMPGAAggregationLoopFunctions::PlaceCluster(const CVector2 &c_center,
   }
 }
 
-void CMPGAAggregationLoopFunctions::ConfigureFromGenome(const Real *genome) {
-  /* Set the Binary parameters */
+void SegregationLoopFunction::ConfigureFromGenome(const Real *genome) {
   for (const auto &robot_controller: m_controllers) {
-    robot_controller->SetParameters(GenericFootbotController::GENOME_SIZE, genome);
+    robot_controller->SetParameters(SegregationFootbotController::GENOME_SIZE, genome);
   }
 }
 
-Real CMPGAAggregationLoopFunctions::Score() {
-  // Equation (1) from Self-organized aggregation without computation
-  CSpace::TMapPerType &robot_map = GetSpace().GetEntitiesByType("foot-bot");
-
-  auto accum_position = [](CVector3 sum, const CSpace::TMapPerType::value_type &p) {
-    auto robot = any_cast<CFootBotEntity *>(p.second);
-    auto robot_position = robot->GetEmbodiedEntity().GetOriginAnchor().Position;
-    return sum + robot_position;
-  };
-
-  auto centroid =
-      std::accumulate(std::begin(robot_map), std::end(robot_map), CVector3::ZERO, accum_position) / robot_map.size();
-
-  auto accum_cost = [centroid](double cost, const CSpace::TMapPerType::value_type &p) {
-    auto robot = any_cast<CFootBotEntity *>(p.second);
-    auto robot_position = robot->GetEmbodiedEntity().GetOriginAnchor().Position;
-    auto c = (robot_position - centroid).SquareLength();
-    return cost + c;
-  };
-
-  auto cost = std::accumulate(std::begin(robot_map), std::end(robot_map), 0.0, accum_cost);
-  constexpr double ROBOT_RADIUS = 0.17;
-  cost *= 1 / (4 * std::pow(ROBOT_RADIUS, 2));
-
-  return -cost;
+void SegregationLoopFunction::LoadFromFile(const std::string &params_filename) {
+  for (const auto &robot_controller: m_controllers) {
+    robot_controller->LoadFromFile(params_filename);
+  }
 }
 
-REGISTER_LOOP_FUNCTIONS(CMPGAAggregationLoopFunctions, "aggregation_loop_functions")
+Real SegregationLoopFunction::Score() {
+  return m_cost;
+}
+
+void SegregationLoopFunction::PostStep() {
+  m_cost += CostAtStep(m_step) * m_step;
+  ++m_step;
+}
+
