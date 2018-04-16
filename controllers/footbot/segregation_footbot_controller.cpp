@@ -31,23 +31,6 @@ void SegregationFootbotController::Init(TConfigurationNode &t_node) {
     LoadFromFile(params_filename);
   }
 
-  for (UInt32 led_id = 0; led_id < m_pcLEDs->GetNumLEDs() / 2; ++led_id) {
-    switch (m_group) {
-      case 0: m_pcLEDs->SetSingleColor(led_id, CColor::GREEN);
-        break;
-      case 1: m_pcLEDs->SetSingleColor(led_id, CColor::PURPLE);
-        break;
-      case 2: m_pcLEDs->SetSingleColor(led_id, CColor::ORANGE);
-        break;
-      case 3: m_pcLEDs->SetSingleColor(led_id, CColor::YELLOW);
-        break;
-      case 4: m_pcLEDs->SetSingleColor(led_id, CColor::BLUE);
-        break;
-      default: m_pcLEDs->SetSingleColor(led_id, CColor::RED);
-        break;
-    }
-  }
-
   Reset();
 }
 
@@ -107,7 +90,8 @@ SegregationFootbotController::SensorState SegregationFootbotController::GetKinSe
     }
   }
 
-  for (auto led_id = static_cast<UInt32>(m_pcLEDs->GetNumLEDs() / 2); led_id < m_pcLEDs->GetNumLEDs(); ++led_id) {
+  for (auto i = 10; i < 14; ++i) {
+    UInt32 led_id = static_cast<UInt32>(i % 12);
     switch (sens_state) {
       case SensorState::KIN: m_pcLEDs->SetSingleColor(led_id, CColor::BLUE);
         break;
@@ -122,6 +106,22 @@ SegregationFootbotController::SensorState SegregationFootbotController::GetKinSe
 }
 
 void SegregationFootbotController::ControlStep() {
+
+  switch (m_group) {
+    case 0: m_pcLEDs->SetAllColors(CColor::GREEN);
+      break;
+    case 1: m_pcLEDs->SetAllColors(CColor::RED);
+      break;
+    case 2: m_pcLEDs->SetAllColors(CColor::BLUE);
+      break;
+    case 3: m_pcLEDs->SetAllColors(CColor::GREEN);
+      break;
+    case 4: m_pcLEDs->SetAllColors(CColor::RED);
+      break;
+    default: m_pcLEDs->SetAllColors(CColor::BLUE);
+      break;
+  }
+
   auto sensor_state = GetKinSensorVal();
   switch (sensor_state) {
     case SensorState::KIN: {
@@ -156,23 +156,6 @@ void SegregationFootbotController::SetParameters(const size_t num_params, const 
 void SegregationFootbotController::SetGroup(unsigned long group) {
   m_group = group;
   m_pcRABAct->SetData(0, (uint8_t) m_group);
-
-  for (UInt32 led_id = 0; led_id < m_pcLEDs->GetNumLEDs() / 2; ++led_id) {
-    switch (m_group) {
-      case 0: m_pcLEDs->SetSingleColor(led_id, CColor::GREEN);
-        break;
-      case 1: m_pcLEDs->SetSingleColor(led_id, CColor::RED);
-        break;
-      case 2: m_pcLEDs->SetSingleColor(led_id, CColor::BLUE);
-        break;
-      case 3: m_pcLEDs->SetSingleColor(led_id, CColor::GREEN);
-        break;
-      case 4: m_pcLEDs->SetSingleColor(led_id, CColor::RED);
-        break;
-      default: m_pcLEDs->SetSingleColor(led_id, CColor::BLUE);
-        break;
-    }
-  }
 }
 
 REGISTER_CONTROLLER(SegregationFootbotController, "footbot_segregation_controller")
