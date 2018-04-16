@@ -6,10 +6,11 @@ void SegregationLoopFunction::Init(TConfigurationNode &t_node) {
   try {
     UInt32 seed;
     GetNodeAttribute(t_node, "random_seed", seed);
+    GetNodeAttributeOrDefault(t_node, "n_classes", n_classes, 1);
     CRandom::CreateCategory("aggregation_loop_function", seed);
     m_rng = CRandom::CreateRNG("aggregation_loop_function");
 
-    UInt32 unPlacedRobots = 0;
+    UInt32 num_placed_robots = 0;
 
     /* Go through the nodes */
     TConfigurationNodeIterator itDistr;
@@ -29,24 +30,24 @@ void SegregationLoopFunction::Init(TConfigurationNode &t_node) {
       GetNodeAttribute(tDistr, "center", cCenter);
 
       /* Number of robots to place */
-      UInt32 unRobots;
-      GetNodeAttribute(tDistr, "robot_num", unRobots);
+      UInt32 robot_num;
+      GetNodeAttribute(tDistr, "robot_num", robot_num);
       /* Parse distribution-specific attributes and place robots */
       if (itDistr->Value() == "line") {
         /* Distance between the robots */
         Real fDistance;
         GetNodeAttribute(tDistr, "robot_distance", fDistance);
-        PlaceLine(cCenter, unRobots, fDistance, unPlacedRobots);
+        PlaceLine(cCenter, robot_num, fDistance, num_placed_robots);
 
       } else if (itDistr->Value() == "cluster") {
         /* Density of the robots */
-        Real fDensity;
-        GetNodeAttribute(tDistr, "robot_density", fDensity);
-        PlaceCluster(cCenter, unRobots, fDensity, unPlacedRobots);
+        Real f_density;
+        GetNodeAttribute(tDistr, "robot_density", f_density);
+        PlaceCluster(cCenter, robot_num, f_density, num_placed_robots);
       }
 
       /* Update robot count */
-      unPlacedRobots += unRobots;
+      num_placed_robots += robot_num;
     }
   }
   catch (CARGoSException &ex) {
@@ -79,20 +80,23 @@ void SegregationLoopFunction::PlaceLine(const CVector2 &c_center,
                                         Real f_distance,
                                         UInt32 un_id_start) {
   try {
-    std::ostringstream cFBId;
+    std::ostringstream footbot_id;
     int j = -static_cast<int>(n_robots / 2);
     for (size_t i = 0; i < n_robots; ++i, ++j) {
-      cFBId.str("");
-      cFBId << (i + un_id_start);
+      auto id = i + un_id_start;
+      auto group_id = id % n_classes;
+      footbot_id.str("");
+      footbot_id << id;
 
       /* Create the robot in the origin and add it to ARGoS space */
       auto position = CVector3{f_distance * j + c_center.GetX(), f_distance * j + c_center.GetY(), 0};
       CQuaternion orientation = CQuaternion{m_rng->Uniform(CRadians::UNSIGNED_RANGE), CVector3::Z};
-      auto robot = new CFootBotEntity(cFBId.str(), XML_CONTROLLER_ID, position, orientation);
+      auto robot = new CFootBotEntity(footbot_id.str(), XML_CONTROLLER_ID, position, orientation);
       AddEntity(*robot);
       auto &generic_controller = robot->GetControllableEntity().GetController();
       auto controller = &dynamic_cast<SegregationFootbotController &>(generic_controller);
       m_controllers.emplace_back(controller);
+      controller->my_group = group_id;
       m_robots.emplace_back(RobotAndInitialPose{robot, position, orientation});
     }
   }
@@ -112,14 +116,17 @@ void SegregationLoopFunction::PlaceCluster(const CVector2 &c_center,
     std::ostringstream cFBId;
 
     for (size_t i = 0; i < n_robots; ++i) {
+      auto id = i + un_id_start;
+      auto group_id = id % n_classes;
       cFBId.str("");
-      cFBId << (i + un_id_start);
+      cFBId << id;
 
       /* Create the robot in the origin and add it to ARGoS space */
       auto robot = new CFootBotEntity(cFBId.str(), XML_CONTROLLER_ID);
       AddEntity(*robot);
       auto &generic_controller = robot->GetControllableEntity().GetController();
       auto controller = &dynamic_cast<SegregationFootbotController &>(generic_controller);
+      controller->my_group = group_id;
       m_controllers.emplace_back(controller);
 
       /* Try to place it in the arena */

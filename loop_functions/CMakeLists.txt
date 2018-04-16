@@ -12,5 +12,8 @@ target_link_libraries(segregation_loop_function
 add_library(mpga SHARED mpga.cpp)
 target_link_libraries(mpga argos3core_simulator segregation_loop_function)
 
-add_library(gauci_segregation_loop_function SHARED gauci_segregation_loop_function.cpp)
+add_library(gauci_segregation_loop_function SHARED gauci_loop_function.cpp)
 target_link_libraries(gauci_segregation_loop_function segregation_loop_function)
+
+add_library(n_class_loop_function SHARED n_class_loop_function.cpp)
+target_link_libraries(n_class_loop_function segregation_loop_function)

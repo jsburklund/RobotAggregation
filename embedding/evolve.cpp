@@ -8,7 +8,7 @@
 #include <functional>
 #include <fstream>
 #include <loop_functions/mpga.h>
-#include <loop_functions/gauci_segregation_loop_function.h>
+#include <loop_functions/gauci_loop_function.h>
 
 #include "args.h"
 
@@ -30,9 +30,9 @@ void FlushIndividual(const CMPGA::SIndividual &s_ind,
   cOFS << std::endl;
 }
 
-Real RobotAggregationScorer(const std::vector<Real> &vec_scores) {
-  auto max = std::max_element(begin(vec_scores), end(vec_scores));
-  return *max;
+Real MeanScoreAggregator(const std::vector<Real> &vec_scores) {
+  auto mean = std::accumulate(begin(vec_scores), end(vec_scores), 0.0) / vec_scores.size();
+  return mean;
 }
 
 int main(int argc, const char **argv) {
@@ -54,13 +54,13 @@ int main(int argc, const char **argv) {
   CMPGA cGA(CRange<Real>(-1.0, 1.0),                   // Allele range
             SegregationFootbotController::GENOME_SIZE, // Genome size
             10,                                        // Population size
-            0.05,                                      // Mutation probability
+            0.15,                                      // Mutation probability
             5,                                         // Number of trials
-            25,                                        // Number of generations
-            true,                                      // Minimize score
+            1000,                                        // Number of generations
+            false,                                     // Maximize score?
             args::get(argos_filename),                 // .argos conf file
-            &RobotAggregationScorer,                   // The score aggregator
-            12345                                      // Random seed
+            &MeanScoreAggregator,                      // The score aggregator
+            0                                          // Random seed
   );
   cGA.Evaluate();
   argos::LOG << "Generation #" << cGA.GetGeneration() << "...";

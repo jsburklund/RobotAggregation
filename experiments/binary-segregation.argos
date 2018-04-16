@@ -19,13 +19,13 @@
       <sensors>
         <range_and_bearing implementation="medium" medium="rab" show_rays="false"/>
       </sensors>
-      <params/>
+      <params num_classes="1"/>
     </footbot_segregation_controller>
 
   </controllers>
 
-  <loop_functions library="build/loop_functions/libgauci_segregation_loop_function"
-                  label="gauci_segregation_loop_function" random_seed="0" num_classes="1">
+  <loop_functions library="build/loop_functions/libn_class_loop_function" label="n_class_loop_function" random_seed="0"
+                  num_classes="2">
     <!--<line center="2.5,2.5" robot_num="10" robot_distance="0.3" />-->
     <cluster center="2.5,2.5" robot_num="10" robot_density="0.05"/>
   </loop_functions>

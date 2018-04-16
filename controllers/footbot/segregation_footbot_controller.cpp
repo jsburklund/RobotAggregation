@@ -37,11 +37,6 @@ void SegregationFootbotController::Init(TConfigurationNode &t_node) {
   size_t pos;
   my_id = std::stoul(my_idstr, &pos);
 
-  // Set group based on ID modulo some number
-  UInt8 num_classes;
-  GetNodeAttributeOrDefault(t_node, "num_classes", num_classes, 1);
-  my_group = my_id % num_classes;
-
   for (UInt32 led_id = 0; led_id < m_pcLEDs->GetNumLEDs() / 2; ++led_id) {
     switch (my_group) {
       case 0: m_pcLEDs->SetSingleColor(led_id, CColor::ORANGE);
@@ -162,7 +157,6 @@ void SegregationFootbotController::SetParameters(const size_t num_params, const 
   for (size_t i = 0; i < num_params; ++i) {
     m_params[i] = params[i];
   }
-
 }
 
 REGISTER_CONTROLLER(SegregationFootbotController, "footbot_segregation_controller")

@@ -233,32 +233,35 @@ void CMPGA::LaunchARGoS(UInt32 un_slave_id) {
     LOGERR << ex.what() << std::endl;
     ::raise(SIGTERM);
   }
-  /* Get a reference to the loop functions */
-  SegregationLoopFunction &cLoopFunctions = dynamic_cast<SegregationLoopFunction &>(cSimulator.GetLoopFunctions());
-  /* Create vector of scores */
+  auto &cLoopFunctions = dynamic_cast<SegregationLoopFunction &>(cSimulator.GetLoopFunctions());
   std::vector<Real> vecScores(m_unNumTrials, 0.0);
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
   /* Continue working until killed by parent */
-  while (1) {
+  while (true) {
     /* Suspend yourself, waiting for parent's resume signal */
     ::raise(SIGTSTP);
     /* Resumed */
+
     /* Configure the controller with the genome */
-    cLoopFunctions.ConfigureFromGenome(m_pcSharedMem->GetGenome(un_slave_id));
+    LOG << un_slave_id << ": ";
+    auto genome = m_pcSharedMem->GetGenome(un_slave_id);
+    cLoopFunctions.ConfigureFromGenome(genome);
+
     /* Run the trials */
     for (size_t i = 0; i < m_unNumTrials; ++i) {
-      /* Reset the experiment.
-       * This internally calls also SeggregationLoopFunction::Reset(). */
       cSimulator.Reset();
-      /* Run the experiment */
       cSimulator.Execute();
-      /* Store score */
       vecScores[i] = cLoopFunctions.Score();
       LOG.Flush();
       LOGERR.Flush();
     };
+
     /* Put result in shared memory */
     m_pcSharedMem->SetScore(un_slave_id, m_tScoreAggregator(vecScores));
   }
+#pragma clang diagnostic pop
 }
 
 /****************************************/
@@ -310,7 +313,7 @@ void CMPGA::Mutation() {
   for (UInt32 i = 2; i < m_unPopSize; ++i) {
     for (UInt32 a = 0; a < m_unGenomeSize; ++a) {
       if (m_pcRNG->Bernoulli(m_fMutationProb))
-        m_tPopulation[i]->Genome[a] += m_pcRNG->Uniform(m_cAlleleRange) * 0.05;
+        m_tPopulation[i]->Genome[a] = m_pcRNG->Uniform(m_cAlleleRange);
     }
   }
 }

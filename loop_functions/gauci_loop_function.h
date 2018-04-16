@@ -9,7 +9,7 @@
 
 using namespace argos;
 
-class GauciSegregationLoopFunction : public SegregationLoopFunction {
+class GauciLoopFunction : public SegregationLoopFunction {
 
   Real CostAtStep(unsigned long step) override;
 

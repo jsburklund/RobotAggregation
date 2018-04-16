@@ -1,11 +1,16 @@
 #include <numeric>
 #include <iterator>
 
-#include "gauci_segregation_loop_function.h"
+#include "n_class_loop_function.h"
 
-Real GauciSegregationLoopFunction::CostAtStep(unsigned long step) {
-  // Equation (1) from Self-organized aggregation without computation
+Real NClassLoopFunction::CostAtStep(unsigned long step) {
   CSpace::TMapPerType &robot_map = GetSpace().GetEntitiesByType("foot-bot");
+
+  // split up the map into containers for each robot group
+  for (const auto &p : robot_map) {
+    auto id = p.first;
+    auto robot = any_cast<CFootBotEntity *>(p.second);
+  }
 
   auto accum_position = [](CVector3 sum, const CSpace::TMapPerType::value_type &p) {
     auto robot = any_cast<CFootBotEntity *>(p.second);
@@ -30,4 +35,4 @@ Real GauciSegregationLoopFunction::CostAtStep(unsigned long step) {
   return cost;
 }
 
-REGISTER_LOOP_FUNCTIONS(GauciSegregationLoopFunction, "gauci_segregation_loop_function")
+REGISTER_LOOP_FUNCTIONS(NClassLoopFunction, "n_class_loop_function")

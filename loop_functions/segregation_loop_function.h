@@ -54,4 +54,5 @@ class SegregationLoopFunction : public CLoopFunctions {
   Real m_cost = 0;
   unsigned long m_step = 0;
 
+  UInt8 n_classes;
 };
