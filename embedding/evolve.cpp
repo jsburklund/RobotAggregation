@@ -3,9 +3,8 @@
  * uses multiple processes to parallelize the optimization process.
  */
 
-#include <algorithm>
 #include <iostream>
-#include <functional>
+#include <numeric>
 #include <fstream>
 #include <loop_functions/mpga.h>
 #include <loop_functions/gauci_loop_function.h>
