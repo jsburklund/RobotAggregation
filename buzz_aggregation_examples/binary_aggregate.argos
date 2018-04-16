@@ -34,7 +34,7 @@
     <distribute>
       <position max="2,2,0" method="uniform" min="-2,-2,0" />
       <orientation mean="0,0,0" method="gaussian" std_dev="360,0,0" />
-      <entity max_trials="100" quantity="10">
+      <entity max_trials="100" quantity="40">
         <kheperaiv id="kiv">
           <controller config="obsAvoid" />
         </kheperaiv>

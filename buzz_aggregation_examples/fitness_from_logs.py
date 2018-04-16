@@ -6,14 +6,15 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-def compute_dispersion(poses_over_time, robot_radius):
-    centroid = poses_over_time.mean(axis=0)
-    dispersion = 1 / (4 * robot_radius ** 2) * np.sum(np.linalg.norm(poses_over_time - centroid, axis=2) ** 2, axis=1)
-    return dispersion
+
+def compute_dispersion_over_time(poses_over_time, robot_radius):
+    centroid_over_time = np.expand_dims(poses_over_time.mean(axis=1), axis=1)
+    u = np.sum(np.linalg.norm(poses_over_time - centroid_over_time, axis=2) ** 2, axis=1)
+    dispersion_over_time = 1 / (4 * robot_radius ** 2) * u
+    return dispersion_over_time
+
 
 def main():
-    np.set_printoptions(suppress=True)
-
     parser = argparse.ArgumentParser()
     parser.add_argument('log_directories', nargs='+')
     parser.add_argument('--robot-radius', type=float, default=0.0704)
@@ -38,13 +39,13 @@ def main():
 
         poses = np.array(poses)[:, :, 1:]
         poses = np.transpose(poses, [1, 0, 2])
-        dispersion_over_time = compute_dispersion(poses, args.robot_radius)
+        dispersion_over_time = compute_dispersion_over_time(poses, args.robot_radius)
         dispersion_by_trial.append(dispersion_over_time)
         plt.plot(dispersion_over_time, color='black', alpha=0.2)
 
     mean_dispersion = np.mean(dispersion_by_trial, axis=0)
 
-    opt_pack =  0.1482 / (4 * args.robot_radius ** 2)
+    opt_pack = 0.1482 / (4 * args.robot_radius ** 2)
     print("minimum dispersion from trials, optimal dispersion")
     print(np.min(dispersion_by_trial), opt_pack)
 
