@@ -34,6 +34,7 @@ Real MeanScoreAggregator(const std::vector<Real> &vec_scores) {
 
 int main(int argc, const char **argv) {
   args::ArgumentParser parser("main");
+  args::HelpFlag help(parser, "help", "Display this help menu", {'h', "help"});
   args::Positional<std::string> argos_filename(parser, "argos_filename", "", args::Options::Required);
   args::ValueFlag<unsigned int>
       population_size_flag(parser, "population size", "population size", {'p', "population"}, 10);

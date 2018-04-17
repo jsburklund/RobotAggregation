@@ -10,6 +10,7 @@
 
 int main(int argc, const char **argv) {
   args::ArgumentParser parser("main");
+  args::HelpFlag help(parser, "help", "Display this help menu", {'h', "help"});
   args::Positional<std::string>
       argos_filename_flag(parser, "argos_filename", "argos config file", args::Options::Required);
   args::Positional<std::string>

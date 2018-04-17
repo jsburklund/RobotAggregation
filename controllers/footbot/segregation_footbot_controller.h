@@ -45,7 +45,7 @@ class SegregationFootbotController : public CCI_Controller {
   CCI_RangeAndBearingSensor *m_pcRABSens;
   CCI_LEDsActuator *m_pcLEDs;
 
-  Real kCAM_VIEW_ANG = 15 * 3.141593 / 180.0;
+  Real kCAM_VIEW_ANG = 15 * M_PI / 180.0;
 
  private:
   unsigned long m_group = 0;
