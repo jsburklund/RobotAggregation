@@ -4,7 +4,7 @@
 
   <framework>
     <system threads="0"/>
-    <experiment length="180" ticks_per_second="10" random_seed="0"/>
+    <experiment length="180" ticks_per_second="10" random_seed="312"/>
   </framework>
 
   <controllers>
@@ -19,17 +19,17 @@
       <sensors>
         <range_and_bearing implementation="medium" medium="rab" show_rays="false"/>
       </sensors>
-      <params parameter_file="params/amazing_aggregation.dat"/>
+      <params/>
     </footbot_segregation_controller>
 
   </controllers>
 
-  <loop_functions library="build/loop_functions/libgauci_segregation_loop_function"
-                  label="gauci_segregation_loop_function" random_seed="0" num_classes="4">
-    <cluster center="1,2.5" robot_num="10" robot_density="0.2" />
-    <cluster center="2.5,1" robot_num="10" robot_density="0.2" />
-    <cluster center="4,2.5" robot_num="10" robot_density="0.2" />
-    <cluster center="2.5,4" robot_num="10" robot_density="0.2" />
+  <loop_functions library="build/loop_functions/libn_class_segregation_loop_function"
+                  label="n_class_segregation_loop_function" random_seed="0" num_classes="2">
+    <line center="3.25,1.75" robot_num="10" robot_distance="0.3" />
+    <line center="2.75,2.25" robot_num="10" robot_distance="0.3" />
+    <line center="2.25,2.75" robot_num="10" robot_distance="0.3" />
+    <line center="1.75,3.25" robot_num="10" robot_distance="0.3" />
 
   </loop_functions>
 
@@ -62,12 +62,7 @@
     <range_and_bearing id="rab"/>
   </media>
 
-  <visualization>
-    <qt-opengl>
-      <camera>
-        <placement idx="0" position="2.5,2.5,6" look_at="2.5,2.5,0" lens_focal_length="30"/>
-      </camera>
-    </qt-opengl>
-  </visualization>
+  <!-- We don't want nor need a visualization during evolution -->
+  <visualization/>
 
 </argos-configuration>

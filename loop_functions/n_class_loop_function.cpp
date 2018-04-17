@@ -59,4 +59,4 @@ Real NClassLoopFunction::CostAtStep(unsigned long step) {
   return cost - centroid_dispersion_cost;
 }
 
-REGISTER_LOOP_FUNCTIONS(NClassLoopFunction, "n_class_loop_function")
+REGISTER_LOOP_FUNCTIONS(NClassLoopFunction, "n_class_segregation_loop_function")

@@ -1,0 +1,73 @@
+<?xml version="1.0" ?>
+
+<argos-configuration>
+
+  <framework>
+    <system threads="0"/>
+    <experiment length="180" ticks_per_second="10" random_seed="312"/>
+  </framework>
+
+  <controllers>
+
+    <footbot_segregation_controller id="fb_segregation"
+                                    library="build/controllers/footbot/libfootbot_segregation_controller">
+      <actuators>
+        <differential_steering implementation="default"/>
+        <range_and_bearing implementation="default"/>
+        <leds implementation="default" medium="leds"/>
+      </actuators>
+      <sensors>
+        <range_and_bearing implementation="medium" medium="rab" show_rays="false"/>
+      </sensors>
+      <params/>
+    </footbot_segregation_controller>
+
+  </controllers>
+
+  <loop_functions library="build/loop_functions/libn_class_segregation_loop_function"
+                  label="n_class_segregation_loop_function" random_seed="0" num_classes="2">
+    <line center="3.25,1.75" robot_num="5" robot_distance="0.3" />
+    <line center="2.75,2.25" robot_num="5" robot_distance="0.3" />
+    <line center="2.25,2.75" robot_num="5" robot_distance="0.3" />
+    <line center="1.75,3.25" robot_num="5" robot_distance="0.3" />
+
+  </loop_functions>
+
+  <arena size="6, 6, 2" center="2.5,2.5,1">
+
+    <box id="wall_north" size="5,0.1,0.5" movable="false">
+      <body position="2.5,5,0" orientation="0,0,0"/>
+    </box>
+
+    <box id="wall_south" size="5,0.1,0.5" movable="false">
+      <body position="2.5,0,0" orientation="0,0,0"/>
+    </box>
+
+    <box id="wall_east" size="0.1,5,0.5" movable="false">
+      <body position="0,2.5,0" orientation="0,0,0"/>
+    </box>
+
+    <box id="wall_west" size="0.1,5,0.5" movable="false">
+      <body position="5,2.5,0" orientation="0,0,0"/>
+    </box>
+
+  </arena>
+
+  <physics_engines>
+    <dynamics2d id="dyn2d"/>
+  </physics_engines>
+
+  <media>
+    <led id="leds"/>
+    <range_and_bearing id="rab"/>
+  </media>
+
+  <visualization>
+    <qt-opengl>
+      <camera>
+        <placement idx="0" position="2.5,2.5,6" look_at="2.5,2.5,0" lens_focal_length="30"/>
+      </camera>
+    </qt-opengl>
+  </visualization>
+
+</argos-configuration>

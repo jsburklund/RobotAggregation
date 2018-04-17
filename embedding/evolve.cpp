@@ -12,26 +12,12 @@
 
 #include "args.h"
 
-void FlushIndividual(const CMPGA::SIndividual &s_ind,
-                     UInt32 un_generation) {
-  std::ostringstream cOSS;
-  cOSS << ".best_" << un_generation << ".dat";
-  std::ofstream cOFS(cOSS.str().c_str(), std::ios::out | std::ios::trunc);
-  /* First write the number of values to dump */
-  cOFS << SegregationFootbotController::GENOME_SIZE;
-  /* Then dump the genome */
-  for (UInt32 i = 0; i < SegregationFootbotController::GENOME_SIZE; ++i) {
-    cOFS << " " << s_ind.Genome[i];
-  }
-  /* End line */
-  cOFS << std::endl;
-}
 
 void FlushPopulation(const CMPGA::TPopulation population, UInt32 generation) {
   auto individual_idx = 0;
   for (const auto &individual : population) {
     std::ostringstream oss;
-    oss << "." << individual_idx++ << "_" << generation << ".dat";
+    oss << ".individual_" << individual_idx++ << "_gen_" << generation << ".dat";
     std::ofstream ofs(oss.str().c_str(), std::ios::out | std::ios::trunc);
     ofs << SegregationFootbotController::GENOME_SIZE << " ";
     for (const auto gene : individual->Genome) {
