@@ -244,6 +244,8 @@ protected:
    /** Comparison function to sort the population */
    bool (*m_cIndComparator)(const SIndividual*,
                             const SIndividual*);
+
+  UInt8 n_classes;
 };
 
 #endif

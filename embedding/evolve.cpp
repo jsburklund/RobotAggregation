@@ -5,15 +5,13 @@
 
 #include <iostream>
 #include <numeric>
+#include <iterator>
 #include <fstream>
 #include <loop_functions/mpga.h>
 #include <loop_functions/gauci_loop_function.h>
 
 #include "args.h"
 
-/*
- * Flush best individual
- */
 void FlushIndividual(const CMPGA::SIndividual &s_ind,
                      UInt32 un_generation) {
   std::ostringstream cOSS;
@@ -27,6 +25,20 @@ void FlushIndividual(const CMPGA::SIndividual &s_ind,
   }
   /* End line */
   cOFS << std::endl;
+}
+
+void FlushPopulation(const CMPGA::TPopulation population, UInt32 generation) {
+  auto individual_idx = 0;
+  for (const auto &individual : population) {
+    std::ostringstream oss;
+    oss << "." << individual_idx++ << "_" << generation << ".dat";
+    std::ofstream ofs(oss.str().c_str(), std::ios::out | std::ios::trunc);
+    ofs << SegregationFootbotController::GENOME_SIZE << " ";
+    for (const auto gene : individual->Genome) {
+      ofs << gene << " ";
+    }
+    ofs << std::endl;
+  };
 }
 
 Real MeanScoreAggregator(const std::vector<Real> &vec_scores) {
@@ -76,26 +88,20 @@ int main(int argc, const char **argv) {
   for (auto i : cGA.GetPopulation()) {
     argos::LOG << " " << i->Score;
   }
-  argos::LOG << " [Flushing genome... ";
-  /* Flush scores of best individual */
-  FlushIndividual(*cGA.GetPopulation()[0], cGA.GetGeneration());
-  argos::LOG << "done.]";
+  FlushPopulation(cGA.GetPopulation(), cGA.GetGeneration());
   LOG << std::endl;
   LOG.Flush();
   while (!cGA.Done()) {
     cGA.NextGen();
     cGA.Evaluate();
     argos::LOG << "Generation #" << cGA.GetGeneration() << "...";
-    argos::LOG << " scores:";
+    argos::LOG << " costs:";
     for (auto i : cGA.GetPopulation()) {
       argos::LOG << " " << i->Score;
     }
-    if (cGA.GetGeneration() % 5 == 0) {
-      argos::LOG << " [Flushing genome... ";
-      /* Flush scores of best individual */
-      FlushIndividual(*cGA.GetPopulation()[0], cGA.GetGeneration());
-      argos::LOG << "done.]";
-    }
+
+    FlushPopulation(cGA.GetPopulation(), cGA.GetGeneration());
+
     LOG << std::endl;
     LOG.Flush();
   }

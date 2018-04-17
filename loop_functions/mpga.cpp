@@ -11,14 +11,8 @@
 #include <argos3/core/simulator/simulator.h>
 #include "segregation_loop_function.h"
 
-/****************************************/
-/****************************************/
-
 /* File name for shared memory area */
 static const std::string SHARED_MEMORY_FILE = "/MPGA_SHARED_MEMORY_" + ToString(getpid());
-
-/****************************************/
-/****************************************/
 
 bool SortHighToLow(const CMPGA::SIndividual *pc_a,
                    const CMPGA::SIndividual *pc_b) {
@@ -29,9 +23,6 @@ bool SortLowToHigh(const CMPGA::SIndividual *pc_a,
                    const CMPGA::SIndividual *pc_b) {
   return pc_b->Score > pc_a->Score;
 }
-
-/****************************************/
-/****************************************/
 
 CMPGA::CMPGA(const CRange<Real> &c_allele_range,
              UInt32 un_genome_size,
@@ -92,9 +83,6 @@ CMPGA::CMPGA(const CRange<Real> &c_allele_range,
   ::sleep(1);
 }
 
-/****************************************/
-/****************************************/
-
 CMPGA::~CMPGA() {
   /* Terminate slaves */
   for (UInt32 i = 0; i < m_unPopSize; ++i) {
@@ -110,29 +98,17 @@ CMPGA::~CMPGA() {
   Cleanup();
 }
 
-/****************************************/
-/****************************************/
-
 const CMPGA::TPopulation &CMPGA::GetPopulation() const {
   return m_tPopulation;
 }
-
-/****************************************/
-/****************************************/
 
 UInt32 CMPGA::GetGeneration() const {
   return m_unCurrentGeneration;
 }
 
-/****************************************/
-/****************************************/
-
 void CMPGA::Cleanup() {
   delete m_pcSharedMem;
 }
-
-/****************************************/
-/****************************************/
 
 void CMPGA::Evaluate() {
   /* Set parameters for the processes and resume them */
@@ -161,18 +137,15 @@ void CMPGA::Evaluate() {
     /* All OK, one less slave to wait for */
     --unTrialsLeft;
   }
+
   /* Copy the scores into the population data */
   for (UInt32 i = 0; i < m_unPopSize; ++i) {
     m_tPopulation[i]->Score = m_pcSharedMem->GetScore(i);
   }
-  /* Sort the population by score, from the best to the worst */
-  std::sort(m_tPopulation.begin(),
-            m_tPopulation.end(),
-            m_cIndComparator);
-}
 
-/****************************************/
-/****************************************/
+  /* Sort the population by score, from the best to the worst */
+  std::sort(m_tPopulation.begin(), m_tPopulation.end(), m_cIndComparator);
+}
 
 void CMPGA::NextGen() {
   ++m_unCurrentGeneration;
@@ -181,15 +154,9 @@ void CMPGA::NextGen() {
   Mutation();
 }
 
-/****************************************/
-/****************************************/
-
 bool CMPGA::Done() const {
   return m_unCurrentGeneration >= m_unGenerations;
 }
-
-/****************************************/
-/****************************************/
 
 /* Global pointer to the CMPGA object in the current slave, used by
  * SlaveHandleSIGTERM() to perform cleanup */
@@ -264,9 +231,6 @@ void CMPGA::LaunchARGoS(UInt32 un_slave_id) {
 #pragma clang diagnostic pop
 }
 
-/****************************************/
-/****************************************/
-
 void CMPGA::Selection() {
   /* Delete all individuals apart from the top two */
   while (m_tPopulation.size() > 2) {
@@ -274,9 +238,6 @@ void CMPGA::Selection() {
     m_tPopulation.pop_back();
   }
 }
-
-/****************************************/
-/****************************************/
 
 void CMPGA::Crossover() {
   /*
@@ -304,9 +265,6 @@ void CMPGA::Crossover() {
   }
 }
 
-/****************************************/
-/****************************************/
-
 void CMPGA::Mutation() {
   /* Mutate the alleles of the newly added individuals by setting a
    * new random value from a uniform distribution */
@@ -317,9 +275,6 @@ void CMPGA::Mutation() {
     }
   }
 }
-
-/****************************************/
-/****************************************/
 
 CMPGA::CSharedMem::CSharedMem(UInt32 un_genome_size, UInt32 un_pop_size) :
     m_unGenomeSize(un_genome_size),
@@ -354,26 +309,15 @@ CMPGA::CSharedMem::CSharedMem(UInt32 un_genome_size, UInt32 un_pop_size) :
   }
 }
 
-/****************************************/
-/****************************************/
-
 CMPGA::CSharedMem::~CSharedMem() {
   munmap(m_pfSharedMem, m_unPopSize * (m_unGenomeSize + 1) * sizeof(Real));
   close(m_nSharedMemFD);
   shm_unlink(SHARED_MEMORY_FILE.c_str());
 }
 
-/****************************************/
-/****************************************/
-
-
 Real *CMPGA::CSharedMem::GetGenome(UInt32 un_individual) {
   return m_pfSharedMem + un_individual * (m_unGenomeSize + 1);
 }
-
-/****************************************/
-/****************************************/
-
 
 void CMPGA::CSharedMem::SetGenome(UInt32 un_individual,
                                   const Real *pf_genome) {
@@ -382,21 +326,11 @@ void CMPGA::CSharedMem::SetGenome(UInt32 un_individual,
            m_unGenomeSize * sizeof(Real));
 }
 
-/****************************************/
-/****************************************/
-
 Real CMPGA::CSharedMem::GetScore(UInt32 un_individual) {
   return m_pfSharedMem[un_individual * (m_unGenomeSize + 1) + m_unGenomeSize];
 }
-
-/****************************************/
-/****************************************/
-
 
 void CMPGA::CSharedMem::SetScore(UInt32 un_individual,
                                  Real f_score) {
   m_pfSharedMem[un_individual * (m_unGenomeSize + 1) + m_unGenomeSize] = f_score;
 }
-
-/****************************************/
-/****************************************/
