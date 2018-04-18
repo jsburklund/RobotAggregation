@@ -16,7 +16,3 @@ build
 
 ## Peter
 *.swp
-
-## temp output
-*.json
-*generated*
