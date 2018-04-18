@@ -12,7 +12,6 @@
 
 #include "args.h"
 
-
 void FlushPopulation(const CMPGA::TPopulation population, UInt32 generation) {
   auto individual_idx = 0;
   for (const auto &individual : population) {
@@ -68,7 +67,8 @@ int main(int argc, const char **argv) {
             false,
             args::get(argos_filename),
             &MeanScoreAggregator,
-            args::get(random_seed_flag));
+            args::get(random_seed_flag),
+            false);
   cGA.Evaluate();
   argos::LOG << "Generation #" << cGA.GetGeneration() << "...";
   argos::LOG << " scores:";

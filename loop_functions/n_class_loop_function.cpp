@@ -28,7 +28,8 @@ Real NClassLoopFunction::CostAtStep(unsigned long step) {
     auto robots = group.second;
 
     auto centroid =
-        std::accumulate(std::begin(robot_map), std::end(robot_map), CVector3::ZERO, accum_position) / robot_map.size();
+        std::accumulate(std::begin(robot_map), std::end(robot_map), CVector3::ZERO, accum_position)
+            / robot_map.size();
 
     centroids.emplace_back(centroid);
 
@@ -50,7 +51,8 @@ Real NClassLoopFunction::CostAtStep(unsigned long step) {
     auto c = (p - centroid_of_centroids).SquareLength();
     return cost + c;
   };
-  auto centroid_dispersion_cost = std::accumulate(std::begin(centroids), std::end(centroids), 0.0, accum_centroid_cost);
+  auto centroid_dispersion_cost =
+      std::accumulate(std::begin(centroids), std::end(centroids), 0.0, accum_centroid_cost);
   constexpr double ROBOT_RADIUS = 0.17;
   centroid_dispersion_cost *= 1 / (4 * std::pow(ROBOT_RADIUS, 2));
 

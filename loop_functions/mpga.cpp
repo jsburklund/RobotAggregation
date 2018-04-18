@@ -31,9 +31,10 @@ CMPGA::CMPGA(const CRange<Real> &c_allele_range,
              UInt32 un_num_trials,
              UInt32 un_generations,
              bool b_maximize,
-             const std::string &str_argosconf,
+             std::string str_argosconf,
              TScoreAggregator t_score_aggregator,
-             UInt32 un_random_seed) :
+             UInt32 un_random_seed,
+             bool save_logs) :
     m_unCurrentGeneration(0),
     m_cAlleleRange(c_allele_range),
     m_unGenomeSize(un_genome_size),
@@ -41,7 +42,7 @@ CMPGA::CMPGA(const CRange<Real> &c_allele_range,
     m_fMutationProb(f_mutation_prob),
     m_unNumTrials(un_num_trials),
     m_unGenerations(un_generations),
-    m_strARGoSConf(str_argosconf),
+    m_strARGoSConf(std::move(str_argosconf)),
     m_tScoreAggregator(t_score_aggregator),
     MasterPID(::getpid()),
     m_cIndComparator(b_maximize ? SortHighToLow : SortLowToHigh) {
@@ -57,7 +58,7 @@ CMPGA::CMPGA(const CRange<Real> &c_allele_range,
     LOG << pid << " ";
     if (SlavePIDs.back() == 0) {
       /* We're in a slave */
-      LaunchARGoS(i);
+      LaunchARGoS(i, save_logs);
     }
   }
   LOG << "\n";
@@ -170,19 +171,30 @@ void SlaveHandleSIGTERM(int) {
   GA_INSTANCE->Cleanup();
 }
 
-void CMPGA::LaunchARGoS(UInt32 un_slave_id) {
+void CMPGA::LaunchARGoS(UInt32 un_slave_id, bool save_logs) {
   /* Set the global GA instance pointer for signal handler */
   GA_INSTANCE = this;
+
   /* Install handler for SIGTERM */
   ::signal(SIGTERM, SlaveHandleSIGTERM);
+
   /* Initialize ARGoS */
-  /* Redirect LOG and LOGERR to dedicated files to prevent clutter on the screen */
-  std::ofstream cLOGFile(std::string(".ARGoS_LOG_" + ToString(::getpid())).c_str(), std::ios::out);
-  LOG.DisableColoredOutput();
-  LOG.GetStream().rdbuf(cLOGFile.rdbuf());
-  std::ofstream cLOGERRFile(std::string(".ARGoS_LOGERR_" + ToString(::getpid())).c_str(), std::ios::out);
-  LOGERR.DisableColoredOutput();
-  LOGERR.GetStream().rdbuf(cLOGERRFile.rdbuf());
+  if (save_logs) {
+    /* Redirect LOG and LOGERR to dedicated files to prevent clutter on the screen */
+    std::ofstream cLOGFile(std::string(".ARGoS_LOG_" + ToString(::getpid())).c_str(), std::ios::out);
+    LOG.DisableColoredOutput();
+    LOG.GetStream().rdbuf(cLOGFile.rdbuf());
+    std::ofstream cLOGERRFile(std::string(".ARGoS_LOGERR_" + ToString(::getpid())).c_str(), std::ios::out);
+    LOGERR.DisableColoredOutput();
+    LOGERR.GetStream().rdbuf(cLOGERRFile.rdbuf());
+  }
+  else {
+    std::ofstream dev_null("/dev/null");
+    LOG.DisableColoredOutput();
+    LOG.GetStream().rdbuf(dev_null.rdbuf());
+    LOGERR.DisableColoredOutput();
+    LOGERR.GetStream().rdbuf(dev_null.rdbuf());
+  }
   /* The CSimulator class of ARGoS is a singleton. Therefore, to
    * manipulate an ARGoS experiment, it is enough to get its instance */
   argos::CSimulator &cSimulator = argos::CSimulator::GetInstance();

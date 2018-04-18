@@ -167,7 +167,11 @@ Real SegregationLoopFunction::Cost() {
 }
 
 void SegregationLoopFunction::PostStep() {
-  m_cost += CostAtStep(m_step) * m_step;
+  try {
+    m_cost += CostAtStep(m_step) * m_step;
+  } catch (argos::CARGoSException e) {
+    m_cost = -999;
+  }
   ++m_step;
 }
 

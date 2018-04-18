@@ -63,6 +63,6 @@ int main(int argc, const char **argv) {
       printf("trial: %u, cost: %.0f\r\n", i, cost);
     }
   }
-  auto mean =  sum / N;
+  auto mean = sum / N;
   printf("mean: %.4e\r\n", mean);
 }
