@@ -16,7 +16,7 @@ void FlushPopulation(const CMPGA::TPopulation population, UInt32 generation) {
   auto individual_idx = 0;
   for (const auto &individual : population) {
     std::ostringstream oss;
-    oss << ".individual_" << individual_idx++ << "_gen_" << generation << ".dat";
+    oss << "individual_" << individual_idx++ << "_gen_" << generation << ".dat";
     std::ofstream ofs(oss.str().c_str(), std::ios::out | std::ios::trunc);
     ofs << SegregationFootbotController::GENOME_SIZE << " ";
     for (const auto gene : individual->Genome) {

@@ -67,9 +67,9 @@ def main():
 
             plt.plot(np.mean(avg_dispersions, axis=0), label=label)
 
-        print("argos config file, # classes, # trials, mean final dispersion")
+        print("argos config file,classes,trials,mean final dispersion")
         for name, g, t, dispersion in final_info:
-            print("{:75s}, {:2d}, {:2d}, {:10.0f}".format(name, g, t, np.mean(dispersion)))
+            print("{:s},{:d},{:d},{:.0f}".format(name, g, t, np.mean(dispersion)))
 
         if not args.no_plot:
             plt.legend()

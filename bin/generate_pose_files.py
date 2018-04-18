@@ -5,13 +5,14 @@ import subprocess
 
 
 def main():
-    parser = argparse.ArgumentParser("Evaluate cost over a bunch of different argos files")
+    parser = argparse.ArgumentParser("Evaluate cost over a bunch of different argos files.")
     parser.add_argument("params", help="the .dat file of parameters to evaluate")
     parser.add_argument("argos_files", help="all the argos files you want to run evaluate with", nargs="+")
+    parser.add_argument("outfile", help="the filename you want to output paths into", default="generated_files.txt")
     parser.add_argument("--trials", '-t', help="number of trials per argos configuration", type=int, default=5)
     args = parser.parse_args()
 
-    with open("generated_files.txt", 'w') as f:
+    with open(args.outfile, 'w') as f:
         f.write("title_goes_here")
         for argos_file in args.argos_files:
             print("Processing {:s}...".format(argos_file))
