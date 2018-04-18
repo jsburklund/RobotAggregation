@@ -71,7 +71,7 @@ int main(int argc, const char **argv) {
             false);
   cGA.Evaluate();
   argos::LOG << "Generation #" << cGA.GetGeneration() << "...";
-  argos::LOG << " scores:";
+  argos::LOG << " costs:";
   for (auto i : cGA.GetPopulation()) {
     argos::LOG << " " << i->Score;
   }
