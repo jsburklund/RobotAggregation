@@ -166,6 +166,12 @@ void SegregationLoopFunction::LoadFromFile(const std::string &params_filename) {
   }
 }
 
+void SegregationLoopFunction::LoadParameters(const size_t n_params, const Real *params) {
+  for (const auto &robot_controller: m_controllers) {
+    robot_controller->SetParameters(n_params, params);
+  }
+}
+
 Real SegregationLoopFunction::Cost() {
   return m_cost;
 }

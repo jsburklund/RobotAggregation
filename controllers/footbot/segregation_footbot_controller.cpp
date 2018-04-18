@@ -139,7 +139,7 @@ void SegregationFootbotController::ControlStep() {
 
 void SegregationFootbotController::SetParameters(const size_t num_params, const Real *params) {
   if (num_params != m_params.size()) {
-    THROW_ARGOSEXCEPTION("Number of parameter mismatch: was passed"
+    THROW_ARGOSEXCEPTION("Number of parameter mismatch: was passed "
                              << num_params
                              << " parameters, while "
                              << m_params.size()

@@ -16,6 +16,8 @@ def main():
         f.write("title_goes_here\n")
         for argos_file in args.argos_files:
             print("Processing {:s}...".format(argos_file))
+
+            # Execute evaluate and save the poses of time
             cmd = ["./build/bin/evaluate", argos_file, args.params, "-p", "-t", str(args.trials)]
             output = subprocess.run(cmd, stdout=subprocess.PIPE)
             if output.returncode != 0:

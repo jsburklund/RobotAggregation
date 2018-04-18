@@ -32,6 +32,8 @@ class SegregationLoopFunction : public CLoopFunctions {
 
   void LoadFromFile(const std::string &params_filename);
 
+  void LoadParameters(const size_t n_params, const Real *params);
+
   /**
    * Executes user-defined logic right after a control step is executed.
    */

@@ -18,17 +18,21 @@ int main(int argc, const char **argv) {
       params_filename_flag(parser, "params_filename", ".dat file of controller parameters", args::Options::Required);
   args::ValueFlag<unsigned int> trials_flag(parser, "trials", "number of trails", {'t', "trials"}, 10);
   args::Flag generate_poses_flag(parser, "generate_poses", "generate a file of robots poses", {'p', "poses"}, false);
+  args::Flag params_as_str_flag
+      (parser, "params_as_string", "the params input is actually a string of numbers", {"params-as-string"}, false);
 
   try {
     parser.ParseCLI(argc, argv);
   }
   catch (args::Help &e) {
+    std::cout << e.what() << std::endl;
     std::cout << parser;
     return 0;
   }
   catch (args::RequiredError &e) {
+    std::cout << e.what() << std::endl;
     std::cout << parser;
-    return 0;
+    return -1;
   }
 
   std::ofstream dev_null("/dev/null");
@@ -55,15 +59,29 @@ int main(int argc, const char **argv) {
 
   /* Get a reference to the loop functions */
   auto &loop_function = dynamic_cast<SegregationLoopFunction &>(simulator.GetLoopFunctions());
-  auto &params = args::get(params_filename_flag);
-  loop_function.LoadFromFile(params);
+
+  auto params_str = args::get(params_filename_flag);
+  if (args::get(params_as_str_flag)) {
+    std::stringstream ss(params_str);
+    size_t n_params;
+    ss >> n_params;
+    Real params[n_params];
+    Real param;
+    auto i = 0u;
+    while (ss >> param) {
+      params[i++] = param;
+    }
+    loop_function.LoadParameters(n_params, params);
+  } else {
+    loop_function.LoadFromFile(params_str);
+  }
 
   nlohmann::json j;
   std::ofstream of;
   std::stringstream ss;
+  // this file is JSON if -p is passed, otherwise it's just csv
   std::replace(argos_filename.begin(), argos_filename.end(), '/', '-');
-  std::replace(params.begin(), params.end(), '/', '-');
-  ss << params << "_" << argos_filename << "_robot_poses.json";
+  ss << argos_filename << ".evaluate_output";
   of.open(ss.str());
 
   std::cout << ss.str() << "\n";
@@ -98,6 +116,7 @@ int main(int argc, const char **argv) {
     j.push_back(trial_j);
     if (!generate_poses) {
       std::cout << "trial: " << i << " cost: " << cost << "\n";
+      of << i << ", " << cost << "\n";
     }
   }
 
