@@ -12,6 +12,7 @@ def main():
     args = parser.parse_args()
 
     with open("generated_files.txt", 'w') as f:
+        f.write("title_goes_here")
         for argos_file in args.argos_files:
             print("Processing {:s}...".format(argos_file))
             cmd = ["./build/bin/evaluate", argos_file, args.params, "-t", str(args.trials)]
@@ -22,7 +23,11 @@ def main():
                 return
 
             generated_filename = output.stdout.decode("UTF-8").split("\n")[-2]
+            start = generated_filename.index("dat")
+            label = generated_filename[start + 16:-23]
             f.write(generated_filename)
+            f.write(", ")
+            f.write(label)
             f.write("\n")
 
 

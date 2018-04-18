@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import csv
 import os
 import json
 import numpy as np
@@ -26,18 +27,23 @@ def main():
     parser.add_argument("--no-plot", help="skip plotting", action="store_true")
     args = parser.parse_args()
 
-    if not args.no_plot:
-        style_dir = os.path.dirname(os.path.realpath(__file__))
-        style = os.path.join(style_dir, "mpl.style")
-        plt.style.use(style)
-
-        plt.figure()
-        plt.ylabel("Dispersion")
-        plt.xlabel("Time Steps")
-
     with open(args.generated_files, 'r') as f:
+
+        title = f.readline()
+        if not args.no_plot:
+            style_dir = os.path.dirname(os.path.realpath(__file__))
+            style = os.path.join(style_dir, "mpl.style")
+            plt.style.use(style)
+
+            plt.figure()
+            plt.title(title)
+            plt.ylabel("Dispersion")
+            plt.xlabel("Time Steps")
+
         final_info = []
-        for generated_filename in f.readlines():
+        for line in csv.reader(f):
+            generated_filename = line[0]
+            label = line[1]
             generated_filename = generated_filename.strip("\n")
             trials = np.array(json.load(open(generated_filename)))
             n_classes = trials.shape[2]
@@ -59,7 +65,7 @@ def main():
                         plt.plot(d, alpha=0.3)
                         pass
 
-            plt.plot(np.mean(avg_dispersions, axis=0), label=generated_filename)
+            plt.plot(np.mean(avg_dispersions, axis=0), label=label)
 
         print("argos config file, # classes, # trials, mean final dispersion")
         for name, g, t, dispersion in final_info:
