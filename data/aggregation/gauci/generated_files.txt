@@ -1,0 +1,9 @@
+Gauci's Aggregation Parameters
+params-gauci.dat_experiments-1_class-10_in_clusters.argos_robot_poses.json, 10 robot cluster
+params-gauci.dat_experiments-1_class-10_in_lines.argos_robot_poses.json, 10 robot line
+params-gauci.dat_experiments-1_class-3_in_clusters.argos_robot_poses.json, 3 robot cluster
+params-gauci.dat_experiments-1_class-3_in_lines.argos_robot_poses.json, 3 robot line
+params-gauci.dat_experiments-1_class-4_in_clusters.argos_robot_poses.json, 4 robot cluster
+params-gauci.dat_experiments-1_class-4_in_lines.argos_robot_poses.json, 4 robot line
+params-gauci.dat_experiments-1_class-5_in_clusters.argos_robot_poses.json, 5 robot cluster
+params-gauci.dat_experiments-1_class-5_in_lines.argos_robot_poses.json, 5 robot line
