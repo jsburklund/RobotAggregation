@@ -4,9 +4,9 @@
 venv
 .idea
 
-*.dat
 logs
 *ARGoS_LOG*
+test_params.dat
 
 ## Ignore Compiled Python files **
 *.pyc
