@@ -9,7 +9,7 @@ SegregationFootbotController::SegregationFootbotController()
       m_pcRABAct(nullptr),
       m_pcRABSens(nullptr),
       m_pcLEDs(nullptr),
-      m_group(0ul) {
+      m_class(0ul) {
 }
 
 void SegregationFootbotController::Init(TConfigurationNode &t_node) {
@@ -35,8 +35,8 @@ void SegregationFootbotController::Init(TConfigurationNode &t_node) {
 }
 
 void SegregationFootbotController::Reset() {
-  // not this only supports 256 groups
-  m_pcRABAct->SetData(0, (uint8_t) m_group);
+  // not this only supports 256 classs
+  m_pcRABAct->SetData(0, (uint8_t) m_class);
 }
 
 void SegregationFootbotController::LoadFromFile(const std::string &params_filename) {
@@ -83,8 +83,8 @@ SegregationFootbotController::SensorState SegregationFootbotController::GetKinSe
       if (bearing < kCAM_VIEW_ANG && bearing > -kCAM_VIEW_ANG) {
         if (range < closest_range) {
           closest_range = range;
-          uint8_t robot_group = tMsg.Data[0];
-          sens_state = (m_group == robot_group) ? SensorState::KIN : SensorState::NONKIN;
+          uint8_t robot_class = tMsg.Data[0];
+          sens_state = (m_class == robot_class) ? SensorState::KIN : SensorState::NONKIN;
         }
       }
     }
@@ -107,7 +107,7 @@ SegregationFootbotController::SensorState SegregationFootbotController::GetKinSe
 
 void SegregationFootbotController::ControlStep() {
 
-  switch (m_group) {
+  switch (m_class) {
     case 0: m_pcLEDs->SetAllColors(CColor::GREEN);
       break;
     case 1: m_pcLEDs->SetAllColors(CColor::RED);
@@ -151,9 +151,9 @@ void SegregationFootbotController::SetParameters(const size_t num_params, const 
   }
 }
 
-void SegregationFootbotController::SetGroup(unsigned long group) {
-  m_group = group;
-  m_pcRABAct->SetData(0, (uint8_t) m_group);
+void SegregationFootbotController::SetClassId(unsigned long class_id) {
+  m_class = class_id;
+  m_pcRABAct->SetData(0, (uint8_t) m_class);
 }
 
 REGISTER_CONTROLLER(SegregationFootbotController, "footbot_segregation_controller")

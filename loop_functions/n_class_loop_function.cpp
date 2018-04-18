@@ -3,20 +3,8 @@
 
 #include "n_class_loop_function.h"
 
-Real NClassLoopFunction::CostAtStep(unsigned long step) {
-  CSpace::TMapPerType &robot_map = GetSpace().GetEntitiesByType("foot-bot");
-
-  // split up the map into containers for each robot group
-  std::unordered_map<unsigned long, std::vector<CFootBotEntity *>> groups;
-  for (const auto &p : robot_map) {
-    auto id = p.first;
-    auto group_id = id_string_group_map.at(id);
-    auto robot = any_cast<CFootBotEntity *>(p.second);
-    groups[group_id].emplace_back(robot);
-  }
-
-  auto accum_position = [](CVector3 sum, const CSpace::TMapPerType::value_type &p) {
-    auto robot = any_cast<CFootBotEntity *>(p.second);
+Real NClassLoopFunction::CostAtStep(unsigned long step, GroupMap groups) {
+  auto accum_position = [](CVector3 sum, const auto &robot) {
     auto robot_position = robot->GetEmbodiedEntity().GetOriginAnchor().Position;
     return sum + robot_position;
   };
@@ -28,19 +16,18 @@ Real NClassLoopFunction::CostAtStep(unsigned long step) {
     auto robots = group.second;
 
     auto centroid =
-        std::accumulate(std::begin(robot_map), std::end(robot_map), CVector3::ZERO, accum_position)
-            / robot_map.size();
+        std::accumulate(std::begin(robots), std::end(robots), CVector3::ZERO, accum_position)
+            / robots.size();
 
     centroids.emplace_back(centroid);
 
-    auto accum_cost = [centroid](double cost, const CSpace::TMapPerType::value_type &p) {
-      auto robot = any_cast<CFootBotEntity *>(p.second);
+    auto accum_cost = [centroid](double cost, const auto &robot) {
       auto robot_position = robot->GetEmbodiedEntity().GetOriginAnchor().Position;
       auto c = (robot_position - centroid).SquareLength();
       return cost + c;
     };
 
-    cost = std::accumulate(std::begin(robot_map), std::end(robot_map), 0.0, accum_cost);
+    cost = std::accumulate(std::begin(robots), std::end(robots), 0.0, accum_cost);
     constexpr double ROBOT_RADIUS = 0.17;
     cost *= 1 / (4 * std::pow(ROBOT_RADIUS, 2));
 

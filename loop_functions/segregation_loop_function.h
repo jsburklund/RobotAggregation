@@ -16,6 +16,9 @@ class SegregationLoopFunction : public CLoopFunctions {
 
  public:
 
+  using GroupMap = std::unordered_map<unsigned long, std::vector<CFootBotEntity *>>;
+  using GroupPosMap = std::unordered_map<unsigned long, std::vector<CVector3>>;
+
   static constexpr auto XML_CONTROLLER_ID = "fb_segregation";
 
   SegregationLoopFunction();
@@ -34,13 +37,16 @@ class SegregationLoopFunction : public CLoopFunctions {
    */
   void PostStep() override;
 
-  virtual Real CostAtStep(unsigned long step) = 0;
+  virtual Real CostAtStep(unsigned long step, GroupMap map) = 0;
 
   /* Calculates the performance of the robot in a trial */
   Real Cost();
 
+  GroupMap classes;
+  std::vector<GroupPosMap> classes_over_time;
+
  protected:
-  std::unordered_map<std::string, unsigned long> id_string_group_map;
+  std::unordered_map<std::string, unsigned long> id_string_class_map;
 
  private:
 

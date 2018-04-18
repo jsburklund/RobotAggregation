@@ -4,3 +4,6 @@ target_link_libraries(evolve mpga segregation_loop_function argos3core_simulator
 add_executable(evaluate evaluate.cpp)
 target_link_libraries(evaluate segregation_loop_function argos3core_simulator)
 
+add_executable(bug bug.cpp)
+target_link_libraries(bug argos3core_simulator)
+

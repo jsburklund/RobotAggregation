@@ -1,3 +1,5 @@
+#include <iterator>
+
 #include "segregation_loop_function.h"
 
 SegregationLoopFunction::SegregationLoopFunction() : m_rng(nullptr) {}
@@ -61,6 +63,8 @@ void SegregationLoopFunction::Reset() {
   m_step = 0;
   m_cost = 0;
 
+  classes_over_time.clear();
+
   for (const auto &robot_and_initial_pose: m_robots) {
     auto &entity = robot_and_initial_pose.robot->GetEmbodiedEntity();
 
@@ -81,10 +85,10 @@ void SegregationLoopFunction::PlaceLine(const CVector2 &center, UInt32 n_robots,
     int j = -static_cast<int>(n_robots / 2);
     for (size_t i = 0; i < n_robots; ++i, ++j) {
       auto id = i + id_start;
-      auto group_id = id % n_classes;
+      auto class_id = id % n_classes;
       footbot_id.str("");
       footbot_id << id;
-      id_string_group_map[footbot_id.str()] = group_id;
+      id_string_class_map[footbot_id.str()] = class_id;
 
       /* Create the robot in the origin and add it to ARGoS space */
       auto position = CVector3{distance * j + center.GetX(), distance * j + center.GetY(), 0};
@@ -94,7 +98,7 @@ void SegregationLoopFunction::PlaceLine(const CVector2 &center, UInt32 n_robots,
       auto &generic_controller = robot->GetControllableEntity().GetController();
       auto controller = &dynamic_cast<SegregationFootbotController &>(generic_controller);
       m_controllers.emplace_back(controller);
-      controller->SetGroup(group_id);
+      controller->SetClassId(class_id);
       m_robots.emplace_back(RobotAndInitialPose{robot, position, orientation});
     }
   }
@@ -112,17 +116,17 @@ void SegregationLoopFunction::PlaceCluster(const CVector2 &center, UInt32 n_robo
 
     for (size_t i = 0; i < n_robots; ++i) {
       auto id = i + id_start;
-      auto group_id = id % n_classes;
+      auto class_id = id % n_classes;
       footbot_id.str("");
       footbot_id << id;
-      id_string_group_map[footbot_id.str()] = group_id;
+      id_string_class_map[footbot_id.str()] = class_id;
 
       /* Create the robot in the origin and add it to ARGoS space */
       auto robot = new CFootBotEntity(footbot_id.str(), XML_CONTROLLER_ID);
       AddEntity(*robot);
       auto &generic_controller = robot->GetControllableEntity().GetController();
       auto controller = &dynamic_cast<SegregationFootbotController &>(generic_controller);
-      controller->SetGroup(group_id);
+      controller->SetClassId(class_id);
       m_controllers.emplace_back(controller);
 
       /* Try to place it in the arena */
@@ -168,7 +172,29 @@ Real SegregationLoopFunction::Cost() {
 
 void SegregationLoopFunction::PostStep() {
   try {
-    m_cost += CostAtStep(m_step) * m_step;
+    CSpace::TMapPerType &robot_map = GetSpace().GetEntitiesByType("foot-bot");
+
+    // split up the map into containers for each robot class
+    classes.clear();
+    for (const auto &p : robot_map) {
+      auto id = p.first;
+      auto class_id = id_string_class_map.at(id);
+      auto robot = any_cast<CFootBotEntity *>(p.second);
+      classes[class_id].emplace_back(robot);
+    }
+
+    GroupPosMap class_pos;
+    for (auto const &p : classes) {
+      std::vector<CVector3> positions;
+      for (auto const &robot : p.second) {
+        auto robot_position = robot->GetEmbodiedEntity().GetOriginAnchor().Position;
+        positions.emplace_back(robot_position);
+      }
+      class_pos[p.first] = positions;
+    }
+    classes_over_time.push_back(class_pos);
+
+    m_cost += CostAtStep(m_step, classes);
   } catch (argos::CARGoSException e) {
     m_cost = -999;
   }

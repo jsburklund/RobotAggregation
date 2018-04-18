@@ -35,7 +35,7 @@ class SegregationFootbotController : public CCI_Controller {
 
   void SetParameters(size_t num_params, const Real *params);
 
-  void SetGroup(unsigned long group);
+  void SetClassId(unsigned long class_id);
 
   SensorState GetKinSensorVal();
 
@@ -48,6 +48,6 @@ class SegregationFootbotController : public CCI_Controller {
   Real kCAM_VIEW_ANG = 15 * M_PI / 180.0;
 
  private:
-  unsigned long m_group = 0;
+  unsigned long m_class = 0;
 };
 

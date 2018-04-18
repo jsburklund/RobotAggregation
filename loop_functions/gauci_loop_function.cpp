@@ -3,7 +3,7 @@
 
 #include "gauci_loop_function.h"
 
-Real GauciLoopFunction::CostAtStep(unsigned long step) {
+Real GauciLoopFunction::CostAtStep(unsigned long step, GroupMap /*groups*/) {
   // Equation (1) from Self-organized aggregation without computation
   CSpace::TMapPerType &robot_map = GetSpace().GetEntitiesByType("foot-bot");
 

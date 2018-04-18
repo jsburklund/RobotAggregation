@@ -11,7 +11,7 @@ using namespace argos;
 
 class GauciLoopFunction : public SegregationLoopFunction {
 
-  Real CostAtStep(unsigned long step) override;
+  Real CostAtStep(unsigned long step, std::unordered_map<unsigned long, std::vector<CFootBotEntity *>> map) override;
 
 };
 
