@@ -17,6 +17,7 @@ int main(int argc, const char **argv) {
   args::Positional<std::string>
       params_filename_flag(parser, "params_filename", ".dat file of controller parameters", args::Options::Required);
   args::ValueFlag<unsigned int> trials_flag(parser, "trials", "number of trails", {'t', "trials"}, 10);
+  args::Flag generate_poses_flag(parser, "generate_poses", "generate a file of robots poses", {'p', "poses"}, false);
 
   try {
     parser.ParseCLI(argc, argv);
@@ -36,6 +37,7 @@ int main(int argc, const char **argv) {
 
   argos::CSimulator &simulator = argos::CSimulator::GetInstance();
   auto &argos_filename = args::get(argos_filename_flag);
+  auto generate_poses = args::get(generate_poses_flag);
 
   try {
     /* Set the .argos configuration file
@@ -94,7 +96,12 @@ int main(int argc, const char **argv) {
       trial_j.push_back(j_t);
     }
     j.push_back(trial_j);
+    if (!generate_poses) {
+      std::cout << "trial: " << i << " cost: " << cost << "\n";
+    }
   }
 
-  of << j.dump(2) << std::endl;
+  if (generate_poses) {
+    of << j.dump(2) << std::endl;
+  }
 }

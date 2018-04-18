@@ -10,6 +10,11 @@
 
 using namespace argos;
 
+template<typename T>
+constexpr T deg2rad(T deg) noexcept {
+  return deg * M_PI / 180.0;
+}
+
 class SegregationFootbotController : public CCI_Controller {
 
  public:
@@ -45,7 +50,7 @@ class SegregationFootbotController : public CCI_Controller {
   CCI_RangeAndBearingSensor *m_pcRABSens;
   CCI_LEDsActuator *m_pcLEDs;
 
-  Real kCAM_VIEW_ANG = 15 * M_PI / 180.0;
+  static constexpr Real kCAM_VIEW_ANG = deg2rad(15.0);
 
  private:
   unsigned long m_class = 0;

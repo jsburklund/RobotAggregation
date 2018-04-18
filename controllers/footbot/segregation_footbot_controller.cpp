@@ -122,11 +122,11 @@ void SegregationFootbotController::ControlStep() {
 
   auto sensor_state = GetKinSensorVal();
   switch (sensor_state) {
-    case SensorState::KIN: {
+    case SensorState::NOTHING: {
       m_pcWheels->SetLinearVelocity(SCALE * m_params[0], SCALE * m_params[1]);
       break;
     }
-    case SensorState::NOTHING: {
+    case SensorState::KIN: {
       m_pcWheels->SetLinearVelocity(SCALE * m_params[2], SCALE * m_params[3]);
       break;
     }
