@@ -56,8 +56,7 @@ def main():
                 dispersion_per_class_over_time = compute_dispersion_per_class_over_time(trial, args.robot_radius)
                 avg_dispersion_over_time = np.mean(dispersion_per_class_over_time, axis=0)
                 final_dispersions_per_class = dispersion_per_class_over_time[:, -1]
-                avg_final_dispersion = np.mean(final_dispersions_per_class, axis=0)
-                final_info.append((generated_filename, n_classes, n_trials, avg_final_dispersion))
+                avg_final_dispersion_by_trial = np.mean(final_dispersions_per_class, axis=0)
                 avg_dispersions.append(avg_dispersion_over_time)
 
                 if not args.no_plot:
@@ -65,7 +64,9 @@ def main():
                         plt.plot(d, alpha=0.3)
                         pass
 
-            plt.plot(np.mean(avg_dispersions, axis=0), label=label)
+            overall_avg_final_dispersion = np.mean(avg_dispersions, axis=0)
+            final_info.append((generated_filename, n_classes, n_trials, overall_avg_final_dispersion))
+            plt.plot(overall_avg_final_dispersion, label=label)
 
         print("argos config file,classes,trials,mean final dispersion")
         for name, g, t, dispersion in final_info:
