@@ -10,7 +10,7 @@
 #include "json.hpp"
 
 int main(int argc, const char **argv) {
-  args::ArgumentParser parser("main");
+  args::ArgumentParser parser("simulate an argos config and controller params, and either print cost or save poses.");
   args::HelpFlag help(parser, "help", "Display this help menu", {'h', "help"});
   args::Positional<std::string>
       argos_filename_flag(parser, "argos_filename", "argos config file", args::Options::Required);

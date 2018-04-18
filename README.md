@@ -19,7 +19,7 @@ This will probably find a good aggregation behavior. It will output a bunch of f
 You can then view the behavior of any of your evolved genomes like this
 
   # will launch argos and let you play it
-  # this will generate a files of robot poses over time by trial
+  # this will also print the cost values from whichever loop function is specified in the argos configuration file
   ./build/bin/evaluate experiments/1_class-viz/5_in_lines-viz.argos individual_0_gen_5.dat -t 1
 
 To do a rigorous evaluate of any paramter file on _all_ the different start configurations, we have to python scripts. Here's an example usage
