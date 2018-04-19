@@ -19,13 +19,15 @@ def main():
     plt.title("N-Class Segregation Cost")
 
     shape = (args.resolution, args.resolution)
-    cost_image = np.zeros(shape)
+    cost_image = np.ones(shape) * 1e24
     for grid_search_output_filename in args.grid_search_outputs:
         data = np.genfromtxt(grid_search_output_filename, delimiter=',')
         for parameter_evaluation in data:
             parameter_idx = int(parameter_evaluation[0])
+            cost = parameter_evaluation[-1]
             row, col = np.unravel_index(parameter_idx, shape)
-            cost_image[row, col] = parameter_evaluation[-1]
+            if cost < cost_image[row, col]:
+                cost_image[row, col] = parameter_evaluation[-1]
 
     plt.imshow(cost_image)
 
