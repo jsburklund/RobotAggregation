@@ -2,6 +2,7 @@
 
 import argparse
 import subprocess
+import sys
 import time
 
 import numpy as np
@@ -50,7 +51,7 @@ def main():
                     print(" ".join(cmd))
                     output = output.stdout.decode("UTF-8")
                     print(output)
-                    return
+                    return -1
 
                 generated_filename = output.stdout.decode("UTF-8").split("\n")[8]
                 data = np.genfromtxt(generated_filename, delimiter=',')
@@ -65,7 +66,8 @@ def main():
             outfile.write("\n")
 
     print("Finished evaluting paramaters #{:d} to #{:d}".format(args.skip, param_idx))
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

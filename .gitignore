@@ -14,5 +14,8 @@ test_params.dat
 ## CMake
 build
 
+## Cluster
+slurm-*
+
 ## Peter
 *.swp

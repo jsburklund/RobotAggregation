@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-#SBATCH -J jobname
+#SBATCH -N 1
+#SBATCH -n 1
+#SBATCH -t 1:00:00
+#SBATCH -J grid_search
 
 # Stop execution after any error
 set -e
@@ -12,7 +15,7 @@ PROJDIR=$PWD
 
 # or another folder where you want your data to be stored
 # Job-related variables
-THISJOB=grid_search_$1_$2
+THISJOB=grid_search
 
 # some way to identify this job execution
 WORKDIR=$LOCALDIR/$MYUSER/$THISJOB
@@ -31,14 +34,13 @@ cp $PROJDIR/bin/grid_search.py .
 
 # Execute program (this also writes files in work dir)
 echo $WORKDIR
-echo "STARTING AT: "
-echo $1
-echo "STOPPING AT: "
-echo $2
-./grid_search.py experiments/2_class/*.argos experiments/4_class/*.argos -t 4 -v --skip=$1 --stop-at=$2
+# this will evaluate 16(configs)*4(trials) = 64 total trials per parameter
+# each trial takes .83 seconds, so each parameter takes 53 seconds
+# so we can do roughly 65 parameters per hour
+./grid_search.py experiments/2_class/*.argos experiments/4_class/*.argos -t 4 -v --skip=0 --stop-at=50
 
 # Transfer generated files into home directory
 cp grid_search_output* $DATADIR
 
 # Cleanup
-rm -rf $WORKDIR
+rm -r $WORKDIR
