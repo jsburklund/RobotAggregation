@@ -38,6 +38,8 @@ def main():
                 continue
 
             mean_costs_for_all_argos_configs = []
+            # TODO: parallelize me!
+            # We only need to get one number out of each process, the mean_cost_over_trials variable
             for argos_file in args.argos_files:
                 # Execute evaluate and save the poses of time
                 params_str = "\"6 " + " ".join([str(p) for p in params]) + "\""
