@@ -27,6 +27,18 @@ def main():
       if not tmp: break
       bot += tmp
 
+  for nRobots in [12, 16, 20, 40]:
+  	for dist in [0.03, 0.05, 0.1, 0.2]:
+	  	fp = open("distributions/%d_uniform_%.2f_density.argos" % (nRobots, dist), 'w')
+	  	fp.write(top)
+
+	  	fp.write('    <cluster center="2.5,2.5" robot_num="%d" robot_density="%.2f" />\n' % (nRobots, dist))
+
+	  	fp.write(bot)
+	  	fp.close()
+
+  exit()
+
   for n in nGroups:
     fp = open("distributions/%d_in_lines.argos" % n, 'w')
     fp.write(top)
