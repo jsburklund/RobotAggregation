@@ -21,9 +21,12 @@ WORKDIR=$LOCALDIR/$MYUSER/$THISJOB
 rm -rf $WORKDIR && mkdir -p $WORKDIR && cd $WORKDIR
 
 # setup the directories and files we expect
-mkdir -p build/bin
+cp -r $PROJDIR/bin .
 cp -r $PROJDIR/build .
+cp -r $PROJDIR/controllers .
+cp -r $PROJDIR/loop_functions .
 cp -r $PROJDIR/experiments .
+cp $PROJDIR/CMakeLists.txt .
 cp $PROJDIR/bin/grid_search.py .
 
 # Execute program (this also writes files in work dir)
@@ -35,7 +38,7 @@ echo $2
 ./grid_search.py experiments/2_class/*.argos -n 10 -t 10 -v --skip=$1 --stop-at=$2
 
 # Transfer generated files into home directory
-cp -a grid_search_output* $DATADIR
+cp grid_search_output* $DATADIR
 
 # Cleanup
 rm -rf $WORKDIR
