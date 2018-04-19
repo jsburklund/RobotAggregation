@@ -24,6 +24,8 @@ def main():
     parser.add_argument("-n", help="number values per parameter", type=int, default=5)
     args = parser.parse_args()
 
+
+    output = []
     for params in param_generator(args.n):
         for argos_file in args.argos_files:
             # Execute evaluate and save the poses of time
@@ -42,7 +44,9 @@ def main():
             generated_filename = output.stdout.decode("UTF-8").split("\n")[8]
             data = np.genfromtxt(generated_filename, delimiter=',')
             mean_cost_over_trials = np.mean(data, axis=0)[1]
-            print(mean_cost_over_trials)
+            output.append(params + [mean_cost_over_trials])
+    output = np.array(output)
+    np.savetxt("grid_search_results.npy", output)
 
 
 if __name__ == '__main__':
