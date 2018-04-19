@@ -7,14 +7,14 @@ import time
 import numpy as np
 
 
-def param_generator(n, min=-1, max=1):
+def param_generator(resolution, min=-1, max=1):
     """ Fight me. """
-    for vl0 in np.linspace(min, max, n):
-        for vr0 in np.linspace(min, max, n):
-            for vl1 in np.linspace(min, max, n):
-                for vr1 in np.linspace(min, max, n):
-                    for vl2 in np.linspace(min, max, n):
-                        for vr2 in np.linspace(min, max, n):
+    for vl0 in np.linspace(min, max, resolution):
+        for vr0 in np.linspace(min, max, resolution):
+            for vl1 in np.linspace(min, max, resolution):
+                for vr1 in np.linspace(min, max, resolution):
+                    for vl2 in np.linspace(min, max, resolution):
+                        for vr2 in np.linspace(min, max, resolution):
                             yield [vl0, vr0, vl1, vr1, vl2, vr2]
 
 
@@ -22,7 +22,7 @@ def main():
     parser = argparse.ArgumentParser("Evaluate cost over a bunch of different argos files.")
     parser.add_argument("argos_files", help="all the argos files you want to run evaluate with", nargs="+")
     parser.add_argument("--trials", '-t', help="number of trials per argos configuration", type=int, default=5)
-    parser.add_argument("-n", help="number values per parameter", type=int, default=5)
+    parser.add_argument("--resolution", help="number values per parameter", type=int, default=10)
     parser.add_argument("--skip", help="skip this many of the first parameter pairs", type=int, default=0)
     parser.add_argument("--stop-at", help="stop after evaluating this many parameter pairs", type=int, default=-1)
     parser.add_argument("--verbose", "-v", help="print more shit", action="store_true")
@@ -30,7 +30,7 @@ def main():
 
     outfile_name = "grid_search_output_{:d}.txt".format(int(time.time()))
     with open(outfile_name, 'w')  as outfile:
-        for param_idx, params in enumerate(param_generator(args.n)):
+        for param_idx, params in enumerate(param_generator(args.resolution)):
             if param_idx == args.stop_at:
                 break
             if param_idx < args.skip:
