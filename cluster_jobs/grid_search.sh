@@ -35,7 +35,7 @@ echo "STARTING AT: "
 echo $1
 echo "STOPPING AT: "
 echo $2
-./grid_search.py experiments/2_class/*.argos -n 10 -t 10 -v --skip=$1 --stop-at=$2
+./grid_search.py experiments/2_class/*.argos experiments/4_class/*.argos -t 4 -v --skip=$1 --stop-at=$2
 
 # Transfer generated files into home directory
 cp grid_search_output* $DATADIR
