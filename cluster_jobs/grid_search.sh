@@ -38,4 +38,4 @@ echo $2
 cp -a grid_search_output* $DATADIR
 
 # Cleanup
-# rm -rf $WORKDIR
+rm -rf $WORKDIR
