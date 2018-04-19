@@ -6,6 +6,7 @@ import sys
 import time
 
 import numpy as np
+from multiprocessing import Pool
 
 
 def param_generator(resolution, min=-1, max=1):
@@ -19,10 +20,33 @@ def param_generator(resolution, min=-1, max=1):
                             yield [vl0, vr0, vl1, vr1, vl2, vr2]
 
 
+def evaluate_params(args):
+    # Execute evaluate and save the poses of time
+    params, argos_file, trials, verbose = args
+    params_str = "\"6 " + " ".join([str(p) for p in params]) + "\""
+    cmd = ["./build/bin/evaluate", argos_file, params_str, "--params-as-string", "-t", str(trials)]
+    cmd_str = " ".join(cmd)
+    if verbose:
+        print("EXECUTING:", cmd_str)
+    output = subprocess.run(cmd_str, stdout=subprocess.PIPE, shell=True)
+    if output.returncode != 0:
+        print("subprocess failed:")
+        print(" ".join(cmd))
+        output = output.stdout.decode("UTF-8")
+        print(output)
+        return -1
+
+    generated_filename = output.stdout.decode("UTF-8").split("\n")[8]
+    data = np.genfromtxt(generated_filename, delimiter=',')
+    mean_cost_over_trials = np.mean(data, axis=0)[1]
+    return mean_cost_over_trials
+
+
 def main():
     parser = argparse.ArgumentParser("Evaluate cost over a bunch of different argos files.")
     parser.add_argument("argos_files", help="all the argos files you want to run evaluate with", nargs="+")
-    parser.add_argument("--trials", '-t', help="number of trials per argos configuration", type=int, default=5)
+    parser.add_argument("--pool-size", "-p", help="number of worker subprocesses to spawn", type=int, required=True)
+    parser.add_argument("--trials", '-t', help="number of trials per argos configuration", type=int, default=4)
     parser.add_argument("--resolution", help="number values per parameter", type=int, default=10)
     parser.add_argument("--skip", help="skip this many of the first parameter pairs", type=int, default=0)
     parser.add_argument("--stop-at", help="stop after evaluating this many parameter pairs", type=int, default=-1)
@@ -37,35 +61,20 @@ def main():
             if param_idx < args.skip:
                 continue
 
-            mean_costs_for_all_argos_configs = []
-            # TODO: parallelize me!
-            # We only need to get one number out of each process, the mean_cost_over_trials variable
-            for argos_file in args.argos_files:
-                # Execute evaluate and save the poses of time
-                params_str = "\"6 " + " ".join([str(p) for p in params]) + "\""
-                cmd = ["./build/bin/evaluate", argos_file, params_str, "--params-as-string", "-t", str(args.trials)]
-                cmd_str = " ".join(cmd)
-                if args.verbose:
-                    print("EXECUTING:", cmd_str)
-                output = subprocess.run(cmd_str, stdout=subprocess.PIPE, shell=True)
-                if output.returncode != 0:
-                    print("subprocess failed:")
-                    print(" ".join(cmd))
-                    output = output.stdout.decode("UTF-8")
-                    print(output)
-                    return -1
+            # Evaluate these parameters for each configuration, with several trials on each configuration
+            # We parallelize over configurations here
+            with Pool(processes=args.pool_size) as pool:
+                pool_args = [(params, f, args.trials, args.verbose) for f in args.argos_files]
+                costs = pool.map(evaluate_params, pool_args)
+                print(costs)
+                mean_cost_over_all_trials = np.mean(costs)
 
-                generated_filename = output.stdout.decode("UTF-8").split("\n")[8]
-                data = np.genfromtxt(generated_filename, delimiter=',')
-                mean_cost_over_trials = np.mean(data, axis=0)[1]
-                mean_costs_for_all_argos_configs.append(mean_cost_over_trials)
-
-            outfile.write("{:d}, ".format(param_idx))
-            for p in params:
-                outfile.write("{:.4f}".format(p))
-                outfile.write(", ")
-            outfile.write("{:.3f}".format(mean_cost_over_trials))
-            outfile.write("\n")
+                outfile.write("{:d}, ".format(param_idx))
+                for p in params:
+                    outfile.write("{:.4f}".format(p))
+                    outfile.write(", ")
+                outfile.write("{:.3f}".format(mean_cost_over_all_trials))
+                outfile.write("\n")
 
     print("Finished evaluting paramaters #{:d} to #{:d}".format(args.skip, param_idx))
     return 0
