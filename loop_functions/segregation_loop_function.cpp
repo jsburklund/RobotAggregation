@@ -75,7 +75,7 @@ void SegregationLoopFunction::Reset() {
       auto position = position_noise + robot_and_initial_pose.position;
       success = MoveEntity(entity, position, robot_and_initial_pose.orientation, false);
       ++attempts;
-    } while (!success and attempts < 10);
+    } while (!success and attempts < 20);
   }
 }
 
@@ -141,7 +141,7 @@ void SegregationLoopFunction::PlaceCluster(const CVector2 &center, UInt32 n_robo
             CVector3(m_rng->Uniform(area_range) + center.GetX(), m_rng->Uniform(area_range) + center.GetY(), 0.f);
         orientation = CQuaternion{m_rng->Uniform(CRadians::UNSIGNED_RANGE), CVector3::Z};
         bDone = MoveEntity(robot->GetEmbodiedEntity(), position, orientation);
-      } while (!bDone && attempts <= 10);
+      } while (!bDone && attempts <= 20);
       if (!bDone) {
         THROW_ARGOSEXCEPTION("Can't place " << footbot_id.str());
       }
