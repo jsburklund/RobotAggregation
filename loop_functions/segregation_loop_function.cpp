@@ -14,42 +14,39 @@ void SegregationLoopFunction::Init(TConfigurationNode &t_node) {
 
     UInt32 num_placed_robots = 0;
 
-    /* Go through the nodes */
     TConfigurationNodeIterator itDistr;
     for (itDistr = itDistr.begin(&t_node); itDistr != itDistr.end(); ++itDistr) {
 
-      /* Make sure a known distribution was passed */
-      if (itDistr->Value() != "line" && itDistr->Value() != "cluster") {
+      if (itDistr->Value() != "line" && itDistr->Value() != "cluster" && itDistr->Value() != "single") {
         THROW_ARGOSEXCEPTION("Unknown topology \"" << itDistr->Value() << "\"");
       }
 
-      /* Get current node */
       TConfigurationNode &tDistr = *itDistr;
 
       /* Parse common attributes */
-      /* Distribution center */
       CVector2 cCenter;
       GetNodeAttribute(tDistr, "center", cCenter);
 
-      /* Number of robots to place */
       UInt32 robot_num;
-      GetNodeAttribute(tDistr, "robot_num", robot_num);
-      /* Parse distribution-specific attributes and place robots */
+      GetNodeAttributeOrDefault(tDistr, "robot_num", robot_num, 0u);
       if (itDistr->Value() == "line") {
         /* Distance between the robots */
         Real fDistance;
         GetNodeAttribute(tDistr, "robot_distance", fDistance);
         PlaceLine(cCenter, robot_num, fDistance, num_placed_robots);
-
+        num_placed_robots += robot_num;
       } else if (itDistr->Value() == "cluster") {
         /* Density of the robots */
         Real f_density;
         GetNodeAttribute(tDistr, "robot_density", f_density);
         PlaceCluster(cCenter, robot_num, f_density, num_placed_robots);
+        num_placed_robots += robot_num;
+      } else if (itDistr->Value() == "single") {
+        unsigned long class_id;
+        GetNodeAttribute(tDistr, "class", class_id);
+        PlaceSingle(cCenter, class_id, num_placed_robots);
+        ++num_placed_robots;
       }
-
-      /* Update robot count */
-      num_placed_robots += robot_num;
     }
   }
   catch (CARGoSException &ex) {
@@ -76,6 +73,27 @@ void SegregationLoopFunction::Reset() {
       success = MoveEntity(entity, position, robot_and_initial_pose.orientation, false);
       ++attempts;
     } while (!success and attempts < 20);
+  }
+}
+
+void SegregationLoopFunction::PlaceSingle(const CVector2 &center, unsigned long class_id, UInt32 id) {
+  try {
+    std::ostringstream footbot_id;
+    footbot_id.str("");
+    footbot_id << id;
+    id_string_class_map[footbot_id.str()] = class_id;
+
+    auto position = CVector3{center.GetX(), center.GetY(), 0};
+    CQuaternion orientation = CQuaternion{m_rng->Uniform(CRadians::UNSIGNED_RANGE), CVector3::Z};
+    auto robot = new CFootBotEntity(footbot_id.str(), XML_CONTROLLER_ID, position, orientation);
+    AddEntity(*robot);
+    auto &generic_controller = robot->GetControllableEntity().GetController();
+    auto controller = &dynamic_cast<SegregationFootbotController &>(generic_controller);
+    m_controllers.emplace_back(controller);
+    controller->SetClassId(class_id);
+    m_robots.emplace_back(RobotAndInitialPose{robot, position, orientation});
+  } catch (CARGoSException &ex) {
+    THROW_ARGOSEXCEPTION_NESTED("While placing robots in a line", ex);
   }
 }
 

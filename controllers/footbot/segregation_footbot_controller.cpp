@@ -8,8 +8,7 @@ SegregationFootbotController::SegregationFootbotController()
       m_pcWheels(nullptr),
       m_pcRABAct(nullptr),
       m_pcRABSens(nullptr),
-      m_pcLEDs(nullptr),
-      m_class(0ul) {
+      m_pcLEDs(nullptr) {
 }
 
 void SegregationFootbotController::Init(TConfigurationNode &t_node) {
@@ -26,6 +25,7 @@ void SegregationFootbotController::Init(TConfigurationNode &t_node) {
 
   std::string params_filename;
   GetNodeAttributeOrDefault(t_node, "parameter_file", params_filename, std::string());
+  GetNodeAttributeOrDefault(t_node, "viz", viz, false);
 
   if (!params_filename.empty()) {
     LoadFromFile(params_filename);
@@ -90,15 +90,17 @@ SegregationFootbotController::SensorState SegregationFootbotController::GetKinSe
     }
   }
 
-  for (auto i = 10; i < 14; ++i) {
-    UInt32 led_id = static_cast<UInt32>(i % 12);
-    switch (sens_state) {
-      case SensorState::KIN: m_pcLEDs->SetSingleColor(led_id, CColor::BLUE);
-        break;
-      case SensorState::NONKIN: m_pcLEDs->SetSingleColor(led_id, CColor::RED);
-        break;
-      case SensorState::NOTHING: m_pcLEDs->SetSingleColor(led_id, CColor::WHITE);
-        break;
+  if (viz) {
+    for (auto i = 10; i < 14; ++i) {
+      UInt32 led_id = static_cast<UInt32>(i % 12);
+      switch (sens_state) {
+        case SensorState::KIN: m_pcLEDs->SetSingleColor(led_id, CColor::BLUE);
+          break;
+        case SensorState::NONKIN: m_pcLEDs->SetSingleColor(led_id, CColor::RED);
+          break;
+        case SensorState::NOTHING: m_pcLEDs->SetSingleColor(led_id, CColor::WHITE);
+          break;
+      }
     }
   }
 
@@ -107,19 +109,20 @@ SegregationFootbotController::SensorState SegregationFootbotController::GetKinSe
 
 void SegregationFootbotController::ControlStep() {
 
-  switch (m_class) {
-    case 0: m_pcLEDs->SetAllColors(CColor::GREEN);
-      break;
-    case 1: m_pcLEDs->SetAllColors(CColor::RED);
-      break;
-    case 2: m_pcLEDs->SetAllColors(CColor::BLUE);
-      break;
-    case 3: m_pcLEDs->SetAllColors(CColor::WHITE);
-      break;
-    default: m_pcLEDs->SetAllColors(CColor::BLACK);
-      break;
+  if (viz) {
+    switch (m_class) {
+      case 0: m_pcLEDs->SetAllColors(CColor::GREEN);
+        break;
+      case 1: m_pcLEDs->SetAllColors(CColor::RED);
+        break;
+      case 2: m_pcLEDs->SetAllColors(CColor::BLUE);
+        break;
+      case 3: m_pcLEDs->SetAllColors(CColor::WHITE);
+        break;
+      default: m_pcLEDs->SetAllColors(CColor::BLACK);
+        break;
+    }
   }
-
   auto sensor_state = GetKinSensorVal();
   switch (sensor_state) {
     case SensorState::NOTHING: {

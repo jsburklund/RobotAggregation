@@ -54,5 +54,6 @@ class SegregationFootbotController : public CCI_Controller {
 
  private:
   unsigned long m_class = 0;
+  bool viz = false;
 };
 

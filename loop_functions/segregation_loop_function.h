@@ -52,6 +52,8 @@ class SegregationLoopFunction : public CLoopFunctions {
 
  private:
 
+  void PlaceSingle(const CVector2 &center, unsigned long class_id, UInt32 id);
+
   void PlaceLine(const CVector2 &center, UInt32 un_robots, Real distance, UInt32 un_id_start);
 
   void PlaceCluster(const CVector2 &center, UInt32 un_robots, Real density, UInt32 un_id_start);

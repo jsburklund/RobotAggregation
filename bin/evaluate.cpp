@@ -99,21 +99,23 @@ int main(int argc, const char **argv) {
     simulator.Execute();
     Real cost = loop_function.Cost();
     nlohmann::json trial_j;
-    for (const auto &class_at_time_t : loop_function.classes_over_time) {
-      // print all the X, Y positions of the robots at each time step
-      nlohmann::json j_t;
-      for (const auto &p : class_at_time_t) {
-        auto class_id = p.first;
-        auto poses = p.second;
-        nlohmann::json j_class;
-        for (const auto &pose : poses) {
-          j_class.push_back({pose.GetX(), pose.GetY()});
+    if (generate_poses) {
+      for (const auto &class_at_time_t : loop_function.classes_over_time) {
+        // print all the X, Y positions of the robots at each time step
+        nlohmann::json j_t;
+        for (const auto &p : class_at_time_t) {
+          auto class_id = p.first;
+          auto poses = p.second;
+          nlohmann::json j_class;
+          for (const auto &pose : poses) {
+            j_class.push_back({pose.GetX(), pose.GetY()});
+          }
+          j_t.push_back(j_class);
         }
-        j_t.push_back(j_class);
+        trial_j.push_back(j_t);
       }
-      trial_j.push_back(j_t);
+      j.push_back(trial_j);
     }
-    j.push_back(trial_j);
     if (!generate_poses) {
       std::cout << "trial: " << i << " cost: " << cost << "\n";
       of << i << ", " << cost << "\n";
