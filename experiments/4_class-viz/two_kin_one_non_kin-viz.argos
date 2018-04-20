@@ -4,7 +4,7 @@
 
   <framework>
     <system threads="0"/>
-    <experiment length="0" ticks_per_second="10" random_seed="312"/>
+    <experiment length="200" ticks_per_second="10" random_seed="312"/>
   </framework>
 
   <controllers>
@@ -19,18 +19,19 @@
       <sensors>
         <range_and_bearing implementation="medium" medium="rab" show_rays="false"/>
       </sensors>
-      <params/>
+      <params viz="true"/>
     </footbot_segregation_controller>
 
   </controllers>
 
   <loop_functions library="build/loop_functions/libn_class_segregation_loop_function"
                   label="n_class_segregation_loop_function" random_seed="0" num_classes="4">
-    <line center="3.25,1.75" robot_num="1" robot_distance="0.2" />
-    <line center="2.75,2.25" robot_num="1" robot_distance="0.2" />
-    <line center="2.25,2.75" robot_num="1" robot_distance="0.2" />
-    <line center="1.75,3.25" robot_num="1" robot_distance="0.2" />
-    <line center="1.75,3.25" robot_num="1" robot_distance="0.2" />
+    <single center="1,1" class="0" />
+    <single center="1.5,1.5" class="1" />
+    <single center="2,2" class="2" />
+    <single center="2.5,2.5" class="1" />
+    <single center="3,3" class="2" />
+    <single center="3.5,3.5" class="0" />
 
   </loop_functions>
 
