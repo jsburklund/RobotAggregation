@@ -19,14 +19,14 @@
       <sensors>
         <range_and_bearing implementation="medium" medium="rab" show_rays="false"/>
       </sensors>
-      <params/>
+      <params viz="true"/>
     </footbot_segregation_controller>
 
   </controllers>
 
   <loop_functions library="build/loop_functions/libgauci_segregation_loop_function"
-                  label="gauci_segregation_loop_function" random_seed="0" num_classes="1">
-    <cluster center="2.5,2.5" robot_num="16" robot_density="0.20" />
+                  label="gauci_segregation_loop_function" random_seed="0" num_classes="7">
+    <cluster center="2.5,2.5" robot_num="40" robot_density="0.03" />
 
   </loop_functions>
 
@@ -67,5 +67,5 @@
     </qt-opengl>
   </visualization>
 
- 
+
 </argos-configuration>

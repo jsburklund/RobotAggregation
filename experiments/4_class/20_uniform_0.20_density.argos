@@ -25,8 +25,8 @@
   </controllers>
 
   <loop_functions library="build/loop_functions/libgauci_segregation_loop_function"
-                  label="gauci_segregation_loop_function" random_seed="0" num_classes="1">
-    <cluster center="2.5,2.5" robot_num="12" robot_density="0.20" />
+                  label="gauci_segregation_loop_function" random_seed="0" num_classes="4">
+    <cluster center="2.5,2.5" robot_num="20" robot_density="0.20" />
 
   </loop_functions>
 
@@ -67,5 +67,5 @@
     </qt-opengl>
   </visualization>
 
- 
+
 </argos-configuration>
