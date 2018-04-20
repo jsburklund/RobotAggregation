@@ -4,7 +4,7 @@
 
   <framework>
     <system threads="0"/>
-    <experiment length="180" ticks_per_second="10" random_seed="312"/>
+    <experiment length="0" ticks_per_second="10" random_seed="312"/>
   </framework>
 
   <controllers>
@@ -24,13 +24,17 @@
 
   </controllers>
 
-  <loop_functions library="build/loop_functions/libgauci_segregation_loop_function"
-                  label="gauci_segregation_loop_function" random_seed="0" num_classes="1">
-    <!--<line center="2.5,2.5" robot_num="10" robot_distance="0.3" />-->
-    <cluster center="2.5,2.5" robot_num="10" robot_density="0.02"/>
+  <loop_functions library="build/loop_functions/libn_class_segregation_loop_function"
+                  label="n_class_segregation_loop_function" random_seed="0" num_classes="4">
+    <line center="3.25,1.75" robot_num="1" robot_distance="0.2" />
+    <line center="2.75,2.25" robot_num="1" robot_distance="0.2" />
+    <line center="2.25,2.75" robot_num="1" robot_distance="0.2" />
+    <line center="1.75,3.25" robot_num="1" robot_distance="0.2" />
+    <line center="1.75,3.25" robot_num="1" robot_distance="0.2" />
+
   </loop_functions>
 
-  <arena size="6, 6, 2" center="2.5,2.5,1">
+  <arena size="100, 100, 2" center="2.5,2.5,1">
 
     <box id="wall_north" size="5,0.1,0.5" movable="false">
       <body position="2.5,5,0" orientation="0,0,0"/>
@@ -59,7 +63,12 @@
     <range_and_bearing id="rab"/>
   </media>
 
-  <!-- We don't want nor need a visualization during evolution -->
-  <visualization/>
+  <visualization>
+    <qt-opengl>
+      <camera>
+        <placement idx="0" position="2.5,2.5,6" look_at="2.5,2.5,0" lens_focal_length="30"/>
+      </camera>
+    </qt-opengl>
+  </visualization>
 
 </argos-configuration>
