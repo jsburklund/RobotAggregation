@@ -26,8 +26,6 @@ def evaluate_params(args):
     params_str = "\"6 " + " ".join([str(p) for p in params]) + "\""
     cmd = ["./build/bin/evaluate", argos_file, params_str, "--params-as-string", "-t", str(trials)]
     cmd_str = " ".join(cmd)
-    if verbose:
-        print("EXECUTING:", cmd_str)
     output = subprocess.run(cmd_str, stdout=subprocess.PIPE, shell=True)
     if output.returncode != 0:
         print("subprocess failed:")
@@ -45,6 +43,8 @@ def evaluate_params(args):
             cost = 0
         sum += float(cost)
     mean = sum / len(output)
+    if verbose:
+        print(cmd_str, mean)
     return mean
 
 
