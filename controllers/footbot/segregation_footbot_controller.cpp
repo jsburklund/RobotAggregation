@@ -35,7 +35,7 @@ void SegregationFootbotController::Init(TConfigurationNode &t_node) {
 }
 
 void SegregationFootbotController::Reset() {
-  // not this only supports 256 classs
+  // not this only supports 256 classes
   m_pcRABAct->SetData(0, (uint8_t) m_class);
 }
 
