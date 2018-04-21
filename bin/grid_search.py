@@ -36,10 +36,16 @@ def evaluate_params(args):
         print(output)
         return -1
 
-    generated_filename = output.stdout.decode("UTF-8").split("\n")[8]
-    data = np.genfromtxt(generated_filename, delimiter=',')
-    mean_cost_over_trials = np.mean(data, axis=0)[1]
-    return mean_cost_over_trials
+    sum = 0
+    output = output.stdout.decode("UTF-8").split("\n")[8:-1]
+    for line in output:
+        try:
+            cost = float(line.split(" ")[-1])
+        except ValueError:
+            cost = 0
+        sum += float(cost)
+    mean = sum / len(output)
+    return mean
 
 
 def main():
@@ -47,7 +53,7 @@ def main():
     parser.add_argument("argos_files", help="all the argos files you want to run evaluate with", nargs="+")
     parser.add_argument("--pool-size", "-p", help="number of worker subprocesses to spawn", type=int, required=True)
     parser.add_argument("--trials", '-t', help="number of trials per argos configuration", type=int, default=4)
-    parser.add_argument("--resolution", help="number values per parameter", type=int, default=10)
+    parser.add_argument("--resolution", help="number values per parameter", type=int, default=5)
     parser.add_argument("--skip", help="skip this many of the first parameter pairs", type=int, default=0)
     parser.add_argument("--stop-at", help="stop after evaluating this many parameter pairs", type=int, default=-1)
     parser.add_argument("--verbose", "-v", help="print more shit", action="store_true")
@@ -55,6 +61,11 @@ def main():
 
     outfile_name = "grid_search_output_{:d}.txt".format(int(time.time()))
     with open(outfile_name, 'w')  as outfile:
+        outfile.write("- - - - - - - ")
+        for argos_file in args.argos_files:
+            outfile.write("{:s} ".format(argos_file))
+        outfile.write("\n")
+
         for param_idx, params in enumerate(param_generator(args.resolution)):
             if param_idx == args.stop_at:
                 break
@@ -66,14 +77,12 @@ def main():
             with Pool(processes=args.pool_size) as pool:
                 pool_args = [(params, f, args.trials, args.verbose) for f in args.argos_files]
                 costs = pool.map(evaluate_params, pool_args)
-                print(costs)
-                mean_cost_over_all_trials = np.mean(costs)
 
-                outfile.write("{:d}, ".format(param_idx))
+                outfile.write("{:d} ".format(param_idx))
                 for p in params:
-                    outfile.write("{:.4f}".format(p))
-                    outfile.write(", ")
-                outfile.write("{:.3f}".format(mean_cost_over_all_trials))
+                    outfile.write("{:.4f} ".format(p))
+                for cost in costs:
+                    outfile.write("{:.3f} ".format(cost))
                 outfile.write("\n")
 
     print("Finished evaluting paramaters #{:d} to #{:d}".format(args.skip, param_idx))

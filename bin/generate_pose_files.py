@@ -5,7 +5,7 @@ import subprocess
 
 
 def main():
-    parser = argparse.ArgumentParser("Evaluate cost over a bunch of different argos files.")
+    parser = argparse.ArgumentParser("Generate pose files over a bunch of different argos files.")
     parser.add_argument("argos_files", help="all the argos files you want to run evaluate with", nargs="+")
     parser.add_argument("params", help="the .dat file of parameters to evaluate")
     parser.add_argument("--outfile", help="the filename you want to output paths into", default="generated_files.txt")

@@ -78,18 +78,18 @@ int main(int argc, const char **argv) {
 
   nlohmann::json j;
   std::ofstream of;
-  std::stringstream ss;
-  // this file is JSON if -p is passed, otherwise it's just csv
-  std::replace(argos_filename.begin(), argos_filename.end(), '/', '-');
-  ss << argos_filename << ".evaluate_output";
-  of.open(ss.str());
-
-  std::cout << ss.str() << "\n";
-
-  if (!of.good()) {
-    std::cout << strerror(errno) << "\n";
+  if (generate_poses) {
+    std::stringstream ss;
+    std::replace(argos_filename.begin(), argos_filename.end(), '/', '-');
+    ss << argos_filename << ".evaluate_output";
+    of.open(ss.str());
     std::cout << ss.str() << "\n";
-    return -1;
+
+    if (!of.good()) {
+      std::cout << strerror(errno) << "\n";
+      std::cout << ss.str() << "\n";
+      return -1;
+    }
   }
 
   unsigned int N = args::get(trials_flag);
@@ -117,8 +117,7 @@ int main(int argc, const char **argv) {
       j.push_back(trial_j);
     }
     if (!generate_poses) {
-      std::cout << "trial: " << i << " cost: " << cost << "\n";
-      of << i << ", " << cost << "\n";
+      std::cout << i << " " << cost << "\n";
     }
   }
 
