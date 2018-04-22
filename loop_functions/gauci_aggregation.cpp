@@ -1,7 +1,7 @@
 #include <numeric>
 #include <iterator>
 
-#include "gauci_loop_function.h"
+#include "gauci_aggregation.h"
 
 Real GauciLoopFunction::CostAtStep(unsigned long step, GroupMap /*groups*/) {
   // Equation (1) from Self-organized aggregation without computation
@@ -30,4 +30,4 @@ Real GauciLoopFunction::CostAtStep(unsigned long step, GroupMap /*groups*/) {
   return cost;
 }
 
-REGISTER_LOOP_FUNCTIONS(GauciLoopFunction, "gauci_segregation_loop_function")
+REGISTER_LOOP_FUNCTIONS(GauciLoopFunction, "gauci_aggregation")

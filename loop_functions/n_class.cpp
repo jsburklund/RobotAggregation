@@ -1,23 +1,21 @@
 #include <numeric>
 #include <iterator>
 
-#include "n_class_loop_function.h"
+#include "n_class.h"
 
-Real NClassLoopFunction::CostAtStep(unsigned long step, GroupMap groups) {
+Real NClass::CostAtStep(unsigned long step, GroupMap groups) {
   auto accum_position = [](CVector3 sum, const auto &robot) {
     auto robot_position = robot->GetEmbodiedEntity().GetOriginAnchor().Position;
     return sum + robot_position;
   };
 
   auto cost = 0.0;
-  // calculate the cluster metric for each group
   std::vector<CVector3> centroids;
   for (const auto &group : groups) {
     auto robots = group.second;
 
     auto centroid =
-        std::accumulate(std::begin(robots), std::end(robots), CVector3::ZERO, accum_position)
-            / robots.size();
+        std::accumulate(std::begin(robots), std::end(robots), CVector3::ZERO, accum_position) / robots.size();
 
     centroids.emplace_back(centroid);
 
@@ -48,4 +46,4 @@ Real NClassLoopFunction::CostAtStep(unsigned long step, GroupMap groups) {
   return cost - centroid_dispersion_cost;
 }
 
-REGISTER_LOOP_FUNCTIONS(NClassLoopFunction, "n_class_segregation_loop_function")
+REGISTER_LOOP_FUNCTIONS(NClassLoopFunction, "n_class")

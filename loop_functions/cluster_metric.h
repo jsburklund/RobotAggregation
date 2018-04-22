@@ -9,7 +9,7 @@
 
 using namespace argos;
 
-class NClassLoopFunction : public SegregationLoopFunction {
+class ClusterMetricLoopFunction : public SegregationLoopFunction {
 
   Real CostAtStep(unsigned long step, std::unordered_map<unsigned long, std::vector<CFootBotEntity *>> map) override;
 
