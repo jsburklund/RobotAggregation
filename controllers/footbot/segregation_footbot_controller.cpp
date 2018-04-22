@@ -91,7 +91,7 @@ SegregationFootbotController::SensorState SegregationFootbotController::GetKinSe
   }
 
   if (viz) {
-    for (auto i = 10; i < 14; ++i) {
+    for (auto i = 11; i < 13; ++i) {
       UInt32 led_id = static_cast<UInt32>(i % 12);
       switch (sens_state) {
         case SensorState::KIN: m_pcLEDs->SetSingleColor(led_id, CColor::BLUE);

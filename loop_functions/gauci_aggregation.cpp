@@ -4,6 +4,7 @@
 #include "gauci_aggregation.h"
 
 Real GauciLoopFunction::CostAtStep(unsigned long step, GroupMap /*groups*/) {
+  constexpr double ROBOT_RADIUS = 0.085036758f;
   // Equation (1) from Self-organized aggregation without computation
   CSpace::TMapPerType &robot_map = GetSpace().GetEntitiesByType("foot-bot");
 
@@ -24,7 +25,6 @@ Real GauciLoopFunction::CostAtStep(unsigned long step, GroupMap /*groups*/) {
   };
 
   auto cost = std::accumulate(std::begin(robot_map), std::end(robot_map), 0.0, accum_cost);
-  constexpr double ROBOT_RADIUS = 0.17/2;
   cost *= 1 / (4 * std::pow(ROBOT_RADIUS, 2));
 
   return cost;

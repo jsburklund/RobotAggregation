@@ -4,6 +4,7 @@
 #include "n_class.h"
 
 Real NClass::CostAtStep(unsigned long step, GroupMap groups) {
+  constexpr double ROBOT_RADIUS = 0.085036758f;
   auto accum_position = [](CVector3 sum, const auto &robot) {
     auto robot_position = robot->GetEmbodiedEntity().GetOriginAnchor().Position;
     return sum + robot_position;
@@ -26,7 +27,6 @@ Real NClass::CostAtStep(unsigned long step, GroupMap groups) {
     };
 
     group_aggregation_cost = std::accumulate(std::begin(robots), std::end(robots), 0.0, accum_cost);
-    constexpr double ROBOT_RADIUS = 0.17/2;
     group_aggregation_cost *= 1 / (4 * std::pow(ROBOT_RADIUS, 2));
 
   }
@@ -38,7 +38,6 @@ Real NClass::CostAtStep(unsigned long step, GroupMap groups) {
   };
   auto centroid_dispersion_cost =
       std::accumulate(std::begin(centroids), std::end(centroids), 0.0, accum_centroid_cost);
-  constexpr double ROBOT_RADIUS = 0.17;
   centroid_dispersion_cost *= 1 / (4 * std::pow(ROBOT_RADIUS, 2));
 
   // centroid dispersion cost should be high

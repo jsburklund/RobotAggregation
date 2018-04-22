@@ -27,7 +27,8 @@ int main(int argc, const char **argv) {
                                                    "the label used in the macro for that loop function", {"label"});
   args::ValueFlag<unsigned int> trials_flag(parser, "trials", "number of trails", {'t', "trials"}, 4);
   args::ValueFlag<unsigned int> num_classes_flag(parser, "num_classes", "number of classes", {'c', "classes"}, 4);
-  args::Flag viz_flag(parser, "viz", "show argos visualizaiton", {'z', "viz"}, false);
+  args::ValueFlag<unsigned int> num_steps_flag(parser, "num_steps", "number of time steps", {'s', "steps"}, 180);
+  args::Flag viz_flag(parser, "viz", "show argos visualization", {'z', "viz"}, false);
   args::Flag generate_poses_flag(parser, "generate_poses", "generate a file of robots poses", {'p', "poses"}, false);
   args::Flag params_as_str_flag(parser, "params_as_string", "the params input is actually a string of numbers",
                                 {"params-as-string"}, false);
@@ -56,6 +57,7 @@ int main(int argc, const char **argv) {
   auto library_label = args::get(library_label_flag);
   auto generate_poses = args::get(generate_poses_flag);
   auto num_classes = args::get(num_classes_flag);
+  auto num_steps = args::get(num_steps_flag);
   auto viz = args::get(viz_flag);
 
   if (library_label.empty()) {
@@ -66,6 +68,9 @@ int main(int argc, const char **argv) {
 
   ticpp::Document argos_config;
   argos_config.LoadFile(argos_filename);
+  auto framework = argos_config.FirstChildElement()->FirstChildElement("framework");
+  auto experiment = framework->FirstChildElement("experiment");
+  experiment->SetAttribute("length", num_steps);
   auto loop_functions = argos_config.FirstChildElement()->FirstChildElement("loop_functions");
   auto controllers = argos_config.FirstChildElement()->FirstChildElement("controllers");
   auto controller = controllers->FirstChildElement("footbot_segregation_controller");
