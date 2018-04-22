@@ -9,7 +9,7 @@ Real NClass::CostAtStep(unsigned long step, GroupMap groups) {
     return sum + robot_position;
   };
 
-  auto cost = 0.0;
+  auto group_aggregation_cost = 0.0;
   std::vector<CVector3> centroids;
   for (const auto &group : groups) {
     auto robots = group.second;
@@ -25,9 +25,9 @@ Real NClass::CostAtStep(unsigned long step, GroupMap groups) {
       return cost + c;
     };
 
-    cost = std::accumulate(std::begin(robots), std::end(robots), 0.0, accum_cost);
-    constexpr double ROBOT_RADIUS = 0.17;
-    cost *= 1 / (4 * std::pow(ROBOT_RADIUS, 2));
+    group_aggregation_cost = std::accumulate(std::begin(robots), std::end(robots), 0.0, accum_cost);
+    constexpr double ROBOT_RADIUS = 0.17/2;
+    group_aggregation_cost *= 1 / (4 * std::pow(ROBOT_RADIUS, 2));
 
   }
 
@@ -43,7 +43,7 @@ Real NClass::CostAtStep(unsigned long step, GroupMap groups) {
 
   // centroid dispersion cost should be high
   // so we subtract it to make the overall cost lower when centroids are dispersed.
-  return cost - centroid_dispersion_cost;
+  return group_aggregation_cost - centroid_dispersion_cost;
 }
 
 REGISTER_LOOP_FUNCTIONS(NClass, "n_class")

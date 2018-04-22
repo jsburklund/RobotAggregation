@@ -67,10 +67,14 @@ int main(int argc, const char **argv) {
   ticpp::Document argos_config;
   argos_config.LoadFile(argos_filename);
   auto loop_functions = argos_config.FirstChildElement()->FirstChildElement("loop_functions");
+  auto controllers = argos_config.FirstChildElement()->FirstChildElement("controllers");
+  auto controller = controllers->FirstChildElement("footbot_segregation_controller");
+  auto controller_params = controller->FirstChildElement("params");
   loop_functions->SetAttribute("library", library_path);
   loop_functions->SetAttribute("label", library_label);
   loop_functions->SetAttribute("num_classes", num_classes);
   if (viz) {
+    controller_params->SetAttribute("viz", "true");
     auto viz_element = argos_config.FirstChildElement()->FirstChildElement("visualization");
     ticpp::Element placement("placement");
     placement.SetAttribute("idx", "0");

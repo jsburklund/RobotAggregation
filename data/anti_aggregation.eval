@@ -1,0 +1,14 @@
+n_class
+[INFO] Not using threads
+[INFO] Using random seed = 312
+[INFO] Using simulation clock tick = 0.1
+[INFO] Total experiment length in clock ticks = 18000
+[INFO] Loaded library "./build/controllers/footbot/libfootbot_segregation_controller.so"
+[INFO] Loaded library "././build/loop_functions/libn_class.so"
+[INFO] The physics engine "dyn2d" will perform 10 iterations per tick (dt = 0.01 sec)
+[INFO] No visualization selected.
+0 -5.2637e+07
+1 -5.50159e+07
+2 -5.37565e+07
+3 -4.49153e+07
+4 -5.30681e+07

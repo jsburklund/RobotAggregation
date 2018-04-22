@@ -24,7 +24,7 @@ Real GauciLoopFunction::CostAtStep(unsigned long step, GroupMap /*groups*/) {
   };
 
   auto cost = std::accumulate(std::begin(robot_map), std::end(robot_map), 0.0, accum_cost);
-  constexpr double ROBOT_RADIUS = 0.17;
+  constexpr double ROBOT_RADIUS = 0.17/2;
   cost *= 1 / (4 * std::pow(ROBOT_RADIUS, 2));
 
   return cost;
