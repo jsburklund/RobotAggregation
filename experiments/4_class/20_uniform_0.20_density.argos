@@ -24,8 +24,7 @@
 
   </controllers>
 
-  <loop_functions library="build/loop_functions/libgauci_segregation_loop_function"
-                  label="gauci_segregation_loop_function" random_seed="0" num_classes="4">
+  <loop_functions random_seed="0">
     <cluster center="2.5,2.5" robot_num="20" robot_density="0.20" />
 
   </loop_functions>
