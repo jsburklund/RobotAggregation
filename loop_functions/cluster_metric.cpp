@@ -36,6 +36,7 @@ size_t find_largest_component(int **A, size_t n) {
 }
 
 Real ClusterMetricLoopFunction::CostAtStep(unsigned long step, GroupMap groups) {
+  Real cost = 0;
   for (auto &kv : groups) {
     const auto group_id = kv.first;
     const auto robots = kv.second;
@@ -60,23 +61,16 @@ Real ClusterMetricLoopFunction::CostAtStep(unsigned long step, GroupMap groups) 
     }
 
     auto largest_component_size = find_largest_component(A, robots.size());
-    std::cout << group_id << ", " << largest_component_size << "\n";
 
     for (size_t i = 0; i < robots.size(); ++i) {
       free(A[i]);
     }
     free(A);
 
-//    std::cout << group_id << ":\n";
-//    for (size_t i = 0 ; i < robots.size(); ++i) {
-//      for (size_t j = 0 ; j < robots.size(); ++j) {
-//        std::cout << A[i][j] << " ";
-//      }
-//      std::cout << std::endl;
-//    }
+    cost += -static_cast<Real>(largest_component_size) / robots.size();
   }
 
-  return 0;
+  return cost;
 }
 
 REGISTER_LOOP_FUNCTIONS(ClusterMetricLoopFunction, "cluster_metric")
