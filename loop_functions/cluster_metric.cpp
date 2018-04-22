@@ -11,6 +11,8 @@ Real ClusterMetricLoopFunction::CostAtStep(unsigned long step, GroupMap groups) 
   for (auto &kv : groups) {
     auto group_id = kv.first;
     auto robots = kv.second;
+
+
   }
 
   return 0;

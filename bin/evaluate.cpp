@@ -17,12 +17,14 @@ int main(int argc, const char **argv) {
   args::HelpFlag help(parser, "help", "Display this help menu", {'h', "help"});
   args::Positional<std::string> base_argos_config_flag(parser, "base_argos_filename", "base.argos config file",
                                                        args::Options::Required);
-  args::Positional<std::string> params_filename_flag(parser, "params_filename", ".dat file of controller parameters",
-                                                     args::Options::Required);
   args::Positional<std::string> library_path_flag(parser, "loop_function_library",
                                                   "the relative path to the library to load", args::Options::Required);
-  args::Positional<std::string> library_label_flag(parser, "loop_function_label",
-                                                   "the label used in the macro for that loop function");
+  args::Positional<std::string> params_filename_flag(parser, "params_filename",
+                                                     ".dat file of controller parameters, \
+                                                     or a string of the genom is --params-as-string is passed",
+                                                     args::Options::Required);
+  args::ValueFlag<std::string> library_label_flag(parser, "loop_function_label",
+                                                   "the label used in the macro for that loop function", {"label"});
   args::ValueFlag<unsigned int> trials_flag(parser, "trials", "number of trails", {'t', "trials"}, 4);
   args::ValueFlag<unsigned int> num_classes_flag(parser, "num_classes", "number of classes", {'c', "classes"}, 4);
   args::Flag viz_flag(parser, "viz", "show argos visualizaiton", {'z', "viz"}, false);
@@ -55,6 +57,12 @@ int main(int argc, const char **argv) {
   auto generate_poses = args::get(generate_poses_flag);
   auto num_classes = args::get(num_classes_flag);
   auto viz = args::get(viz_flag);
+
+  if (library_label.empty()) {
+    auto position = library_path.rfind('/') + 4;
+    library_label = library_path.substr(position, library_path.size() - position - 3);
+  }
+  std::cout << library_label << "\n";
 
   ticpp::Document argos_config;
   argos_config.LoadFile(argos_filename);

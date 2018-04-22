@@ -23,7 +23,7 @@ def main():
             shape = tuple([args.resolution]*6)
             cost_image = np.ones((args.resolution, args.resolution)) * 1e24
             for grid_search_output_filename in args.grid_search_outputs:
-                data = np.genfromtxt(grid_search_output_filename, delimiter=',')
+                data = np.genfromtxt(grid_search_output_filename, skip_header=True)
                 for parameter_evaluation in data:
                     parameter_idx = int(parameter_evaluation[0])
                     cost = parameter_evaluation[-1]
@@ -33,7 +33,7 @@ def main():
                     if cost < cost_image[row, col]:
                         cost_image[row, col] = parameter_evaluation[-1]
 
-            plt.imshow(1 / cost_image)
+            plt.imshow(1 / cost_image, cmap='Reds')
 
     plt.show()
 

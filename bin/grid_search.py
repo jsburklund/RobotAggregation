@@ -22,9 +22,9 @@ def param_generator(resolution, min, max):
 
 def evaluate_params(args):
     # Execute evaluate and save the poses of time
-    params, argos_file, trials, verbose = args
+    params, argos_file, library_path, trials, verbose = args
     params_str = "\"6 " + " ".join([str(p) for p in params]) + "\""
-    cmd = ["./build/bin/evaluate", argos_file, params_str, "--params-as-string", "-t", str(trials)]
+    cmd = ["./build/bin/evaluate", "--params-as-string", "-t", str(trials), argos_file, library_path, params_str]
     cmd_str = " ".join(cmd)
     output = subprocess.run(cmd_str, stdout=subprocess.PIPE, shell=True)
     if output.returncode != 0:
@@ -44,13 +44,14 @@ def evaluate_params(args):
         sum += float(cost)
     mean = sum / len(output)
     if verbose:
-        print(cmd_str, mean)
+        print("{:s} {:E}".format(cmd_str, mean))
     return mean
 
 
 def main():
     parser = argparse.ArgumentParser("Evaluate cost over a bunch of different argos files.")
     parser.add_argument("argos_files", help="all the argos files you want to run evaluate with", nargs="+")
+    parser.add_argument("library_path", help="the path to the loop function *.so library to use")
     parser.add_argument("--pool-size", "-p", help="number of worker subprocesses to spawn", type=int, required=True)
     parser.add_argument("--trials", '-t', help="number of trials per argos configuration", type=int, default=4)
     parser.add_argument("--resolution", help="number values per parameter", type=int, default=5)
@@ -77,7 +78,6 @@ def main():
     else:
         minimum = [-1] * 6
 
-    print(minimum, maximum)
     outfile_name = "grid_search_output_{:d}.txt".format(int(time.time()))
     with open(outfile_name, 'w')  as outfile:
         outfile.write("- - - - - - - ")
@@ -94,7 +94,7 @@ def main():
             # Evaluate these parameters for each configuration, with several trials on each configuration
             # We parallelize over configurations here
             with Pool(processes=args.pool_size) as pool:
-                pool_args = [(params, f, args.trials, args.verbose) for f in args.argos_files]
+                pool_args = [(params, f, args.library_path, args.trials, args.verbose) for f in args.argos_files]
                 costs = pool.map(evaluate_params, pool_args)
 
                 outfile.write("{:d} ".format(param_idx))
