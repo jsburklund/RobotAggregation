@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #SBATCH -N 1
-#SBATCH -n 16
+#SBATCH -n 36
 #SBATCH -t 1:00:00
 #SBATCH -J grid_search
 
@@ -34,10 +34,7 @@ cp $PROJDIR/bin/grid_search.py .
 
 # Execute program (this also writes files in work dir)
 echo $WORKDIR
-# this will evaluate 16(configs)*4(trials) = 64 total trials per parameter
-# each trial takes .83 seconds, so each parameter takes 53 seconds
-# so we can do roughly 65 parameters per hour
-./grid_search.py --resolution=7 --pool-size=16 --trials 4 --skip=0 --stop-at=-1 experiments/1_class/*.argos experiments/2_class/*.argos experiments/4_class/*.argos build/loop_functions/libn_class.so
+./grid_search.py --resolution=7 --pool-size=36 --trials 1 --skip=0 --stop-at=256 experiments/1_class/*.argos experiments/2_class/*.argos experiments/4_class/*.argos build/loop_functions/libcluster_metric.so
 
 # Transfer generated files into home directory
 cp grid_search_output* $DATADIR
