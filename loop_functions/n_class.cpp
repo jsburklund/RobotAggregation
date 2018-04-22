@@ -46,4 +46,4 @@ Real NClass::CostAtStep(unsigned long step, GroupMap groups) {
   return cost - centroid_dispersion_cost;
 }
 
-REGISTER_LOOP_FUNCTIONS(NClassLoopFunction, "n_class")
+REGISTER_LOOP_FUNCTIONS(NClass, "n_class")

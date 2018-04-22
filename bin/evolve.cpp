@@ -8,7 +8,7 @@
 #include <iterator>
 #include <fstream>
 #include <loop_functions/mpga.h>
-#include <loop_functions/gauci_loop_function.h>
+#include <loop_functions/gauci_aggregation.h>
 
 #include "args.h"
 

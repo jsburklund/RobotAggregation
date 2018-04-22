@@ -12,11 +12,14 @@ target_link_libraries(segregation_loop_function
 add_library(mpga SHARED mpga.cpp)
 target_link_libraries(mpga argos3core_simulator segregation_loop_function)
 
-add_library(gauci_segregation_loop_function SHARED gauci_aggregation.cpp)
-target_link_libraries(gauci_segregation_loop_function segregation_loop_function)
+add_library(gauci_aggregation SHARED gauci_aggregation.cpp)
+target_link_libraries(gauci_aggregation segregation_loop_function)
 
-add_library(n_class_segregation_loop_function SHARED n_class.cpp)
-target_link_libraries(n_class_segregation_loop_function segregation_loop_function)
+add_library(n_class SHARED n_class.cpp)
+target_link_libraries(n_class segregation_loop_function)
 
-add_library(cluster_metric_segregation_loop_function SHARED cluster_metric.cpp)
-target_link_libraries(cluster_metric_segregation_loop_function segregation_loop_function)
+add_library(cluster_metric SHARED cluster_metric.cpp)
+target_link_libraries(cluster_metric segregation_loop_function)
+
+#add_library(convex_hull SHARED convex_hull.cpp)
+#target_link_libraries(convex_hull segregation_loop_function)

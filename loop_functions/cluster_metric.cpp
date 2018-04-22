@@ -16,4 +16,4 @@ Real ClusterMetricLoopFunction::CostAtStep(unsigned long step, GroupMap groups) 
   return 0;
 }
 
-REGISTER_LOOP_FUNCTIONS(ClusterMetricLoopFunction, "cluster_metric_segregation_loop_function")
+REGISTER_LOOP_FUNCTIONS(ClusterMetricLoopFunction, "cluster_metric")

@@ -123,3 +123,11 @@ void convexHull(Point points[], int n) {
       S.pop();
    }
 }
+
+using namespace argos;
+
+class ConvexHull : public SegregationLoopFunction {
+
+  Real CostAtStep(unsigned long step, std::unordered_map<unsigned long, std::vector<CFootBotEntity *>> map) override;
+
+};

@@ -1,9 +1,9 @@
 #include <numeric>
 #include <iterator>
 
-#include "n_class.h"
+#include "convex_hull.h"
 
-Real ConvexHullLoopFunction::CostAtStep(unsigned long step, GroupMap groups) {
+Real ConvexHull::CostAtStep(unsigned long step, GroupMap groups) {
   auto accum_position = [](CVector3 sum, const auto &robot) {
     auto robot_position = robot->GetEmbodiedEntity().GetOriginAnchor().Position;
     return sum + robot_position;
@@ -12,4 +12,4 @@ Real ConvexHullLoopFunction::CostAtStep(unsigned long step, GroupMap groups) {
   return 0;
 }
 
-REGISTER_LOOP_FUNCTIONS(ConvexHullLoopFunction, "convex_hull")
+REGISTER_LOOP_FUNCTIONS(ConvexHull, "convex_hull")

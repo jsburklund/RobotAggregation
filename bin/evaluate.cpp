@@ -22,8 +22,7 @@ int main(int argc, const char **argv) {
   args::Positional<std::string> library_path_flag(parser, "loop_function_library",
                                                   "the relative path to the library to load", args::Options::Required);
   args::Positional<std::string> library_label_flag(parser, "loop_function_label",
-                                                   "the label used in the macro for that loop function",
-                                                   args::Options::Required);
+                                                   "the label used in the macro for that loop function");
   args::ValueFlag<unsigned int> trials_flag(parser, "trials", "number of trails", {'t', "trials"}, 4);
   args::ValueFlag<unsigned int> num_classes_flag(parser, "num_classes", "number of classes", {'c', "classes"}, 4);
   args::Flag viz_flag(parser, "viz", "show argos visualizaiton", {'z', "viz"}, false);
