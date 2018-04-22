@@ -1,9 +1,0 @@
-argos config file,classes,trials,mean final dispersion
-params-gauci.dat_experiments-1_class-10_in_clusters.argos_robot_poses.json,1,5,2241
-params-gauci.dat_experiments-1_class-10_in_lines.argos_robot_poses.json,1,5,2163
-params-gauci.dat_experiments-1_class-3_in_clusters.argos_robot_poses.json,1,5,804
-params-gauci.dat_experiments-1_class-3_in_lines.argos_robot_poses.json,1,5,250
-params-gauci.dat_experiments-1_class-4_in_clusters.argos_robot_poses.json,1,5,1032
-params-gauci.dat_experiments-1_class-4_in_lines.argos_robot_poses.json,1,5,458
-params-gauci.dat_experiments-1_class-5_in_clusters.argos_robot_poses.json,1,5,1095
-params-gauci.dat_experiments-1_class-5_in_lines.argos_robot_poses.json,1,5,454

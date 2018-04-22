@@ -1,9 +1,0 @@
-Evolved Two ClassSegregation on 4 Class configuration
-data-two_class-4_18_two_class-individual_0_gen_4.dat_experiments-4_class-10_in_clusters.argos_robot_poses.json, 10_in_clusters
-data-two_class-4_18_two_class-individual_0_gen_4.dat_experiments-4_class-10_in_lines.argos_robot_poses.json, 10_in_lines
-data-two_class-4_18_two_class-individual_0_gen_4.dat_experiments-4_class-3_in_clusters.argos_robot_poses.json, 3_in_clusters
-data-two_class-4_18_two_class-individual_0_gen_4.dat_experiments-4_class-3_in_lines.argos_robot_poses.json, 3_in_lines
-data-two_class-4_18_two_class-individual_0_gen_4.dat_experiments-4_class-4_in_clusters.argos_robot_poses.json, 4.dat_experiments-4_class-4_in_clusters
-data-two_class-4_18_two_class-individual_0_gen_4.dat_experiments-4_class-4_in_lines.argos_robot_poses.json, 4.dat_experiments-4_class-4_in_lines
-data-two_class-4_18_two_class-individual_0_gen_4.dat_experiments-4_class-5_in_clusters.argos_robot_poses.json, 5_in_clusters
-data-two_class-4_18_two_class-individual_0_gen_4.dat_experiments-4_class-5_in_lines.argos_robot_poses.json, 5_in_lines
