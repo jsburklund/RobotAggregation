@@ -2,8 +2,11 @@
 #include <iostream>
 #include <functional>
 #include <fstream>
+
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/logging/argos_log.h>
+#include <argos3/core/utility/configuration/tinyxml/ticpp.h>
+
 #include <loop_functions/segregation_loop_function.h>
 
 #include "args.h"
@@ -12,14 +15,21 @@
 int main(int argc, const char **argv) {
   args::ArgumentParser parser("simulate an argos config and controller params, and either print cost or save poses.");
   args::HelpFlag help(parser, "help", "Display this help menu", {'h', "help"});
-  args::Positional<std::string>
-      argos_filename_flag(parser, "argos_filename", "argos config file", args::Options::Required);
-  args::Positional<std::string>
-      params_filename_flag(parser, "params_filename", ".dat file of controller parameters", args::Options::Required);
-  args::ValueFlag<unsigned int> trials_flag(parser, "trials", "number of trails", {'t', "trials"}, 10);
+  args::Positional<std::string> base_argos_config_flag(parser, "base_argos_filename", "base.argos config file",
+                                                       args::Options::Required);
+  args::Positional<std::string> params_filename_flag(parser, "params_filename", ".dat file of controller parameters",
+                                                     args::Options::Required);
+  args::Positional<std::string> library_path_flag(parser, "loop_function_library",
+                                                  "the relative path to the library to load", args::Options::Required);
+  args::Positional<std::string> library_label_flag(parser, "loop_function_label",
+                                                   "the label used in the macro for that loop function",
+                                                   args::Options::Required);
+  args::ValueFlag<unsigned int> trials_flag(parser, "trials", "number of trails", {'t', "trials"}, 4);
+  args::ValueFlag<unsigned int> num_classes_flag(parser, "num_classes", "number of classes", {'c', "classes"}, 4);
+  args::Flag viz_flag(parser, "viz", "show argos visualizaiton", {'z', "viz"}, false);
   args::Flag generate_poses_flag(parser, "generate_poses", "generate a file of robots poses", {'p', "poses"}, false);
-  args::Flag params_as_str_flag
-      (parser, "params_as_string", "the params input is actually a string of numbers", {"params-as-string"}, false);
+  args::Flag params_as_str_flag(parser, "params_as_string", "the params input is actually a string of numbers",
+                                {"params-as-string"}, false);
 
   try {
     parser.ParseCLI(argc, argv);
@@ -40,16 +50,37 @@ int main(int argc, const char **argv) {
 //  LOG.GetStream().rdbuf(dev_null.rdbuf());
 
   argos::CSimulator &simulator = argos::CSimulator::GetInstance();
-  auto &argos_filename = args::get(argos_filename_flag);
+  auto &argos_filename = args::get(base_argos_config_flag);
+  auto library_path = args::get(library_path_flag);
+  auto library_label = args::get(library_label_flag);
   auto generate_poses = args::get(generate_poses_flag);
+  auto num_classes = args::get(num_classes_flag);
+  auto viz = args::get(viz_flag);
+
+  ticpp::Document argos_config;
+  argos_config.LoadFile(argos_filename);
+  auto loop_functions = argos_config.FirstChildElement()->FirstChildElement("loop_functions");
+  loop_functions->SetAttribute("library", library_path);
+  loop_functions->SetAttribute("label", library_label);
+  loop_functions->SetAttribute("num_classes", num_classes);
+  if (viz) {
+    auto viz_element = argos_config.FirstChildElement()->FirstChildElement("visualization");
+    ticpp::Element placement("placement");
+    placement.SetAttribute("idx", "0");
+    placement.SetAttribute("position", "2.5,2.5,6");
+    placement.SetAttribute("look_at", "2.5,2.5,0");
+    placement.SetAttribute("lens_focal_length", "30");
+    ticpp::Element camera("camera");
+    ticpp::Element qt("qt-opengl");
+    camera.InsertEndChild(placement);
+    qt.InsertEndChild(camera);
+    viz_element->InsertEndChild(qt);
+  }
 
   try {
-    /* Set the .argos configuration file
-     * This is a relative path which assumed that you launch the executable
-     * from argos3-examples (as said also in the README) */
-    simulator.SetExperimentFileName(argos_filename);
-    /* Load it to configure ARGoS */
-    simulator.LoadExperiment();
+    simulator.Load(argos_config);
+//    simulator.SetExperimentFileName(argos_filename);
+//    simulator.LoadExperiment();
     argos::LOG.Flush();
     argos::LOGERR.Flush();
   }
