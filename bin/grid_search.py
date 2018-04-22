@@ -9,14 +9,14 @@ import numpy as np
 from multiprocessing import Pool
 
 
-def param_generator(resolution, min=-1, max=1):
+def param_generator(resolution, min, max):
     """ Fight me. """
-    for vl0 in np.linspace(min, max, resolution):
-        for vr0 in np.linspace(min, max, resolution):
-            for vl1 in np.linspace(min, max, resolution):
-                for vr1 in np.linspace(min, max, resolution):
-                    for vl2 in np.linspace(min, max, resolution):
-                        for vr2 in np.linspace(min, max, resolution):
+    for vl0 in np.linspace(min[0], max[0], resolution):
+        for vr0 in np.linspace(min[1], max[1], resolution):
+            for vl1 in np.linspace(min[2], max[2], resolution):
+                for vr1 in np.linspace(min[3], max[3], resolution):
+                    for vl2 in np.linspace(min[4], max[4], resolution):
+                        for vr2 in np.linspace(min[5], max[5], resolution):
                             yield [vl0, vr0, vl1, vr1, vl2, vr2]
 
 
@@ -56,9 +56,28 @@ def main():
     parser.add_argument("--resolution", help="number values per parameter", type=int, default=5)
     parser.add_argument("--skip", help="skip this many of the first parameter pairs", type=int, default=0)
     parser.add_argument("--stop-at", help="stop after evaluating this many parameter pairs", type=int, default=-1)
+    parser.add_argument("--minimum", help="min values for each param. A list of 6 numbers")
+    parser.add_argument("--maximum", help="max values for each param. A list of 6 numbers")
     parser.add_argument("--verbose", "-v", help="print more shit", action="store_true")
     args = parser.parse_args()
 
+    if args.maximum:
+        maximum = [float(i) for i in args.maximum.split(" ")]
+        if len(maximum) != 6:
+            print("maximum must have 6 numbers")
+            return
+    else:
+        maximum = [1] * 6
+
+    if args.minimum:
+        minimum = [float(i) for i in args.minimum.split(" ")]
+        if len(minimum) != 6:
+            print("minimum must have 6 numbers")
+            return
+    else:
+        minimum = [-1] * 6
+
+    print(minimum, maximum)
     outfile_name = "grid_search_output_{:d}.txt".format(int(time.time()))
     with open(outfile_name, 'w')  as outfile:
         outfile.write("- - - - - - - ")
@@ -66,7 +85,7 @@ def main():
             outfile.write("{:s} ".format(argos_file))
         outfile.write("\n")
 
-        for param_idx, params in enumerate(param_generator(args.resolution)):
+        for param_idx, params in enumerate(param_generator(args.resolution, minimum, maximum)):
             if param_idx == args.stop_at:
                 break
             if param_idx < args.skip:
