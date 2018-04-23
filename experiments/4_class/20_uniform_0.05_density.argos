@@ -55,7 +55,7 @@
 
   <media>
     <led id="leds"/>
-    <range_and_bearing id="rab"/>
+    <range_and_bearing id="rab" grid_size="1,1,1"/>
   </media>
 
   <visualization/>
