@@ -28,10 +28,12 @@ int main(int argc, const char **argv) {
   args::ValueFlag<unsigned int> trials_flag(parser, "trials", "number of trails", {'t', "trials"}, 4);
   args::ValueFlag<unsigned int> num_classes_flag(parser, "num_classes", "number of classes", {'c', "classes"}, 4);
   args::ValueFlag<unsigned int> num_steps_flag(parser, "num_steps", "number of time steps", {'s', "steps"}, 180);
+  args::ValueFlag<float> sensor_length_flag(parser, "sensor_length_cm", "max range of sensor", {"sensor-length"}, -1);
   args::Flag viz_flag(parser, "viz", "show argos visualization", {'z', "viz"}, false);
   args::Flag generate_poses_flag(parser, "generate_poses", "generate a file of robots poses", {'p', "poses"}, false);
   args::Flag params_as_str_flag(parser, "params_as_string", "the params input is actually a string of numbers",
                                 {"params-as-string"}, false);
+  args::Flag print_mean_flag(parser, "print_mean", "print mean of costs", {'m', "mean"}, false);
 
   try {
     parser.ParseCLI(argc, argv);
@@ -59,12 +61,14 @@ int main(int argc, const char **argv) {
   auto num_classes = args::get(num_classes_flag);
   auto num_steps = args::get(num_steps_flag);
   auto viz = args::get(viz_flag);
+  auto sensor_length_cm = args::get(sensor_length_flag);
+  auto print_mean = args::get(print_mean_flag);
 
   if (library_label.empty()) {
     auto position = library_path.rfind('/') + 4;
     library_label = library_path.substr(position, library_path.size() - position - 3);
   }
-  std::cout << library_label << "\n";
+  std::cout << library_label << '\n';
 
   ticpp::Document argos_config;
   argos_config.LoadFile(argos_filename);
@@ -78,6 +82,11 @@ int main(int argc, const char **argv) {
   loop_functions->SetAttribute("library", library_path);
   loop_functions->SetAttribute("label", library_label);
   loop_functions->SetAttribute("num_classes", num_classes);
+
+  if (sensor_length_cm != -1.0) {
+    controller_params->SetAttribute("sensor_length_cm", sensor_length_cm);
+  }
+
   if (viz) {
     controller_params->SetAttribute("viz", "true");
     auto viz_element = argos_config.FirstChildElement()->FirstChildElement("visualization");
@@ -130,16 +139,17 @@ int main(int argc, const char **argv) {
     std::replace(argos_filename.begin(), argos_filename.end(), '/', '-');
     ss << argos_filename << ".evaluate_output";
     of.open(ss.str());
-    std::cout << ss.str() << "\n";
+    std::cout << ss.str() << '\n';
 
     if (!of.good()) {
-      std::cout << strerror(errno) << "\n";
-      std::cout << ss.str() << "\n";
+      std::cout << strerror(errno) << '\n';
+      std::cout << ss.str() << '\n';
       return -1;
     }
   }
 
   unsigned int N = args::get(trials_flag);
+  Real cost_sum = 0;
   for (unsigned int i = 0u; i < N; ++i) {
     simulator.Reset();
     loop_function.Reset();
@@ -164,8 +174,13 @@ int main(int argc, const char **argv) {
       j.push_back(trial_j);
     }
     if (!generate_poses) {
-      std::cout << i << " " << cost << "\n";
+      std::cout << i << " " << cost << '\n';
+      cost_sum += cost;
     }
+  }
+
+  if (print_mean) {
+    std::cout << "mean: " << cost_sum / N << '\n';
   }
 
   if (generate_poses) {

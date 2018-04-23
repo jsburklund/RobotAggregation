@@ -26,6 +26,7 @@ void SegregationFootbotController::Init(TConfigurationNode &t_node) {
   std::string params_filename;
   GetNodeAttributeOrDefault(t_node, "parameter_file", params_filename, std::string());
   GetNodeAttributeOrDefault(t_node, "viz", viz, false);
+  GetNodeAttributeOrDefault(t_node, "sensor_length_cm", sensor_length_cm, INFINITY);
 
   if (!params_filename.empty()) {
     LoadFromFile(params_filename);
@@ -75,14 +76,14 @@ SegregationFootbotController::SensorState SegregationFootbotController::GetKinSe
 
   auto sens_state = SensorState::NOTHING;
   if (!tMsgs.empty()) {
-    Real closest_range = INFINITY;
+    float closest_range_cm = sensor_length_cm;
 
     for (const auto &tMsg : tMsgs) {
       Real bearing = tMsg.HorizontalBearing.GetValue();
-      Real range = tMsg.Range;
+      Real range_cm = tMsg.Range;
       if (bearing < kCAM_VIEW_ANG && bearing > -kCAM_VIEW_ANG) {
-        if (range < closest_range) {
-          closest_range = range;
+        if (range_cm < closest_range_cm) {
+          closest_range_cm = range_cm;
           uint8_t robot_class = tMsg.Data[0];
           sens_state = (m_class == robot_class) ? SensorState::KIN : SensorState::NONKIN;
         }

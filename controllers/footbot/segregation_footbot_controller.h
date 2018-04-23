@@ -54,6 +54,7 @@ class SegregationFootbotController : public CCI_Controller {
 
  private:
   unsigned long m_class = 0;
+  float sensor_length_cm = INFINITY;
   bool viz = false;
 };
 
