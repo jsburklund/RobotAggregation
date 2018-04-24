@@ -26,7 +26,6 @@ int main(int argc, const char **argv) {
   args::ValueFlag<std::string> library_label_flag(parser, "loop_function_label",
                                                    "the label used in the macro for that loop function", {"label"});
   args::ValueFlag<unsigned int> trials_flag(parser, "trials", "number of trails", {'t', "trials"}, 4);
-  args::ValueFlag<unsigned int> num_classes_flag(parser, "num_classes", "number of classes", {'c', "classes"}, 4);
   args::ValueFlag<unsigned int> num_steps_flag(parser, "num_steps", "number of time steps", {'s', "steps"}, 180);
   args::ValueFlag<float> sensor_length_flag(parser, "sensor_length_cm", "max range of sensor", {"sensor-length"}, -1);
   args::Flag viz_flag(parser, "viz", "show argos visualization", {'z', "viz"}, false);
@@ -58,7 +57,6 @@ int main(int argc, const char **argv) {
   auto library_path = args::get(library_path_flag);
   auto library_label = args::get(library_label_flag);
   auto generate_poses = args::get(generate_poses_flag);
-  auto num_classes = args::get(num_classes_flag);
   auto num_steps = args::get(num_steps_flag);
   auto viz = args::get(viz_flag);
   auto sensor_length_cm = args::get(sensor_length_flag);
@@ -81,7 +79,6 @@ int main(int argc, const char **argv) {
   auto controller_params = controller->FirstChildElement("params");
   loop_functions->SetAttribute("library", library_path);
   loop_functions->SetAttribute("label", library_label);
-  loop_functions->SetAttribute("num_classes", num_classes);
 
   if (sensor_length_cm != -1.0) {
     controller_params->SetAttribute("sensor_length_cm", sensor_length_cm);

@@ -24,7 +24,7 @@
 
   </controllers>
 
-  <loop_functions random_seed="0">
+  <loop_functions random_seed="0" num_classes="4">
     <cluster center="2.5,2.5" robot_num="40" robot_density="0.20" />
 
   </loop_functions>
