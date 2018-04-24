@@ -22,7 +22,7 @@ def param_generator(resolution, min, max):
 
 def evaluate_params(args):
     # Execute evaluate and save the poses of time
-    params, argos_file, library_path, trials, verbose = args
+    param_idx, params, argos_file, library_path, trials, verbose = args
     params_str = "\"6 " + " ".join([str(p) for p in params]) + "\""
     cmd = ["./build/bin/evaluate", "--params-as-string", "-t", str(trials), argos_file, library_path, params_str]
     cmd_str = " ".join(cmd)
@@ -44,7 +44,7 @@ def evaluate_params(args):
         sum += float(cost)
     mean = sum / len(output)
     if verbose:
-        print("{:s} {:E}".format(cmd_str, mean))
+        print("{:d} {:s} {:E}".format(param_idx, cmd_str, mean))
     return mean
 
 
@@ -94,7 +94,7 @@ def main():
             # Evaluate these parameters for each configuration, with several trials on each configuration
             # We parallelize over configurations here
             with Pool(processes=args.pool_size) as pool:
-                pool_args = [(params, f, args.library_path, args.trials, args.verbose) for f in args.argos_files]
+                pool_args = [(param_idx, params, f, args.library_path, args.trials, args.verbose) for f in args.argos_files]
                 costs = pool.map(evaluate_params, pool_args)
 
                 outfile.write("{:d} ".format(param_idx))
