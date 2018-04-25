@@ -26,6 +26,7 @@ void SegregationFootbotController::Init(TConfigurationNode &t_node) {
   GetNodeAttributeOrDefault(t_node, "kin_nonkin_confusion", kin_nonkin_confusion, 0.);
   GetNodeAttributeOrDefault(t_node, "kin_nothing_confusion", kin_nothing_confusion, 0.);
   GetNodeAttributeOrDefault(t_node, "nonkin_nothing_confusion", nonkin_nothing_confusion, 0.);
+  GetNodeAttributeOrDefault(t_node, "half_beam_angle", half_beam_angle, deg2rad(15.));
 
   if (!params_filename.empty()) {
     LoadFromFile(params_filename);
@@ -80,7 +81,7 @@ SegregationFootbotController::SensorState SegregationFootbotController::GetTrueK
     for (const auto &tMsg : tMsgs) {
       Real bearing = tMsg.HorizontalBearing.GetValue();
       Real range_cm = tMsg.Range;
-      if (bearing < kCAM_VIEW_ANG && bearing > -kCAM_VIEW_ANG) {
+      if (bearing < half_beam_angle && bearing > -half_beam_angle) {
         if (range_cm < closest_range_cm) {
           closest_range_cm = range_cm;
           uint8_t robot_class = tMsg.Data[0];

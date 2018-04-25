@@ -52,7 +52,7 @@ class SegregationFootbotController : public CCI_Controller {
   CCI_LEDsActuator *m_pcLEDs = nullptr;
   CRandom::CRNG *m_rng = nullptr;
 
-  static constexpr Real kCAM_VIEW_ANG = deg2rad(15.0);
+  Real half_beam_angle = deg2rad(15.0);
 
  private:
   unsigned long m_class = 0;
