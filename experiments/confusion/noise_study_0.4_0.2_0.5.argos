@@ -22,10 +22,7 @@
   </controllers>
 
   <loop_functions num_classes="4" random_seed="0">
-    <line center="3.25,1.75" robot_distance="0.3" robot_num="5" />
-    <line center="2.75,2.25" robot_distance="0.3" robot_num="5" />
-    <line center="2.25,2.75" robot_distance="0.3" robot_num="5" />
-    <line center="1.75,3.25" robot_distance="0.3" robot_num="5" />
+    <cluster center="2.5,2.5" robot_density="0.10" robot_num="40" />
 
   </loop_functions>
 
