@@ -3,6 +3,7 @@
 #include <array>
 
 #include <argos3/core/control_interface/ci_controller.h>
+#include <argos3/core/utility/math/rng.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
@@ -42,13 +43,14 @@ class SegregationFootbotController : public CCI_Controller {
 
   void SetClassId(unsigned long class_id);
 
-  SensorState GetKinSensorVal();
+  SensorState GetTrueKinSensorVal();
 
-  std::array<Real, GENOME_SIZE> m_params;
-  CCI_DifferentialSteeringActuator *m_pcWheels;
-  CCI_RangeAndBearingActuator *m_pcRABAct;
-  CCI_RangeAndBearingSensor *m_pcRABSens;
-  CCI_LEDsActuator *m_pcLEDs;
+  std::array<Real, GENOME_SIZE> m_params = {{0, 0, 0, 0, 0, 0}};
+  CCI_DifferentialSteeringActuator *m_pcWheels = nullptr;
+  CCI_RangeAndBearingActuator *m_pcRABAct = nullptr;
+  CCI_RangeAndBearingSensor *m_pcRABSens = nullptr;
+  CCI_LEDsActuator *m_pcLEDs = nullptr;
+  CRandom::CRNG *m_rng = nullptr;
 
   static constexpr Real kCAM_VIEW_ANG = deg2rad(15.0);
 
@@ -56,5 +58,8 @@ class SegregationFootbotController : public CCI_Controller {
   unsigned long m_class = 0;
   float sensor_length_cm = INFINITY;
   bool viz = false;
+  double kin_nonkin_confusion = 0;
+  double kin_nothing_confusion = 0;
+  double nonkin_nothing_confusion = 0;
 };
 

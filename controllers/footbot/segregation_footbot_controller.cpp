@@ -3,12 +3,8 @@
 
 #include <cstdio>
 
-SegregationFootbotController::SegregationFootbotController()
-    : m_params{0, 0, 0, 0},
-      m_pcWheels(nullptr),
-      m_pcRABAct(nullptr),
-      m_pcRABSens(nullptr),
-      m_pcLEDs(nullptr) {
+SegregationFootbotController::SegregationFootbotController() {
+    m_rng = CRandom::CreateRNG("aggregation_loop_function");
 }
 
 void SegregationFootbotController::Init(TConfigurationNode &t_node) {
@@ -27,6 +23,9 @@ void SegregationFootbotController::Init(TConfigurationNode &t_node) {
   GetNodeAttributeOrDefault(t_node, "parameter_file", params_filename, std::string());
   GetNodeAttributeOrDefault(t_node, "viz", viz, false);
   GetNodeAttributeOrDefault(t_node, "sensor_length_cm", sensor_length_cm, INFINITY);
+  GetNodeAttributeOrDefault(t_node, "kin_nonkin_confusion", kin_nonkin_confusion, 0.);
+  GetNodeAttributeOrDefault(t_node, "kin_nothing_confusion", kin_nothing_confusion, 0.);
+  GetNodeAttributeOrDefault(t_node, "nonkin_nothing_confusion", nonkin_nothing_confusion, 0.);
 
   if (!params_filename.empty()) {
     LoadFromFile(params_filename);
@@ -71,7 +70,7 @@ void SegregationFootbotController::LoadFromFile(const std::string &params_filena
   }
 }
 
-SegregationFootbotController::SensorState SegregationFootbotController::GetKinSensorVal() {
+SegregationFootbotController::SensorState SegregationFootbotController::GetTrueKinSensorVal() {
   const CCI_RangeAndBearingSensor::TReadings &tMsgs = m_pcRABSens->GetReadings();
 
   auto sens_state = SensorState::NOTHING;
@@ -124,7 +123,40 @@ void SegregationFootbotController::ControlStep() {
         break;
     }
   }
-  auto sensor_state = GetKinSensorVal();
+  auto true_sensor_state = GetTrueKinSensorVal();
+
+  auto p = m_rng->Uniform(CRange<double>(0., 1.));
+  auto sensor_state = true_sensor_state;
+  switch (true_sensor_state) {
+    case SensorState::NOTHING: {
+      if (p < kin_nothing_confusion) {
+        sensor_state = SensorState::KIN;
+      }
+      else if (p - kin_nothing_confusion < nonkin_nothing_confusion) {
+        sensor_state = SensorState::NONKIN;
+      }
+      break;
+    }
+    case SensorState::KIN: {
+      if (p < kin_nonkin_confusion) {
+        sensor_state = SensorState::NONKIN;
+      }
+      else if (p - kin_nonkin_confusion < kin_nothing_confusion) {
+        sensor_state = SensorState::NOTHING;
+      }
+      break;
+    }
+    case SensorState::NONKIN: {
+      if (p < kin_nonkin_confusion) {
+        sensor_state = SensorState::KIN;
+      }
+      else if (p - kin_nonkin_confusion < nonkin_nothing_confusion) {
+        sensor_state = SensorState::NOTHING;
+      }
+      break;
+    }
+  }
+
   switch (sensor_state) {
     case SensorState::NOTHING: {
       m_pcWheels->SetLinearVelocity(SCALE * m_params[0], SCALE * m_params[1]);

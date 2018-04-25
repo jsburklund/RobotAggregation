@@ -1,0 +1,64 @@
+<argos-configuration>
+
+  <framework>
+    <system threads="0" />
+    <experiment length="180" random_seed="312" ticks_per_second="10" />
+  </framework>
+
+  <controllers>
+
+    <footbot_segregation_controller id="fb_segregation" library="build/controllers/footbot/libfootbot_segregation_controller">
+      <actuators>
+        <differential_steering implementation="default" />
+        <range_and_bearing implementation="default" />
+        <leds implementation="default" medium="leds" />
+      </actuators>
+      <sensors>
+        <range_and_bearing implementation="medium" medium="rab" show_rays="false" />
+      </sensors>
+      <params kin_nonkin_confusion="0.5" kin_nothing_confusion="0.3" nonkin_nothing_confusion="0.4" p_kin_given_nonkin="0.0" p_nonkin_given_kin="0.0" />
+    </footbot_segregation_controller>
+
+  </controllers>
+
+  <loop_functions num_classes="4" random_seed="0">
+    <line center="3.25,1.75" robot_distance="0.3" robot_num="5" />
+    <line center="2.75,2.25" robot_distance="0.3" robot_num="5" />
+    <line center="2.25,2.75" robot_distance="0.3" robot_num="5" />
+    <line center="1.75,3.25" robot_distance="0.3" robot_num="5" />
+
+  </loop_functions>
+
+  <arena center="2.5,2.5,1" size="6, 6, 2">
+
+    <box id="wall_north" movable="false" size="5,0.1,0.5">
+      <body orientation="0,0,0" position="2.5,5,0" />
+    </box>
+
+    <box id="wall_south" movable="false" size="5,0.1,0.5">
+      <body orientation="0,0,0" position="2.5,0,0" />
+    </box>
+
+    <box id="wall_east" movable="false" size="0.1,5,0.5">
+      <body orientation="0,0,0" position="0,2.5,0" />
+    </box>
+
+    <box id="wall_west" movable="false" size="0.1,5,0.5">
+      <body orientation="0,0,0" position="5,2.5,0" />
+    </box>
+
+  </arena>
+
+  <physics_engines>
+    <dynamics2d id="dyn2d" />
+  </physics_engines>
+
+  <media>
+    <led id="leds" />
+    <range_and_bearing grid_size="1,1,1" id="rab" />
+  </media>
+
+  
+  <visualization />
+
+</argos-configuration>
