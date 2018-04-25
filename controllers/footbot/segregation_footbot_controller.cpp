@@ -20,13 +20,15 @@ void SegregationFootbotController::Init(TConfigurationNode &t_node) {
   }
 
   std::string params_filename;
+  double half_beam_angle_deg;
   GetNodeAttributeOrDefault(t_node, "parameter_file", params_filename, std::string());
   GetNodeAttributeOrDefault(t_node, "viz", viz, false);
   GetNodeAttributeOrDefault(t_node, "sensor_length_cm", sensor_length_cm, INFINITY);
   GetNodeAttributeOrDefault(t_node, "kin_nonkin_confusion", kin_nonkin_confusion, 0.);
   GetNodeAttributeOrDefault(t_node, "kin_nothing_confusion", kin_nothing_confusion, 0.);
   GetNodeAttributeOrDefault(t_node, "nonkin_nothing_confusion", nonkin_nothing_confusion, 0.);
-  GetNodeAttributeOrDefault(t_node, "half_beam_angle", half_beam_angle, deg2rad(15.));
+  GetNodeAttributeOrDefault(t_node, "half_beam_angle", half_beam_angle_deg, 15.);
+  half_beam_angle = deg2rad(half_beam_angle_deg);
 
   if (!params_filename.empty()) {
     LoadFromFile(params_filename);
