@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import numpy as np
+import csv
 import matplotlib.pyplot as plt
 import argparse
 
@@ -8,6 +9,7 @@ import argparse
 def main():
     parser = argparse.ArgumentParser("Visualize a set of output files from grid search")
     parser.add_argument("grid_search_outputs", nargs="+")
+    parser.add_argument("--outfile")
     parser.add_argument("--resolution", type=int, default=7)
     parser.add_argument("--no-plot", action="store_true")
 
@@ -22,9 +24,15 @@ def main():
         costs[first_param_idx:last_param_idx + 1] = np.mean(f[:,7:], axis=1)
         params[first_param_idx:last_param_idx + 1,:] = f[:,1:7]
 
+    if args.outfile:
+        writer = csv.writer(open(args.outfile, 'w'), delimiter=',')
+        for i, c in enumerate(costs):
+            if c != 0:
+                writer.writerow([i, c])
+
     best_idx = np.argmin(costs)
-    print("Best Params, Cost")
-    print(params[best_idx], costs[best_idx])
+    print("Best Params, Index, Cost")
+    print(params[best_idx], best_idx, costs[best_idx])
 
     if not args.no_plot:
         for x_param in range(6):
