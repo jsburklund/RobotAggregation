@@ -1,0 +1,9 @@
+experiments/beam_angle/5_deg.argos -3030.533
+experiments/beam_angle/10_deg.argos -3111.657
+experiments/beam_angle/15_deg.argos -3986.798
+experiments/beam_angle/20_deg.argos -3801.376
+experiments/beam_angle/25_deg.argos -3515.929
+experiments/beam_angle/30_deg.argos -3133.669
+experiments/beam_angle/35_deg.argos -2861.025
+experiments/beam_angle/40_deg.argos -2460.486
+experiments/beam_angle/45_deg.argos -2201.925

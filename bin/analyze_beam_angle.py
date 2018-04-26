@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+import re
 import argparse
+import csv
 import os
 import subprocess
 import sys
@@ -63,13 +65,20 @@ def plot_func(args):
     style = os.path.join(style_dir, "mpl.style")
     plt.style.use(style)
 
-    costs = np.genfromtxt(args.beam_angle_output)
+    reader = csv.reader(open(args.beam_angle_output, 'r'), delimiter=' ')
+    costs = []
+    degs = []
+    for row in reader:
+        m = re.search("(\d+)_deg", row[0])
+        deg = float(m.groups()[0])
+        degs.append(deg)
+        costs.append(float(row[1]))
+
     plt.figure()
-    x = np.arange(1, 27.5, 2.5)
-    plt.plot(x, costs[:,1])
-    plt.scatter(x, costs[:,1])
-    plt.xlabel("beam angle")
-    plt.ylabel("cost")
+    plt.plot(degs, costs)
+    plt.scatter(degs, costs)
+    plt.xlabel("Half beam angle (degrees)")
+    plt.ylabel("Cost")
     plt.show()
 
 
