@@ -85,7 +85,7 @@ void SegregationLoopFunction::PlaceSingle(const CVector2 &center, unsigned long 
 
     auto position = CVector3{center.GetX(), center.GetY(), 0};
     CQuaternion orientation = CQuaternion{m_rng->Uniform(CRadians::UNSIGNED_RANGE), CVector3::Z};
-    auto robot = new CFootBotEntity(footbot_id.str(), XML_CONTROLLER_ID, position, orientation);
+    auto robot = new CFootBotEntity(footbot_id.str(), XML_CONTROLLER_ID, position, orientation, 100);
     AddEntity(*robot);
     auto &generic_controller = robot->GetControllableEntity().GetController();
     auto controller = &dynamic_cast<SegregationFootbotController &>(generic_controller);
@@ -111,7 +111,7 @@ void SegregationLoopFunction::PlaceLine(const CVector2 &center, UInt32 n_robots,
       /* Create the robot in the origin and add it to ARGoS space */
       auto position = CVector3{distance * j + center.GetX(), distance * j + center.GetY(), 0};
       CQuaternion orientation = CQuaternion{m_rng->Uniform(CRadians::UNSIGNED_RANGE), CVector3::Z};
-      auto robot = new CFootBotEntity(footbot_id.str(), XML_CONTROLLER_ID, position, orientation);
+      auto robot = new CFootBotEntity(footbot_id.str(), XML_CONTROLLER_ID, position, orientation, 100);
       AddEntity(*robot);
       auto &generic_controller = robot->GetControllableEntity().GetController();
       auto controller = &dynamic_cast<SegregationFootbotController &>(generic_controller);
@@ -140,7 +140,9 @@ void SegregationLoopFunction::PlaceCluster(const CVector2 &center, UInt32 n_robo
       id_string_class_map[footbot_id.str()] = class_id;
 
       /* Create the robot in the origin and add it to ARGoS space */
-      auto robot = new CFootBotEntity(footbot_id.str(), XML_CONTROLLER_ID);
+      CQuaternion orientation = CQuaternion{m_rng->Uniform(CRadians::UNSIGNED_RANGE), CVector3::Z};
+      CVector3 position = CVector3::ZERO;
+      auto robot = new CFootBotEntity(footbot_id.str(), XML_CONTROLLER_ID, position, orientation, 100);
       AddEntity(*robot);
       auto &generic_controller = robot->GetControllableEntity().GetController();
       auto controller = &dynamic_cast<SegregationFootbotController &>(generic_controller);
@@ -150,8 +152,6 @@ void SegregationLoopFunction::PlaceCluster(const CVector2 &center, UInt32 n_robo
       /* Try to place it in the arena */
       auto attempts = 0;
       bool bDone;
-      CVector3 position;
-      CQuaternion orientation;
       do {
         /* Choose a random position and orientation */
         ++attempts;
