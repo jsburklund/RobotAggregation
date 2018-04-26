@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 
 import argparse
+import os
 import subprocess
 import sys
 import time
 
-import numpy as np
+import matplotlib.pyplot as plt
 from multiprocessing import Pool
+import numpy as np
 
 
 def evaluate(args):
@@ -23,29 +25,22 @@ def evaluate(args):
         return -1
 
     sum = 0
+    costs = []
     output = output.stdout.decode("UTF-8").split("\n")[8:-1]
     for line in output:
         try:
             cost = float(line.split(" ")[-1])
         except ValueError:
             cost = 0
+        costs.append(cost)
         sum += float(cost)
     mean = sum / len(output)
     if verbose:
-        print("{:s} {:E}".format(cmd_str, mean))
+        print(cmd_str, costs)
     return mean
 
 
-def main():
-    parser = argparse.ArgumentParser("Evaluate cost over the beam angle argos files.")
-    parser.add_argument("argos_files", help="the argos files you want to run evaluate with", nargs="+")
-    parser.add_argument("library_path", help="the path to the loop function *.so library to use")
-    parser.add_argument("params", help="params file to evaluate")
-    parser.add_argument("--pool-size", "-p", help="number of worker subprocesses to spawn", type=int, required=True)
-    parser.add_argument("--trials", '-t', help="number of trials per argos configuration", type=int, default=100)
-    parser.add_argument("--verbose", "-v", help="print more shit", action="store_true")
-    args = parser.parse_args()
-
+def eval_func(args):
     params = np.genfromtxt(args.params)[1:]
     if args.verbose:
         print(params)
@@ -61,6 +56,40 @@ def main():
                 outfile.write(" ")
                 outfile.write("{:.3f} ".format(cost))
                 outfile.write("\n")
+
+
+def plot_func(args):
+    style_dir = os.path.dirname(os.path.realpath(__file__))
+    style = os.path.join(style_dir, "mpl.style")
+    plt.style.use(style)
+
+    costs = np.genfromtxt(args.beam_angle_output)
+    plt.figure()
+    x = np.arange(1, 27.5, 2.5)
+    plt.plot(x, costs[:,1])
+    plt.scatter(x, costs[:,1])
+    plt.xlabel("beam angle")
+    plt.ylabel("cost")
+    plt.show()
+
+
+def main():
+    parser = argparse.ArgumentParser("Evaluate cost over the beam angle argos files.")
+    subparsers = parser.add_subparsers()
+    evaluate = subparsers.add_parser('evaluate', help="run the simulations")
+    evaluate.add_argument("argos_files", help="the argos files you want to run evaluate with", nargs="+")
+    evaluate.add_argument("library_path", help="the path to the loop function *.so library to use")
+    evaluate.add_argument("params", help="params file to evaluate")
+    evaluate.add_argument("--pool-size", "-p", help="number of worker subprocesses to spawn", type=int, required=True)
+    evaluate.add_argument("--trials", '-t', help="number of trials per argos configuration", type=int, default=100)
+    evaluate.add_argument("--verbose", "-v", help="print more shit", action="store_true")
+    evaluate.set_defaults(func=eval_func)
+    plot = subparsers.add_parser('plot', help="plot the output of \'evaluate\'")
+    plot.add_argument("beam_angle_output", help='file output by the evaluate subcommand')
+    plot.set_defaults(func=plot_func)
+
+    args = parser.parse_args()
+    args.func(args)
 
     return 0
 
