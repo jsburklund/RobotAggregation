@@ -19,7 +19,7 @@
       <sensors>
         <range_and_bearing implementation="medium" medium="rab" show_rays="false"/>
       </sensors>
-      <params half_beam_angle="7.5"/>
+      <params half_beam_angle="45"/>
     </footbot_segregation_controller>
 
   </controllers>
