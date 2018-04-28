@@ -34,17 +34,18 @@ def main():
     print("Best Params, Index, Cost")
     print(params[best_idx], best_idx, costs[best_idx])
 
-    good_indeces, = np.where(costs < -2700)
+    good_indeces, = np.where(costs < -2600)
     print("Good params")
     for i in good_indeces:
         p = params[i]
         # check if this matches the "patterns" of known segregating controllers
+        # this never prints anything because turns out they all can be described this way
         if p[0] > p[1]:
-            if p[3] > p[2] and p[4] > p[5]:
+            if p[3] >= p[2] and p[4] > p[5]:
                 # left-hand circles segregating
                 continue
         elif p[0] < p[1]:
-            if p[2] > p[3] and p[5] > p[4]:
+            if p[2] >= p[3] and p[5] > p[4]:
                 # right-hand circles segregating
                 continue
         print(p, i, "{:0.4f}".format(costs[i]))
