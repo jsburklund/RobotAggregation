@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+
+<argos-configuration>
+
+  <framework>
+    <system threads="0"/>
+    <experiment length="180" ticks_per_second="10" random_seed="312"/>
+  </framework>
+
+  <controllers>
+
+    <footbot_segregation_controller id="fb_segregation"
+                                    library="build/controllers/footbot/libfootbot_segregation_controller">
+      <actuators>
+        <differential_steering implementation="default"/>
+        <range_and_bearing implementation="default"/>
+        <leds implementation="default" medium="leds"/>
+      </actuators>
+      <sensors>
+        <range_and_bearing implementation="medium" medium="rab" show_rays="false"/>
+      </sensors>
+      <params/>
+    </footbot_segregation_controller>
+
+  </controllers>
+
+  <loop_functions random_seed="0" num_classes="14">
+    <cluster center="0,0" robot_num="100" robot_density="0.10" />
+
+  </loop_functions>
+
+  <arena size="50, 50, 2" center="0,0,1">
+  </arena>
+
+  <physics_engines>
+    <dynamics2d id="dyn2d"/>
+  </physics_engines>
+
+  <media>
+    <led id="leds"/>
+    <range_and_bearing id="rab" grid_size="1,1,1"/>
+  </media>
+
+  <visualization/>
+
+
+</argos-configuration>
