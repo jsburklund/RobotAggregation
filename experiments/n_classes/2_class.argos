@@ -25,7 +25,7 @@
   </controllers>
 
   <loop_functions random_seed="0" num_classes="2">
-    <cluster center="0,0" robot_num="20" robot_density="0.10" />
+    <cluster center="0,0" robot_num="100" robot_density="0.10" />
 
   </loop_functions>
 
