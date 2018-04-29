@@ -40,9 +40,9 @@ def evaluate_params(args):
         try:
             cost = float(line.split(" ")[-1])
         except ValueError:
-            cost = 0
+            continue
         sum += float(cost)
-    mean = sum / len(output)
+    mean = sum / len(costs)
     if verbose:
         print("{:d} {:s} {:E}".format(param_idx, cmd_str, mean))
     return mean

@@ -33,10 +33,10 @@ def evaluate(args):
         try:
             cost = float(line.split(" ")[-1])
         except ValueError:
-            cost = 0
+            continue
         costs.append(cost)
         sum += float(cost)
-    mean = sum / len(output)
+    mean = sum / len(costs)
     if verbose:
         print(cmd_str, costs)
     return mean
