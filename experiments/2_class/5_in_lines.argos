@@ -24,7 +24,7 @@
 
   </controllers>
 
-  <loop_functions random_seed="0" num_classes="4">
+  <loop_functions random_seed="0" num_classes="2">
     <line center="3.25,1.75" robot_num="5" robot_distance="0.3" />
     <line center="2.75,2.25" robot_num="5" robot_distance="0.3" />
     <line center="2.25,2.75" robot_num="5" robot_distance="0.3" />
