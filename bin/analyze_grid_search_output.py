@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import numpy as np
+import os
 import csv
 import matplotlib.pyplot as plt
 import argparse
@@ -15,14 +16,18 @@ def main():
 
     args = parser.parse_args()
 
+    style_dir = os.path.dirname(os.path.realpath(__file__))
+    style = os.path.join(style_dir, "mpl.style")
+    plt.style.use(style)
+
     costs = np.zeros((args.resolution ** 6))
     params = np.zeros((args.resolution ** 6, 6))
     for grid_search_output_filename in args.grid_search_outputs:
         f = np.genfromtxt(grid_search_output_filename, skip_header=True)
-        first_param_idx = int(f[0,0])
-        last_param_idx = int(f[-1,0])
-        costs[first_param_idx:last_param_idx + 1] = np.mean(f[:,7:], axis=1)
-        params[first_param_idx:last_param_idx + 1,:] = f[:,1:7]
+        first_param_idx = int(f[0, 0])
+        last_param_idx = int(f[-1, 0])
+        costs[first_param_idx:last_param_idx + 1] = np.mean(f[:, 7:], axis=1)
+        params[first_param_idx:last_param_idx + 1, :] = f[:, 1:7]
 
     if args.outfile:
         writer = csv.writer(open(args.outfile, 'w'), delimiter=',')
@@ -34,7 +39,7 @@ def main():
     print("Best Params, Index, Cost")
     print(params[best_idx], best_idx, costs[best_idx])
 
-    good_indeces, = np.where(costs < -2600)
+    good_indeces, = np.where(costs < -2700)
     print("Good params")
     for i in good_indeces:
         p = params[i]
@@ -55,11 +60,13 @@ def main():
             for y_param in range(x_param + 1, 6):
 
                 plt.figure()
-                plt.xlabel("param {:d}".format(x_param))
-                plt.ylabel("param {:d}".format(y_param))
-                plt.title("N-Class Segregation Cost (lighter is better)")
+                plt.xlabel("param {:d}".format(x_param), fontsize=32)
+                plt.ylabel("param {:d}".format(y_param), fontsize=32)
+                labels = ['-1.0', '', '', '', '', '', '1.0']
+                plt.xticks(np.arange(7), labels, fontsize=24)
+                plt.yticks(np.arange(7), labels, fontsize=24)
 
-                shape = tuple([args.resolution]*6)
+                shape = tuple([args.resolution] * 6)
                 cost_image = np.ones((args.resolution, args.resolution)) * 1e24
                 for parameter_idx, cost in enumerate(costs):
                     indeces = np.unravel_index(parameter_idx, shape)
@@ -69,6 +76,7 @@ def main():
                         cost_image[row, col] = cost
 
                 plt.imshow(cost_image, cmap='Reds')
+                plt.savefig("{:d}_{:d}_grid_img.png".format(x_param, y_param))
 
         plt.show()
 

@@ -75,9 +75,9 @@ def plot_func(args):
         costs.append(float(row[1]))
 
     plt.figure()
-    plt.plot(degs, costs)
-    plt.scatter(degs, costs)
-    plt.xlabel("Half beam angle (degrees)")
+    plt.plot(degs, costs, linewidth=4)
+    plt.scatter(degs, costs, s=100)
+    plt.xlabel(r"Half Beam Angle ($\beta$, in degrees)")
     plt.ylabel("Cost")
     plt.show()
 

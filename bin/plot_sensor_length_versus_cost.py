@@ -58,7 +58,7 @@ def main():
 
     data = np.genfromtxt(args.csv, skip_header=True, delimiter=',')
     range_meters = data[:,0] / 100
-    proportion_to_max = range_meters / np.sqrt(2 * 6 ** 2)
+    proportion_to_max = range_meters / np.sqrt(2 * 5 ** 2)
     data = data[:,1:]
 
     style_dir = os.path.dirname(os.path.realpath(__file__))
@@ -69,7 +69,7 @@ def main():
     my_boxplot(ax, proportion_to_max, data, width=0.01)
     plt.xlabel("Sensing range, proportion of maximum")
     plt.ylabel("Cluster Metric Cost")
-    plt.plot([0, 0.5], [-720, -720], color='b')
+    plt.plot([0, 0.6], [-720, -720], color='b')
     plt.show()
 
 
