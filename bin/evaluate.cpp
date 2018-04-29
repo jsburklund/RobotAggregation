@@ -23,8 +23,6 @@ int main(int argc, const char **argv) {
                                                      ".dat file of controller parameters, \
                                                      or a string of the genom is --params-as-string is passed",
                                                      args::Options::Required);
-  args::ValueFlag<std::string> library_label_flag(parser, "loop_function_label",
-                                                   "the label used in the macro for that loop function", {"label"});
   args::ValueFlag<unsigned int> trials_flag(parser, "trials", "number of trails", {'t', "trials"}, 4);
   args::ValueFlag<unsigned int> num_steps_flag(parser, "num_steps", "number of time steps", {'s', "steps"}, 180);
   args::ValueFlag<float> sensor_length_flag(parser, "sensor_length_cm", "max range of sensor", {"sensor-length"}, -1);
@@ -48,25 +46,19 @@ int main(int argc, const char **argv) {
     return -1;
   }
 
-  std::ofstream dev_null("/dev/null");
   LOG.DisableColoredOutput();
-//  LOG.GetStream().rdbuf(dev_null.rdbuf());
 
   argos::CSimulator &simulator = argos::CSimulator::GetInstance();
   auto &argos_filename = args::get(base_argos_config_flag);
   auto library_path = args::get(library_path_flag);
-  auto library_label = args::get(library_label_flag);
   auto generate_poses = args::get(generate_poses_flag);
   auto num_steps = args::get(num_steps_flag);
   auto viz = args::get(viz_flag);
   auto sensor_length_cm = args::get(sensor_length_flag);
   auto print_mean = args::get(print_mean_flag);
 
-  if (library_label.empty()) {
-    auto position = library_path.rfind('/') + 4;
-    library_label = library_path.substr(position, library_path.size() - position - 3);
-  }
-  std::cout << library_label << '\n';
+  auto position = library_path.rfind('/') + 4;
+  auto library_label = library_path.substr(position, library_path.size() - position - 3);
 
   ticpp::Document argos_config;
   argos_config.LoadFile(argos_filename);
@@ -101,8 +93,6 @@ int main(int argc, const char **argv) {
 
   try {
     simulator.Load(argos_config);
-//    simulator.SetExperimentFileName(argos_filename);
-//    simulator.LoadExperiment();
     argos::LOG.Flush();
     argos::LOGERR.Flush();
   }
