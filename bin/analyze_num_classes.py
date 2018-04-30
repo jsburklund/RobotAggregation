@@ -70,7 +70,7 @@ def plot_func(args):
     for row in reader:
         m = re.search("(\d+)_class", row[0])
         n_class = float(m.groups()[0])
-        n_classes.append(deg)
+        n_classes.append(n_class)
         costs.append(float(row[1]))
 
     plt.figure()
