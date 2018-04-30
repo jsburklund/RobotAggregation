@@ -35,7 +35,7 @@ cp $PROJDIR/bin/analyze_num_classes.py .
 
 # Execute program (this also writes files in work dir)
 echo $WORKDIR
-./bin/analyze_num_classes.py evaluate experiments/n_classes/* build/loop_functions/libcluster_metric.so params/grid_search_winner.dat -p 25 -t 100
+./bin/analyze_num_classes.py evaluate experiments/n_classes/10_per_class/* build/loop_functions/libcluster_metric.so params/grid_search_winner.dat -p 25 -t 100
 
 # Transfer generated files into home directory
 cp n_classes_* $DATADIR
