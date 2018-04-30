@@ -70,7 +70,7 @@ Real ClusterMetricLoopFunction::CostAtStep(unsigned long step, GroupMap groups) 
     cost += -static_cast<Real>(largest_component_size) / robots.size();
   }
 
-  return cost;
+  return cost / groups.size();
 }
 
 REGISTER_LOOP_FUNCTIONS(ClusterMetricLoopFunction, "cluster_metric")
