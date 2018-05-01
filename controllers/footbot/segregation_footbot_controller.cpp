@@ -84,17 +84,18 @@ SegregationFootbotController::SensorState SegregationFootbotController::GetTrueK
       Real bearing = tMsg.HorizontalBearing.GetValue();
       Real range_cm = tMsg.Range;
       if (bearing < half_beam_angle && bearing > -half_beam_angle) {
-        if (range_cm < closest_range_cm) {
-          closest_range_cm = range_cm;
-          uint8_t robot_class = tMsg.Data[0];
-          sens_state = (m_class == robot_class) ? SensorState::KIN : SensorState::NONKIN;
-        }
+        if((sens_state != SensorState::KIN) || (tMsg.Data[0]==m_class))
+          if (range_cm < closest_range_cm) {
+            closest_range_cm = range_cm;
+            uint8_t robot_class = tMsg.Data[0];
+            sens_state = (m_class == robot_class) ? SensorState::KIN : SensorState::NONKIN;
+          }
       }
     }
   }
 
   if (viz) {
-    for (auto i = 11; i < 13; ++i) {
+    for (auto i = 12; i < 13; ++i) {
       UInt32 led_id = static_cast<UInt32>(i % 12);
       switch (sens_state) {
         case SensorState::KIN: m_pcLEDs->SetSingleColor(led_id, CColor::BLUE);
