@@ -4,7 +4,7 @@
 #include <cstdio>
 
 SegregationFootbotController::SegregationFootbotController() {
-    m_rng = CRandom::CreateRNG("aggregation_loop_function");
+  m_rng = CRandom::CreateRNG("aggregation_loop_function");
 }
 
 void SegregationFootbotController::Init(TConfigurationNode &t_node) {
@@ -20,6 +20,7 @@ void SegregationFootbotController::Init(TConfigurationNode &t_node) {
   }
 
   std::string params_filename;
+  std::string sensor_implementation_str;
   double half_beam_angle_deg;
   GetNodeAttributeOrDefault(t_node, "parameter_file", params_filename, std::string());
   GetNodeAttributeOrDefault(t_node, "viz", viz, false);
@@ -28,7 +29,21 @@ void SegregationFootbotController::Init(TConfigurationNode &t_node) {
   GetNodeAttributeOrDefault(t_node, "kin_nothing_confusion", kin_nothing_confusion, 0.);
   GetNodeAttributeOrDefault(t_node, "nonkin_nothing_confusion", nonkin_nothing_confusion, 0.);
   GetNodeAttributeOrDefault(t_node, "half_beam_angle", half_beam_angle_deg, 15.);
+  GetNodeAttributeOrDefault(t_node, "sensor_implementation", sensor_implementation_str, std::string());
   half_beam_angle = deg2rad(half_beam_angle_deg);
+
+  if (sensor_implementation_str == "kin_first") {
+    sensor_impl =  SensorImpl::KIN_FIRST;
+  }
+  else if (sensor_implementation_str == "closest_first") {
+    sensor_impl =  SensorImpl::CLOSEST_FIRST;
+  }
+  else if (sensor_implementation_str.empty()) {
+    sensor_impl =  SensorImpl::CLOSEST_FIRST;
+  }
+  else {
+    THROW_ARGOSEXCEPTION("sensor implementation must be either \"closest_first\" or \"kin_first\"")
+  }
 
   if (!params_filename.empty()) {
     LoadFromFile(params_filename);
@@ -73,13 +88,11 @@ void SegregationFootbotController::LoadFromFile(const std::string &params_filena
   }
 }
 
-SegregationFootbotController::SensorState SegregationFootbotController::GetTrueKinSensorVal() {
-  const CCI_RangeAndBearingSensor::TReadings &tMsgs = m_pcRABSens->GetReadings();
-
+SegregationFootbotController::SensorState
+SegregationFootbotController::ClosestFirstSensor(const CCI_RangeAndBearingSensor::TReadings &tMsgs) {
   auto sens_state = SensorState::NOTHING;
   if (!tMsgs.empty()) {
     float closest_range_cm = sensor_length_cm;
-
     for (const auto &tMsg : tMsgs) {
       Real bearing = tMsg.HorizontalBearing.GetValue();
       Real range_cm = tMsg.Range;
@@ -93,17 +106,55 @@ SegregationFootbotController::SensorState SegregationFootbotController::GetTrueK
     }
   }
 
-  if (viz) {
-    for (auto i = 11; i < 13; ++i) {
-      UInt32 led_id = static_cast<UInt32>(i % 12);
-      switch (sens_state) {
-        case SensorState::KIN: m_pcLEDs->SetSingleColor(led_id, CColor::BLUE);
-          break;
-        case SensorState::NONKIN: m_pcLEDs->SetSingleColor(led_id, CColor::RED);
-          break;
-        case SensorState::NOTHING: m_pcLEDs->SetSingleColor(led_id, CColor::WHITE);
-          break;
+  return sens_state;
+}
+
+SegregationFootbotController::SensorState
+SegregationFootbotController::KinFirstSensor(const CCI_RangeAndBearingSensor::TReadings &tMsgs) {
+  auto sens_state = SensorState::NOTHING;
+  if (!tMsgs.empty()) {
+    for (const auto &tMsg : tMsgs) {
+      Real bearing = tMsg.HorizontalBearing.GetValue();
+      if (bearing < half_beam_angle && bearing > -half_beam_angle) {
+        if (tMsg.Data[0] == m_class) {
+          sens_state = SensorState::KIN;
+          continue;
+        } else {
+          sens_state = SensorState::NONKIN;
+        }
       }
+    }
+  }
+
+  return sens_state;
+}
+
+SegregationFootbotController::SensorState SegregationFootbotController::GetTrueKinSensorVal() {
+  const CCI_RangeAndBearingSensor::TReadings &tMsgs = m_pcRABSens->GetReadings();
+  SensorState sens_state = SensorState::NOTHING;
+  switch (sensor_impl) {
+    case SensorImpl::KIN_FIRST: {
+      sens_state = KinFirstSensor(tMsgs);
+      break;
+    }
+    case SensorImpl::CLOSEST_FIRST: {
+      sens_state = ClosestFirstSensor(tMsgs);
+      break;
+    }
+  }
+
+  if (viz) {
+    UInt32 led_id = 11;
+    switch (sens_state) {
+      case SensorState::KIN:
+        m_pcLEDs->SetSingleColor(led_id, CColor::BLUE);
+        break;
+      case SensorState::NONKIN:
+        m_pcLEDs->SetSingleColor(led_id, CColor::RED);
+        break;
+      case SensorState::NOTHING:
+        m_pcLEDs->SetSingleColor(led_id, CColor::WHITE);
+        break;
     }
   }
 
@@ -114,21 +165,29 @@ void SegregationFootbotController::ControlStep() {
 
   if (viz) {
     switch (m_class) {
-      case 0: m_pcLEDs->SetAllColors(CColor::GREEN);
+      case 0:
+        m_pcLEDs->SetAllColors(CColor::GREEN);
         break;
-      case 1: m_pcLEDs->SetAllColors(CColor::RED);
+      case 1:
+        m_pcLEDs->SetAllColors(CColor::RED);
         break;
-      case 2: m_pcLEDs->SetAllColors(CColor::BLUE);
+      case 2:
+        m_pcLEDs->SetAllColors(CColor::BLUE);
         break;
-      case 3: m_pcLEDs->SetAllColors(CColor::WHITE);
+      case 3:
+        m_pcLEDs->SetAllColors(CColor::WHITE);
         break;
-      case 4: m_pcLEDs->SetAllColors(CColor::YELLOW);
+      case 4:
+        m_pcLEDs->SetAllColors(CColor::YELLOW);
         break;
-      case 5: m_pcLEDs->SetAllColors(CColor::CYAN);
+      case 5:
+        m_pcLEDs->SetAllColors(CColor::CYAN);
         break;
-      case 6: m_pcLEDs->SetAllColors(CColor::MAGENTA);
+      case 6:
+        m_pcLEDs->SetAllColors(CColor::MAGENTA);
         break;
-      default: m_pcLEDs->SetAllColors(CColor::BLACK);
+      default:
+        m_pcLEDs->SetAllColors(CColor::BLACK);
         break;
     }
   }
@@ -140,8 +199,7 @@ void SegregationFootbotController::ControlStep() {
     case SensorState::NOTHING: {
       if (p < kin_nothing_confusion) {
         sensor_state = SensorState::KIN;
-      }
-      else if (p - kin_nothing_confusion < nonkin_nothing_confusion) {
+      } else if (p - kin_nothing_confusion < nonkin_nothing_confusion) {
         sensor_state = SensorState::NONKIN;
       }
       break;
@@ -149,8 +207,7 @@ void SegregationFootbotController::ControlStep() {
     case SensorState::KIN: {
       if (p < kin_nonkin_confusion) {
         sensor_state = SensorState::NONKIN;
-      }
-      else if (p - kin_nonkin_confusion < kin_nothing_confusion) {
+      } else if (p - kin_nonkin_confusion < kin_nothing_confusion) {
         sensor_state = SensorState::NOTHING;
       }
       break;
@@ -158,8 +215,7 @@ void SegregationFootbotController::ControlStep() {
     case SensorState::NONKIN: {
       if (p < kin_nonkin_confusion) {
         sensor_state = SensorState::KIN;
-      }
-      else if (p - kin_nonkin_confusion < nonkin_nothing_confusion) {
+      } else if (p - kin_nonkin_confusion < nonkin_nothing_confusion) {
         sensor_state = SensorState::NOTHING;
       }
       break;

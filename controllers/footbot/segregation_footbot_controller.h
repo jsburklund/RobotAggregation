@@ -18,12 +18,17 @@ constexpr T deg2rad(T deg) noexcept {
 
 class SegregationFootbotController : public CCI_Controller {
 
- public:
+public:
 
   enum class SensorState : unsigned int {
     NOTHING = 0,
     KIN = 1,
     NONKIN = 2
+  };
+
+  enum class SensorImpl : unsigned int {
+    KIN_FIRST,
+    CLOSEST_FIRST
   };
 
   static const size_t GENOME_SIZE = 6;
@@ -43,6 +48,10 @@ class SegregationFootbotController : public CCI_Controller {
 
   void SetClassId(unsigned long class_id);
 
+  SensorState KinFirstSensor(const CCI_RangeAndBearingSensor::TReadings &tMsgs);
+
+  SensorState ClosestFirstSensor(const CCI_RangeAndBearingSensor::TReadings &tMsgs);
+
   SensorState GetTrueKinSensorVal();
 
   std::array<Real, GENOME_SIZE> m_params = {{0, 0, 0, 0, 0, 0}};
@@ -54,12 +63,13 @@ class SegregationFootbotController : public CCI_Controller {
 
   Real half_beam_angle = deg2rad(15.0);
 
- private:
+private:
   unsigned long m_class = 0;
   float sensor_length_cm = INFINITY;
   bool viz = false;
   double kin_nonkin_confusion = 0;
   double kin_nothing_confusion = 0;
   double nonkin_nothing_confusion = 0;
+  SensorImpl sensor_impl;
 };
 
