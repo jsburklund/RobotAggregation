@@ -18,3 +18,8 @@ experiments/n_classes/10_per_class/17_class.argos -730.381
 experiments/n_classes/10_per_class/18_class.argos -649.614
 experiments/n_classes/10_per_class/19_class.argos -640.413
 experiments/n_classes/10_per_class/20_class.argos -634.726
+experiments/n_classes/10_per_class/21_class.argos -650.027
+experiments/n_classes/10_per_class/22_class.argos -596.803
+experiments/n_classes/10_per_class/23_class.argos -568.778
+experiments/n_classes/10_per_class/24_class.argos -572.770
+experiments/n_classes/10_per_class/25_class.argos -574.250
