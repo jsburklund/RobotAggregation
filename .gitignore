@@ -21,4 +21,4 @@ slurm-*
 
 ## Peter
 *.swp
-*output*.txt
+./*output*.txt
