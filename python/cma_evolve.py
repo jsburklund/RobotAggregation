@@ -41,6 +41,7 @@ def evaluate_params(args):
 
 def main():
     np.set_printoptions(suppress=True, precision=2)
+    np.random.seed(0)
 
     parser = argparse.ArgumentParser("Evolve controller parameters")
     parser.add_argument("argos_files", help="all the argos files you want to run evaluate with", nargs="+")
@@ -49,7 +50,7 @@ def main():
     parser.add_argument("--generations", '-g', help="number of generations", type=int, default=10)
     parser.add_argument("--trials", '-t', help="number of trials per argos configuration", type=int, default=1)
     parser.add_argument("--popsize", help="number of genomes per population", type=int, default=10)
-    parser.add_argument("--cma-seed", help="seed for CMA-ES", type=int, default=0)
+    parser.add_argument("--cma-seed", help="seed for CMA-ES", type=int, default=1)  # cannot be 0
     parser.add_argument("--verbose", "-v", help="print more shit", action="store_true")
     args = parser.parse_args()
 
