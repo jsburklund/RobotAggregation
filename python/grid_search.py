@@ -36,11 +36,13 @@ def evaluate_params(args):
 
     sum = 0
     output = output.stdout.decode("UTF-8").split("\n")[8:-1]
+    costs = []
     for line in output:
         try:
             cost = float(line.split(" ")[-1])
         except ValueError:
             continue
+        costs.append(cost)
         sum += float(cost)
     mean = sum / len(costs)
     if verbose:
