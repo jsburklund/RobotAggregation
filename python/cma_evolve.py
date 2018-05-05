@@ -53,6 +53,7 @@ def main():
     parser.add_argument("--verbose", "-v", help="print more shit", action="store_true")
     args = parser.parse_args()
 
+    outfile = open("cma_evolve_output_{:d}.txt".format(int(time.time())), 'w')
     es = cma.CMAEvolutionStrategy(np.zeros(6), 0.72, {'seed': args.cma_seed, 'popsize': args.popsize})
     generation_idx = 0
     while not es.stop() and generation_idx < args.generations:
@@ -80,6 +81,9 @@ def main():
 
     for p, c in zip(pop, costs_per_genome):
         print(p, c)
+        population_as_string = "".join(["{:.3f}, ".format(i) for i in p])[:-2]
+        outfile.write(population_as_string)
+        outfile.write("\n")
 
     return 0
 
