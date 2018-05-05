@@ -14,6 +14,7 @@ test_params.dat
 ## CMake
 build
 build_release
+build_debug
 
 ## Cluster
 slurm-*
