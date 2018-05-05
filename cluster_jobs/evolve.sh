@@ -35,7 +35,7 @@ cp $PROJDIR/python/cma_evolve.py .
 
 # Execute program (this also writes files in work dir)
 echo $WORKDIR
-./cma_eovlve.py -p 12 -t 1 experiments/4_class/*uniform* build/loop_functions/libcluster_metric.so -v -g 100
+./cma_evolve.py -p 12 -t 1 experiments/4_class/*uniform* build/loop_functions/libcluster_metric.so -v -g 100
 
 # Transfer generated files into home directory
 cp cma_evolve_output_*.txt $DATADIR

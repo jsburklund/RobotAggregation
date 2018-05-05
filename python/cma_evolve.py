@@ -13,7 +13,7 @@ import numpy as np
 def evaluate_params(args):
     params, argos_file, library_path, trials, verbose = args
     params_str = "\"6 " + " ".join([str(p) for p in params]) + "\""
-    cmd = ["./build_release/bin/evaluate", "--params-as-string", "-t", str(trials), argos_file, library_path, params_str]
+    cmd = ["./build/bin/evaluate", "--params-as-string", "-t", str(trials), argos_file, library_path, params_str]
     cmd_str = " ".join(cmd)
     output = subprocess.run(cmd_str, stdout=subprocess.PIPE, shell=True)
     if output.returncode != 0:
