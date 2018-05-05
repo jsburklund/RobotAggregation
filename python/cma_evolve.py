@@ -57,15 +57,13 @@ def main():
     outfile = open("cma_evolve_output_{:d}.txt".format(int(time.time())), 'w')
     es = cma.CMAEvolutionStrategy(np.zeros(6), 0.72, {'seed': args.cma_seed, 'popsize': args.popsize})
     generation_idx = 0
+    pool = Pool(processes=args.pool_size)
     while not es.stop() and generation_idx < args.generations:
         pop = es.ask()
         costs_per_genome = []
-        if args.verbose:
-            print("Generation:", generation_idx)
+        print("Generation:", generation_idx)
         for genome in pop:
-            if args.verbose:
-                print("evaluting", genome)
-            pool = Pool(processes=args.pool_size)
+            print("evaluting", genome)
             pool_args = [(genome, f, args.library_path, args.trials, args.verbose) for f in args.argos_files]
             costs = pool.map(evaluate_params, pool_args)
             genome_mean_cost = np.mean(costs)
@@ -74,13 +72,12 @@ def main():
         es.tell(pop, costs_per_genome)
         generation_idx += 1
 
-        if args.verbose:
-            print("mean cost of generation:", np.mean(costs_per_genome))
+        print("mean cost of generation:", np.mean(costs_per_genome))
 
     print("finished in {:d} iterations".format(es.result.iterations))
     print("final population, cost")
 
-    outfile.write("vl0, vr0, vl1, vr1, vl2, vr2, mean cost")
+    outfile.write("vl0, vr0, vl1, vr1, vl2, vr2, mean cost\n")
     for p, c in zip(pop, costs_per_genome):
         print(p, c)
         population_as_string = "".join(["{:.8f}, ".format(i) for i in p])[:-2]
