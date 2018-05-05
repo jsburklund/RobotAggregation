@@ -77,10 +77,11 @@ def main():
     print("finished in {:d} iterations".format(es.result.iterations))
     print("final population, cost")
 
-    outfile.write("vl0, vr0, vl1, vr1, vl2, vr2, mean cost\n")
-    for p, c in zip(pop, costs_per_genome):
+    outfile.write("vl0 vr0 vl1 vr1 vl2 vr2 cost")
+    pop_and_costs = sorted(zip(pop, costs_per_genome), key=lambda pair: pair[1])
+    for p, c in pop_and_costs:
         print(p, c)
-        population_as_string = "".join(["{:.8f}, ".format(i) for i in p])[:-2]
+        population_as_string = "".join(["{:.8f} ".format(i) for i in p])[:-2]
         outfile.write(population_as_string)
         outfile.write(" ")
         outfile.write("{:.8f}".format(c))
