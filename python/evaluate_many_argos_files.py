@@ -50,7 +50,7 @@ def main():
     parser.add_argument("library_path", help="the path to the loop function *.so library to use")
     parser.add_argument("params", help="params file to evaluate")
     parser.add_argument("--pool-size", "-p", help="number of worker subprocesses to spawn", type=int, required=True)
-    parser.add_argument("--trials", '-t', help="number of trials per argos configuration", type=int, default=100)
+    parser.add_argument("--trials", '-t', help="number of trials per argos configuration", type=int, default=1)
     parser.add_argument("--verbose", "-v", help="print more shit", action="store_true")
 
     args = parser.parse_args()

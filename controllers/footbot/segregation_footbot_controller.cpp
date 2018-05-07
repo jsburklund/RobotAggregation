@@ -186,6 +186,18 @@ void SegregationFootbotController::ControlStep() {
       case 6:
         m_pcLEDs->SetAllColors(CColor::MAGENTA);
         break;
+      case 7:
+        m_pcLEDs->SetAllColors(CColor::BROWN);
+        break;
+      case 8:
+        m_pcLEDs->SetAllColors(CColor::PURPLE);
+        break;
+      case 9:
+        m_pcLEDs->SetAllColors(CColor::ORANGE);
+        break;
+      case 10:
+        m_pcLEDs->SetAllColors(CColor(246, 36, 89));
+        break;
       default:
         m_pcLEDs->SetAllColors(CColor::BLACK);
         break;

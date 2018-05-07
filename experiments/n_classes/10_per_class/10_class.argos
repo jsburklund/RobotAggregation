@@ -29,7 +29,19 @@
 
   </loop_functions>
 
-  <arena size="50, 50, 2" center="0,0,1">
+  <arena size="11, 11, 2" center="0,0,1">
+    <box id="wall_east" size="10,0.1,0.5" movable="false">
+      <body position="0,5,0" orientation="0,0,0"/>
+    </box>
+    <box id="wall_west" size="10,0.1,0.5" movable="false">
+      <body position="0,-5,0" orientation="0,0,0"/>
+    </box>
+    <box id="wall_north" size="0.1,10,0.5" movable="false">
+      <body position="5,0,0" orientation="0,0,0"/>
+    </box>
+    <box id="wall_south" size="0.1,10,0.5" movable="false">
+      <body position="-5,,0" orientation="0,0,0"/>
+    </box>
   </arena>
 
   <physics_engines>

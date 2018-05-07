@@ -81,8 +81,8 @@ int main(int argc, const char **argv) {
     auto viz_element = argos_config.FirstChildElement()->FirstChildElement("visualization");
     ticpp::Element placement("placement");
     placement.SetAttribute("idx", "0");
-    placement.SetAttribute("position", "2.5,2.5,6");
-    placement.SetAttribute("look_at", "2.5,2.5,0");
+    placement.SetAttribute("position", "0,0,6");
+    placement.SetAttribute("look_at", "0,0,0");
     placement.SetAttribute("lens_focal_length", "30");
     ticpp::Element camera("camera");
     ticpp::Element qt("qt-opengl");
