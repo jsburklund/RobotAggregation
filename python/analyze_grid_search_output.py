@@ -12,6 +12,8 @@ def main():
     parser.add_argument("grid_search_outputs", nargs="+")
     parser.add_argument("--outfile")
     parser.add_argument("--resolution", type=int, default=7)
+    parser.add_argument("--best-n", type=int, default=10)
+    parser.add_argument("--ignore-known-controllers", action="store_true")
     parser.add_argument("--no-plot", action="store_true")
 
     args = parser.parse_args()
@@ -35,25 +37,40 @@ def main():
             if c != 0:
                 writer.writerow([i, c])
 
-    best_idx = np.argmin(costs)
+    sorted_cost_indeces = costs.argsort(axis=0)
+    costs.sort()
+    params = params[sorted_cost_indeces]
     print("Best Params, Index, Cost")
-    print(params[best_idx], best_idx, costs[best_idx])
+    print(params[0], costs[0])
 
-    good_indeces, = np.where(costs < -2700)
     print("Good params")
-    for i in good_indeces:
-        p = params[i]
+    unknown_controllers = 0
+    for i, p in enumerate(params[:args.best_n]):
         # check if this matches the "patterns" of known segregating controllers
         # this never prints anything because turns out they all can be described this way
-        if p[0] > p[1]:
-            if p[3] >= p[2] and p[4] > p[5]:
-                # left-hand circles segregating
-                continue
-        elif p[0] < p[1]:
-            if p[2] >= p[3] and p[5] > p[4]:
-                # right-hand circles segregating
-                continue
-        print(p, i, "{:0.4f}".format(costs[i]))
+        if args.ignore_known_controllers:
+            if p[0] > p[1]:
+                if p[4] > p[5]:
+                    if p[3] >= p[2]:
+                        # left-hand circles segregating
+                        continue
+                    else:
+                        # slow clustering segregation?
+                        continue
+            elif p[0] < p[1]:
+                if p[5] > p[4]:
+                    if p[2] >= p[3]:
+                        # right-hand circles segregating
+                        continue
+                    else:
+                        #slow clustering segregation?
+                        continue
+        unknown_controllers += 1
+        print(p, "{:d}th {:0.4f}".format(i, costs[i]))
+
+    idx_of_worst_controller_that_segregates = np.argmax(costs > -2700)
+    print(idx_of_worst_controller_that_segregates)
+    print(params[idx_of_worst_controller_that_segregates])
 
     if not args.no_plot:
         for x_param in range(6):
