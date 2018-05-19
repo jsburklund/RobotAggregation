@@ -22,3 +22,6 @@ slurm-*
 ## Peter
 *.swp
 ./*output*.txt
+
+## not worth tracking
+test.dat
