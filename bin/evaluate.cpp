@@ -48,9 +48,6 @@ int main(int argc, const char **argv) {
     return -1;
   }
 
-  LOG.DisableColoredOutput();
-
-  argos::CSimulator &simulator = argos::CSimulator::GetInstance();
   auto &argos_filename = args::get(base_argos_config_flag);
   auto library_path = args::get(library_path_flag);
   auto generate_poses = args::get(generate_poses_flag);
@@ -58,9 +55,42 @@ int main(int argc, const char **argv) {
   auto viz = args::get(viz_flag);
   auto sensor_length_cm = args::get(sensor_length_flag);
   auto print_mean = args::get(print_mean_flag);
+  auto params_str = args::get(params_filename_flag);
+  auto const params_as_str = args::get(params_as_str_flag);
+  unsigned int const N = args::get(trials_flag);
 
   auto position = library_path.rfind('/') + 4;
   auto library_label = library_path.substr(position, library_path.size() - position - 3);
+
+  LOG.DisableColoredOutput();
+
+  /* Get a reference to the loop functions */
+  auto *library_handle = dlopen(library_path.c_str(), RTLD_LAZY);
+  if (!library_handle) {
+    std::cerr << "Cannot load library: " << dlerror() << '\n';
+    return 1;
+  }
+
+  auto label = (char const *) dlsym(library_handle, "loop_function_label");
+  char *dlsym_error = dlerror();
+  if (dlsym_error) {
+    std::cerr << "Cannot load symbol create: " << dlsym_error << '\n';
+    return 1;
+  }
+
+  typedef MyLoopFunction *(create_func_t)();
+  auto *create_loop_function = (create_func_t *) dlsym(library_handle, "create");
+  dlsym_error = dlerror();
+  if (dlsym_error) {
+    std::cerr << "Cannot load symbol create: " << dlsym_error << '\n';
+    return 1;
+  }
+
+  auto loop_function = create_loop_function();
+
+  std::cout << "Loaded: " << loop_function->GetName() << '\n';
+
+  argos::CSimulator &simulator = argos::CSimulator::GetInstance();
 
   ticpp::Document argos_config;
   argos_config.LoadFile(argos_filename);
@@ -71,7 +101,7 @@ int main(int argc, const char **argv) {
   auto controllers = argos_config.FirstChildElement()->FirstChildElement("controllers");
   auto controller = controllers->FirstChild();
   auto controller_params = controller->FirstChildElement("params");
-  loop_functions->SetAttribute("label", library_label);
+  loop_functions->SetAttribute("label", "segregation_loop_function");
 
   if (sensor_length_cm != -1.0) {
     controller_params->SetAttribute("sensor_length_cm", sensor_length_cm);
@@ -101,100 +131,76 @@ int main(int argc, const char **argv) {
     argos::LOGERR << ex.what() << std::endl;
   }
 
-  /* Get a reference to the loop functions */
-  try {
-    auto *library_handle = dlopen(library_path.c_str(), RTLD_LAZY);
-    if (!library_handle) {
-      std::cerr << "Cannot load library: " << dlerror() << '\n';
-      return 1;
+  simulator.SetLoopFunctions(*loop_function);
+
+  if (params_as_str) {
+    std::stringstream ss(params_str);
+    size_t n_params;
+    ss >> n_params;
+    Real params[n_params];
+    Real param;
+    auto i = 0u;
+    while (ss >> param) {
+      params[++i] = param;
     }
-
-    typedef MyLoopFunction *(create_func_t)();
-    auto *create_loop_function = (create_func_t *) dlsym(library_handle, "create");
-    char *dlsym_error = dlerror();
-    if (dlsym_error) {
-      std::cerr << "Cannot load symbol create: " << dlsym_error << '\n';
-      return 1;
-    }
-
-    auto loop_function = create_loop_function();
-    std::cout << "Loaded: " << loop_function->GetName() << '\n';
-
-    simulator.SetLoopFunctions(*loop_function);
-
-    auto params_str = args::get(params_filename_flag);
-    if (args::get(params_as_str_flag)) {
-      std::stringstream ss(params_str);
-      size_t n_params;
-      ss >> n_params;
-      Real params[n_params];
-      Real param;
-      auto i = 0u;
-      while (ss >> param) {
-        params[++i] = param;
-      }
-      loop_function->LoadParameters(n_params, params);
-    } else {
-      loop_function->LoadFromFile(params_str);
-    }
-
-    nlohmann::json j;
-    std::ofstream of;
-    if (generate_poses) {
-      std::stringstream ss;
-      std::replace(argos_filename.begin(), argos_filename.end(), '/', '-');
-      ss << argos_filename << ".evaluate_output";
-      of.open(ss.str());
-      std::cout << ss.str() << '\n';
-
-      if (!of.good()) {
-        std::cout << strerror(errno) << '\n';
-        std::cout << ss.str() << '\n';
-        return -1;
-      }
-    }
-
-    unsigned int N = args::get(trials_flag);
-    Real cost_sum = 0;
-    for (unsigned int i = 0u; i < N; ++i) {
-      simulator.Reset();
-      loop_function->Reset();
-      simulator.Execute();
-      Real cost = loop_function->Cost();
-      nlohmann::json trial_j;
-      if (generate_poses) {
-        for (const auto &class_at_time_t : loop_function->classes_over_time) {
-          // print all the X, Y positions of the robots at each time step
-          nlohmann::json j_t;
-          for (const auto &p : class_at_time_t) {
-            auto poses = p.second;
-            nlohmann::json j_class;
-            for (const auto &pose : poses) {
-              j_class.push_back({pose.GetX(), pose.GetY()});
-            }
-            j_t.push_back(j_class);
-          }
-          trial_j.push_back(j_t);
-        }
-        j.push_back(trial_j);
-      }
-      if (!generate_poses) {
-        std::cout << i << " " << cost << '\n';
-        cost_sum += cost;
-      }
-    }
-
-    if (print_mean) {
-      std::cout << "mean: " << cost_sum / N << '\n';
-    }
-
-    if (generate_poses) {
-      of << j.dump(2) << std::endl;
-    }
-
-    // unload the library
-    dlclose(library_handle);
-  } catch (std::bad_cast &e) {
-    std::cout << e.what() << '\n';
+    loop_function->LoadParameters(n_params, params);
+  } else {
+    loop_function->LoadFromFile(params_str);
   }
+
+  nlohmann::json j;
+  std::ofstream of;
+  if (generate_poses) {
+    std::stringstream ss;
+    std::replace(argos_filename.begin(), argos_filename.end(), '/', '-');
+    ss << argos_filename << ".evaluate_output";
+    of.open(ss.str());
+    std::cout << ss.str() << '\n';
+
+    if (!of.good()) {
+      std::cout << strerror(errno) << '\n';
+      std::cout << ss.str() << '\n';
+      return -1;
+    }
+  }
+
+  Real cost_sum = 0;
+  for (unsigned int i = 0u; i < N; ++i) {
+    simulator.Reset();
+    loop_function->Reset();
+    simulator.Execute();
+    Real cost = loop_function->Cost();
+    nlohmann::json trial_j;
+    if (generate_poses) {
+      for (const auto &class_at_time_t : loop_function->classes_over_time) {
+        // print all the X, Y positions of the robots at each time step
+        nlohmann::json j_t;
+        for (const auto &p : class_at_time_t) {
+          auto poses = p.second;
+          nlohmann::json j_class;
+          for (const auto &pose : poses) {
+            j_class.push_back({pose.GetX(), pose.GetY()});
+          }
+          j_t.push_back(j_class);
+        }
+        trial_j.push_back(j_t);
+      }
+      j.push_back(trial_j);
+    }
+    if (!generate_poses) {
+      std::cout << i << " " << cost << '\n';
+      cost_sum += cost;
+    }
+  }
+
+  if (print_mean) {
+    std::cout << "mean: " << cost_sum / N << '\n';
+  }
+
+  if (generate_poses) {
+    of << j.dump(2) << std::endl;
+  }
+
+  // unload the library
+  dlclose(library_handle);
 }

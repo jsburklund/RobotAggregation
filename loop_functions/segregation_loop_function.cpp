@@ -8,11 +8,11 @@ SegregationLoopFunction::SegregationLoopFunction() : m_rng(nullptr) {}
 
 void SegregationLoopFunction::Init(TConfigurationNode &t_node) {
   try {
-    UInt32 seed;
+    UInt32 seed = 0;
     GetNodeAttribute(t_node, "random_seed", seed);
     GetNodeAttributeOrDefault(t_node, "num_classes", n_classes, 1);
-    CRandom::CreateCategory("my_rng", seed);
-    m_rng = CRandom::CreateRNG("my_rng");
+    CRandom::CreateCategory("segregation_loop_function", seed);
+    m_rng = CRandom::CreateRNG("segregation_loop_function");
 
     UInt32 num_placed_robots = 0;
 
@@ -235,3 +235,6 @@ std::string SegregationLoopFunction::GetName() {
 extern "C" MyLoopFunction *create() {
   return new SegregationLoopFunction();
 }
+
+char loop_function_label[] = LABEL_NAME;
+REGISTER_LOOP_FUNCTIONS(SegregationLoopFunction, LABEL_NAME)

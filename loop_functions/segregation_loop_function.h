@@ -19,7 +19,7 @@ public:
   using GroupMap = std::unordered_map<unsigned long, std::vector<CFootBotEntity *>>;
   using GroupPosMap = std::unordered_map<unsigned long, std::vector<CVector3>>;
 
-  static constexpr auto XML_CONTROLLER_ID = "fb_controller";
+  static constexpr auto XML_CONTROLLER_ID = "fb_segregation";
 
   SegregationLoopFunction();
 
@@ -72,3 +72,6 @@ private:
 
   UInt8 n_classes;
 };
+
+#define LABEL_NAME "segregation_loop_function"
+extern "C" char loop_function_label[];

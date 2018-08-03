@@ -4,7 +4,7 @@
 #include <cstdio>
 
 SegregationFootbotController::SegregationFootbotController() {
-  m_rng = CRandom::CreateRNG("my_rng");
+  m_rng = CRandom::CreateRNG("segregation_loop_function");
 }
 
 void SegregationFootbotController::Init(TConfigurationNode &t_node) {
