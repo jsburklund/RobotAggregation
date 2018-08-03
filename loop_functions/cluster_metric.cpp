@@ -1,6 +1,9 @@
 #include <stack>
 
 #include "cluster_metric.h"
+#include "segregation_loop_function.h"
+
+namespace argos {
 
 size_t find_largest_component(int **A, size_t n) {
   // use BFS to find components and count their size
@@ -35,7 +38,7 @@ size_t find_largest_component(int **A, size_t n) {
   return largest_componenet_size;
 }
 
-Real ClusterMetricLoopFunction::CostAtStep(unsigned long step, GroupMap groups) {
+Real cluster_metric(unsigned long step, SegregationLoopFunction::GroupMap groups) {
   Real cost = 0;
   for (auto &kv : groups) {
     const auto group_id = kv.first;
@@ -73,4 +76,4 @@ Real ClusterMetricLoopFunction::CostAtStep(unsigned long step, GroupMap groups) 
   return cost / groups.size();
 }
 
-REGISTER_LOOP_FUNCTIONS(ClusterMetricLoopFunction, "cluster_metric")
+}

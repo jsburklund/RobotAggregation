@@ -1,17 +1,13 @@
 #pragma once
 
-#include <controllers/footbot/segregation_footbot_controller.h>
+#include <unordered_map>
+#include <vector>
 
-#include <argos3/core/utility/math/rng.h>
+#include <argos3/core/utility/datatypes/datatypes.h>
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 
-#include <loop_functions/segregation_loop_function.h>
+namespace argos {
 
-using namespace argos;
+Real cluster_metric(unsigned long step, std::unordered_map<unsigned long, std::vector<CFootBotEntity *>> map);
 
-class ClusterMetricLoopFunction : public SegregationLoopFunction {
-
-  Real CostAtStep(unsigned long step, std::unordered_map<unsigned long, std::vector<CFootBotEntity *>> map) override;
-
-};
-
+}

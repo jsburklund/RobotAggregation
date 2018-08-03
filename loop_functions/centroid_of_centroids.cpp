@@ -1,9 +1,12 @@
 #include <numeric>
 #include <iterator>
 
-#include "n_class.h"
+#include <loop_functions/centroid_of_centroids.h>
+#include <loop_functions/segregation_loop_function.h>
 
-Real NClass::CostAtStep(unsigned long step, GroupMap groups) {
+namespace argos {
+
+Real centroid_of_centroids(unsigned long step, SegregationLoopFunction::GroupMap groups) {
   constexpr double ROBOT_RADIUS = 0.085036758f;
   auto accum_position = [](CVector3 sum, const auto &robot) {
     auto robot_position = robot->GetEmbodiedEntity().GetOriginAnchor().Position;
@@ -45,4 +48,4 @@ Real NClass::CostAtStep(unsigned long step, GroupMap groups) {
   return group_aggregation_cost - centroid_dispersion_cost;
 }
 
-REGISTER_LOOP_FUNCTIONS(NClass, "n_class")
+}

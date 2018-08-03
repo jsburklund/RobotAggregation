@@ -6,20 +6,20 @@
 #include <argos3/core/simulator/loop_functions.h>
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 
-#include <loop_functions/segregation_loop_function.h>
+#include <loop_functions/my_loop_function.h>
 #include <controllers/footbot/segregation_footbot_controller.h>
 #include <bits/unordered_map.h>
 
 using namespace argos;
 
-class SegregationLoopFunction : public CLoopFunctions {
+class SegregationLoopFunction : public MyLoopFunction {
 
- public:
+public:
 
   using GroupMap = std::unordered_map<unsigned long, std::vector<CFootBotEntity *>>;
   using GroupPosMap = std::unordered_map<unsigned long, std::vector<CVector3>>;
 
-  static constexpr auto XML_CONTROLLER_ID = "fb_segregation";
+  static constexpr auto XML_CONTROLLER_ID = "fb_controller";
 
   SegregationLoopFunction();
 
@@ -27,30 +27,30 @@ class SegregationLoopFunction : public CLoopFunctions {
 
   void Reset() override;
 
+  std::string GetName() override;
+
   /* Configures the robot controller from the genome */
   void ConfigureFromGenome(const Real *pf_genome);
 
-  void LoadFromFile(const std::string &params_filename);
+  void LoadFromFile(const std::string &params_filename) override;
 
-  void LoadParameters(const size_t n_params, const Real *params);
+  void LoadParameters(const size_t n_params, const Real *params) override;
 
   /**
    * Executes user-defined logic right after a control step is executed.
    */
   void PostStep() override;
 
-  virtual Real CostAtStep(unsigned long step, GroupMap map) = 0;
-
   /* Calculates the performance of the robot in a trial */
-  Real Cost();
+  Real Cost() override;
 
   GroupMap classes;
   std::vector<GroupPosMap> classes_over_time;
 
- protected:
+protected:
   std::unordered_map<std::string, unsigned long> id_string_class_map;
 
- private:
+private:
 
   void PlaceSingle(const CVector2 &center, unsigned long class_id, UInt32 id);
 

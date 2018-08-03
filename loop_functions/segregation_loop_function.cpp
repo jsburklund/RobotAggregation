@@ -1,6 +1,8 @@
 #include <iterator>
 
-#include "segregation_loop_function.h"
+#include <loop_functions/segregation_loop_function.h>
+#include <loop_functions/cluster_metric.h>
+#include <loop_functions/centroid_of_centroids.h>
 
 SegregationLoopFunction::SegregationLoopFunction() : m_rng(nullptr) {}
 
@@ -9,8 +11,8 @@ void SegregationLoopFunction::Init(TConfigurationNode &t_node) {
     UInt32 seed;
     GetNodeAttribute(t_node, "random_seed", seed);
     GetNodeAttributeOrDefault(t_node, "num_classes", n_classes, 1);
-    CRandom::CreateCategory("aggregation_loop_function", seed);
-    m_rng = CRandom::CreateRNG("aggregation_loop_function");
+    CRandom::CreateCategory("my_rng", seed);
+    m_rng = CRandom::CreateRNG("my_rng");
 
     UInt32 num_placed_robots = 0;
 
@@ -218,10 +220,18 @@ void SegregationLoopFunction::PostStep() {
     }
     classes_over_time.push_back(class_pos);
 
-    m_cost += CostAtStep(m_step, classes);
-  } catch (argos::CARGoSException e) {
+    // m_cost += centroid_of_centroids(m_step, classes);
+    m_cost += cluster_metric(m_step, classes);
+  } catch (argos::CARGoSException &/**e**/) {
     m_cost = -999;
   }
   ++m_step;
 }
 
+std::string SegregationLoopFunction::GetName() {
+  return "SegregationLoopFunction";
+}
+
+extern "C" MyLoopFunction *create() {
+  return new SegregationLoopFunction();
+}
