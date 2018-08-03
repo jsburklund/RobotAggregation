@@ -64,32 +64,6 @@ int main(int argc, const char **argv) {
 
   LOG.DisableColoredOutput();
 
-  /* Get a reference to the loop functions */
-  auto *library_handle = dlopen(library_path.c_str(), RTLD_LAZY);
-  if (!library_handle) {
-    std::cerr << "Cannot load library: " << dlerror() << '\n';
-    return 1;
-  }
-
-  auto label = (char const *) dlsym(library_handle, "loop_function_label");
-  char *dlsym_error = dlerror();
-  if (dlsym_error) {
-    std::cerr << "Cannot load symbol create: " << dlsym_error << '\n';
-    return 1;
-  }
-
-  typedef MyLoopFunction *(create_func_t)();
-  auto *create_loop_function = (create_func_t *) dlsym(library_handle, "create");
-  dlsym_error = dlerror();
-  if (dlsym_error) {
-    std::cerr << "Cannot load symbol create: " << dlsym_error << '\n';
-    return 1;
-  }
-
-  auto loop_function = create_loop_function();
-
-  std::cout << "Loaded: " << loop_function->GetName() << '\n';
-
   argos::CSimulator &simulator = argos::CSimulator::GetInstance();
 
   ticpp::Document argos_config;
@@ -101,7 +75,8 @@ int main(int argc, const char **argv) {
   auto controllers = argos_config.FirstChildElement()->FirstChildElement("controllers");
   auto controller = controllers->FirstChild();
   auto controller_params = controller->FirstChildElement("params");
-  loop_functions->SetAttribute("label", "segregation_loop_function");
+  loop_functions->SetAttribute("library", library_path);
+  loop_functions->SetAttribute("label", library_label);
 
   if (sensor_length_cm != -1.0) {
     controller_params->SetAttribute("sensor_length_cm", sensor_length_cm);
@@ -131,7 +106,7 @@ int main(int argc, const char **argv) {
     argos::LOGERR << ex.what() << std::endl;
   }
 
-  simulator.SetLoopFunctions(*loop_function);
+  auto loop_function = &static_cast<SegregationLoopFunction &>(simulator.GetLoopFunctions());
 
   if (params_as_str) {
     std::stringstream ss(params_str);
@@ -200,7 +175,4 @@ int main(int argc, const char **argv) {
   if (generate_poses) {
     of << j.dump(2) << std::endl;
   }
-
-  // unload the library
-  dlclose(library_handle);
 }
