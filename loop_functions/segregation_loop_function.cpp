@@ -206,7 +206,8 @@ void SegregationLoopFunction::PostStep() {
     for (const auto &p : robot_map) {
       auto id = p.first;
       auto class_id = id_string_class_map.at(id);
-      auto pos = any_cast<CVector3>(p.second);
+      auto robot = any_cast<CFootBotEntity *>(p.second);
+      auto pos = robot->GetEmbodiedEntity().GetOriginAnchor().Position;
       classes[class_id].emplace_back(pos);
     }
 
@@ -222,10 +223,12 @@ void SegregationLoopFunction::PostStep() {
     classes_over_time.push_back(class_pos);
 
      m_cost += m_step * centroid_of_centroids(class_pos);
-    m_cost += m_step * cluster_metric(class_pos);
-  } catch (argos::CARGoSException &/**e**/) {
+//    m_cost += m_step * cluster_metric(class_pos);
+  } catch (argos::CARGoSException &e) {
+    argos::LOG << e.what() << std::endl;
     m_cost = -999;
   }
+  // This is actually neccesary since many python script ingest this, it's not just for debugging.
   argos::LOG << m_cost << '\n';
   ++m_step;
 }
