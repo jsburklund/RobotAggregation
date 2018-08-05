@@ -34,7 +34,8 @@ Real centroid_of_centroids(GroupPosMap groups) {
 
   }
 
-  auto centroid_of_centroids = std::accumulate(std::begin(centroids), std::end(centroids), CVector3::ZERO);
+  auto centroid_of_centroids =
+      std::accumulate(std::begin(centroids), std::end(centroids), CVector3::ZERO) / groups.size();
   auto accum_centroid_cost = [centroid_of_centroids](double cost, const CVector3 p) {
     auto c = (p - centroid_of_centroids).SquareLength();
     return cost + c;
