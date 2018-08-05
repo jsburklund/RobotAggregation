@@ -63,11 +63,11 @@ def main():
         costs_per_genome = []
         print("Generation:", generation_idx)
         for genome in pop:
-            print("evaluting", genome)
             pool_args = [(genome, f, args.library_path, args.trials, args.verbose) for f in args.argos_files]
             costs = pool.map(evaluate_params, pool_args)
             genome_mean_cost = np.mean(costs)
             costs_per_genome.append(genome_mean_cost)
+            print("evaluated: {} {}".format(genome, genome_mean_cost))
 
         es.tell(pop, costs_per_genome)
         generation_idx += 1
