@@ -1,2 +1,5 @@
 add_executable(evaluate evaluate.cpp)
 target_link_libraries(evaluate segregation_loop_function argos3core_simulator dl)
+
+add_executable(compute_cost compute_cost.cpp)
+target_link_libraries(compute_cost segregation_loop_function)

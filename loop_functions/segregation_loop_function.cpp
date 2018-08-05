@@ -11,6 +11,7 @@ void SegregationLoopFunction::Init(TConfigurationNode &t_node) {
     UInt32 seed = 0;
     GetNodeAttribute(t_node, "random_seed", seed);
     GetNodeAttributeOrDefault(t_node, "num_classes", n_classes, 1);
+    GetNodeAttributeOrDefault(t_node, "stdev", m_position_stdev, 0.05);
     CRandom::CreateCategory("segregation_loop_function", seed);
     m_rng = CRandom::CreateRNG("segregation_loop_function");
 
@@ -70,7 +71,7 @@ void SegregationLoopFunction::Reset() {
     bool success;
     auto attempts = 0;
     do {
-      CVector3 position_noise{m_rng->Gaussian(0.05, 0.0), m_rng->Gaussian(0.05, 0.0), 0};
+      CVector3 position_noise{m_rng->Gaussian(m_position_stdev, 0.0), m_rng->Gaussian(m_position_stdev, 0.0), 0};
       auto position = position_noise + robot_and_initial_pose.position;
       success = MoveEntity(entity, position, robot_and_initial_pose.orientation, false);
       ++attempts;
@@ -201,30 +202,31 @@ void SegregationLoopFunction::PostStep() {
     CSpace::TMapPerType &robot_map = GetSpace().GetEntitiesByType("foot-bot");
 
     // split up the map into containers for each robot class
-    classes.clear();
+    GroupPosMap classes;
     for (const auto &p : robot_map) {
       auto id = p.first;
       auto class_id = id_string_class_map.at(id);
-      auto robot = any_cast<CFootBotEntity *>(p.second);
-      classes[class_id].emplace_back(robot);
+      auto pos = any_cast<CVector3>(p.second);
+      classes[class_id].emplace_back(pos);
     }
 
     GroupPosMap class_pos;
-    for (auto const &p : classes) {
+    for (auto const &class_i : classes) {
       std::vector<CVector3> positions;
-      for (auto const &robot : p.second) {
-        auto robot_position = robot->GetEmbodiedEntity().GetOriginAnchor().Position;
+      for (auto const &robot : class_i.second) {
+        auto robot_position = robot;
         positions.emplace_back(robot_position);
       }
-      class_pos[p.first] = positions;
+      class_pos[class_i.first] = positions;
     }
     classes_over_time.push_back(class_pos);
 
-    // m_cost += centroid_of_centroids(m_step, classes);
-    m_cost += cluster_metric(m_step, classes);
+     m_cost += m_step * centroid_of_centroids(class_pos);
+    m_cost += m_step * cluster_metric(class_pos);
   } catch (argos::CARGoSException &/**e**/) {
     m_cost = -999;
   }
+  argos::LOG << m_cost << '\n';
   ++m_step;
 }
 

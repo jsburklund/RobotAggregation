@@ -10,4 +10,3 @@ target_link_libraries(segregation_loop_function
         argos3plugin_simulator_genericrobot
         argos3plugin_simulator_media
         rt)
-

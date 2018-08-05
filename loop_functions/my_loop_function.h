@@ -10,12 +10,11 @@
 
 using namespace argos;
 
+using GroupPosMap = std::unordered_map<unsigned long, std::vector<CVector3>>;
+
 class MyLoopFunction : public CLoopFunctions {
 
 public:
-
-  using GroupMap = std::unordered_map<unsigned long, std::vector<CFootBotEntity *>>;
-  using GroupPosMap = std::unordered_map<unsigned long, std::vector<CVector3>>;
 
   void Reset() override = 0;
 
@@ -28,6 +27,5 @@ public:
   /* Calculates the performance of the robot in a trial */
   virtual Real Cost() = 0;
 
-  GroupMap classes;
   std::vector<GroupPosMap> classes_over_time;
 };
