@@ -57,7 +57,7 @@ def main():
     args = parser.parse_args()
 
     outfile = open("cma_evolve_output_{:d}.txt".format(int(time.time())), 'w')
-    es = cma.CMAEvolutionStrategy(np.zeros(6), 0.72, {'seed': args.cma_seed, 'popsize': args.popsize})
+    es = cma.CMAEvolutionStrategy(np.zeros(6), 0.72, {'seed': args.cma_seed, 'popsize': args.popsize, 'bounds': [-1, 1]})
     generation_idx = 0
     pool = Pool(processes=args.pool_size)
     while not es.stop() and generation_idx < args.generations:
