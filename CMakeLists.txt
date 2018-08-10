@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(RobotAggregation)
 
-option(CLUSTER "set to ON if you're building on the cluster" OFF)
 set(CMAKE_CXX_STANDARD 14)
 
 find_package(PkgConfig)
