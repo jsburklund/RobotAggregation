@@ -106,7 +106,7 @@ int main(int argc, const char **argv) {
     argos::LOGERR << ex.what() << std::endl;
   }
 
-  auto loop_function = &static_cast<SegregationLoopFunction &>(simulator.GetLoopFunctions());
+  auto loop_function = dynamic_cast<SegregationLoopFunction &>(simulator.GetLoopFunctions());
 
   if (params_as_str) {
     std::stringstream ss(params_str);
@@ -118,9 +118,9 @@ int main(int argc, const char **argv) {
     while (ss >> param) {
       params[++i] = param;
     }
-    loop_function->LoadParameters(n_params, params);
+    loop_function.LoadParameters(n_params, params);
   } else {
-    loop_function->LoadFromFile(params_str);
+    loop_function.LoadFromFile(params_str);
   }
 
   nlohmann::json j;
@@ -142,12 +142,12 @@ int main(int argc, const char **argv) {
   Real cost_sum = 0;
   for (unsigned int i = 0u; i < N; ++i) {
     simulator.Reset();
-    loop_function->Reset();
+    loop_function.Reset();
     simulator.Execute();
-    Real cost = loop_function->Cost();
+    Real cost = loop_function.Cost();
     nlohmann::json trial_j;
     if (generate_poses) {
-      for (const auto &class_at_time_t : loop_function->classes_over_time) {
+      for (const auto &class_at_time_t : loop_function.classes_over_time) {
         // print all the X, Y positions of the robots at each time step
         nlohmann::json j_t;
         for (const auto &p : class_at_time_t) {
