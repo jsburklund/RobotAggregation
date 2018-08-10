@@ -8,7 +8,7 @@ namespace argos {
 
 Real centroid_of_centroids(GroupPosMap groups) {
   constexpr double ROBOT_RADIUS = 0.085036758f;
-  auto accum_position = [](CVector3 sum, const auto &pos) {
+  auto accum_position = [](CVector3 sum, const CVector3 &pos) {
     auto robot_position = pos;
     return sum + robot_position;
   };
@@ -23,7 +23,7 @@ Real centroid_of_centroids(GroupPosMap groups) {
 
     centroids.emplace_back(centroid);
 
-    auto accum_cost = [centroid](double cost, const auto &pos) {
+    auto accum_cost = [centroid](double cost, const CVector3 &pos) {
       auto robot_position = pos;
       auto c = (robot_position - centroid).SquareLength();
       return cost + c;

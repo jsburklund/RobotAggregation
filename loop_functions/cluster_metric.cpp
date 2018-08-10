@@ -5,10 +5,13 @@
 
 namespace argos {
 
-size_t find_largest_component(int **A, size_t n) {
+size_t find_largest_component(int **A, const size_t n) {
   // use BFS to find components and count their size
   unsigned int largest_componenet_size = 0;
-  bool visited[n] = {false};
+  bool visited[n];
+  for (size_t i = 0; i < n; ++i) {
+    visited[i] = false;
+  }
   for (size_t i = 0; i < n; ++i) {
     auto r = i;
     if (!visited[r]) {
@@ -38,7 +41,7 @@ size_t find_largest_component(int **A, size_t n) {
   return largest_componenet_size;
 }
 
-Real cluster_metric(GroupPosMap groups) {
+Real cluster_metric(const GroupPosMap groups) {
   Real cost = 0;
   for (auto &kv : groups) {
     const auto group_id = kv.first;
@@ -63,8 +66,7 @@ Real cluster_metric(GroupPosMap groups) {
       }
     }
 
-    auto largest_component_size = find_largest_component(A, poses.size());
-    std::cout << largest_component_size << '\n';
+    const auto largest_component_size = find_largest_component(A, poses.size());
     for (size_t i = 0; i < poses.size(); ++i) {
       free(A[i]);
     }
