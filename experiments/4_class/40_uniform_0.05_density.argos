@@ -26,7 +26,6 @@
 
   <loop_functions random_seed="0" num_classes="4">
     <cluster center="0,0" robot_num="40" robot_density="0.05" />
-
   </loop_functions>
 
   <arena size="6, 6, 2" center="0,0,1">
