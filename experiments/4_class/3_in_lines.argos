@@ -25,29 +25,29 @@
   </controllers>
 
   <loop_functions random_seed="0" num_classes="4">
-    <line center="3.25,1.75" robot_num="3" robot_distance="0.3" />
-    <line center="2.75,2.25" robot_num="3" robot_distance="0.3" />
-    <line center="2.25,2.75" robot_num="3" robot_distance="0.3" />
-    <line center="1.75,3.25" robot_num="3" robot_distance="0.3" />
+    <line center="0.75,-.75" robot_num="3" robot_distance="0.3" />
+    <line center="0.25,-.25" robot_num="3" robot_distance="0.3" />
+    <line center="-.25,0.25" robot_num="3" robot_distance="0.3" />
+    <line center="-.75,0.75" robot_num="3" robot_distance="0.3" />
 
   </loop_functions>
 
-  <arena size="6, 6, 2" center="2.5,2.5,1">
+  <arena size="6, 6, 2" center="0,0,1">
 
-    <box id="wall_north" size="5,0.1,0.5" movable="false">
-      <body position="2.5,5,0" orientation="0,0,0"/>
-    </box>
-
-    <box id="wall_south" size="5,0.1,0.5" movable="false">
+    <box id="wall_north" size="0.1,5,0.5" movable="false">
       <body position="2.5,0,0" orientation="0,0,0"/>
     </box>
 
-    <box id="wall_east" size="0.1,5,0.5" movable="false">
-      <body position="0,2.5,0" orientation="0,0,0"/>
+    <box id="wall_south" size="0.1,5,0.5" movable="false">
+      <body position="-2.5,0,0" orientation="0,0,0"/>
     </box>
 
-    <box id="wall_west" size="0.1,5,0.5" movable="false">
-      <body position="5,2.5,0" orientation="0,0,0"/>
+    <box id="wall_east" size="05,.1,0.5" movable="false">
+      <body position="0,-2.5,0" orientation="0,0,0"/>
+    </box>
+
+    <box id="wall_west" size="5,0.1,0.5" movable="false">
+      <body position="0,2.5,0" orientation="0,0,0"/>
     </box>
 
   </arena>
