@@ -2,7 +2,6 @@
 *.bdb
 *.bo
 venv
-.idea
 
 logs
 *ARGoS_LOG*
@@ -25,3 +24,5 @@ slurm-*
 
 ## not worth tracking
 test.dat
+
+workspace.xml
