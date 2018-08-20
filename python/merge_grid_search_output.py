@@ -29,7 +29,7 @@ def main():
 
     merged = np.array(merged)
     merged = merged[merged[:,0].argsort()]
-    np.savetxt(args.outfile, merged, fmt="%6.3f")
+    np.savetxt(args.outfile, merged, fmt="%12.6f")
 
 if __name__ == '__main__':
     main()

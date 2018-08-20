@@ -44,6 +44,33 @@ def main():
             if c != 0:
                 writer.writerow([i, c])
 
+    if not args.no_plot:
+        for x_param in range(6):
+            for y_param in range(x_param + 1, 6):
+
+                plt.figure()
+                plt.xlabel("param {:d}".format(x_param), fontsize=32)
+                plt.ylabel("param {:d}".format(y_param), fontsize=32)
+                labels = ['-1.0', '', '', '', '', '', '1.0']
+                plt.xticks(np.arange(7), labels, fontsize=24)
+                plt.yticks(np.arange(7), labels, fontsize=24)
+
+                shape = tuple([args.resolution] * 6)
+                cost_image = np.ones((args.resolution, args.resolution)) * 1e24
+                for parameter_idx, cost in enumerate(costs):
+                    indeces = np.unravel_index(parameter_idx, shape)
+                    row = indeces[x_param]
+                    col = indeces[y_param]
+                    if cost < cost_image[row, col]:
+                        cost_image[row, col] = cost
+
+                plt.imshow(cost_image, cmap='Reds')
+                if args.save:
+                    plt.savefig("{:d}_{:d}_grid_img.png".format(x_param, y_param))
+
+        plt.show()
+
+    # Sorting messes up plotting so we have to do this after
     sorted_cost_indeces = costs.argsort(axis=0)
     costs.sort()
     params = params[sorted_cost_indeces]
@@ -75,31 +102,6 @@ def main():
         unknown_controllers += 1
         print(p, "{:d}th {:0.4f}".format(i, costs[i]))
 
-    if not args.no_plot:
-        for x_param in range(6):
-            for y_param in range(x_param + 1, 6):
-
-                plt.figure()
-                plt.xlabel("param {:d}".format(x_param), fontsize=32)
-                plt.ylabel("param {:d}".format(y_param), fontsize=32)
-                labels = ['-1.0', '', '', '', '', '', '1.0']
-                plt.xticks(np.arange(7), labels, fontsize=24)
-                plt.yticks(np.arange(7), labels, fontsize=24)
-
-                shape = tuple([args.resolution] * 6)
-                cost_image = np.ones((args.resolution, args.resolution)) * 1e24
-                for parameter_idx, cost in enumerate(costs):
-                    indeces = np.unravel_index(parameter_idx, shape)
-                    row = indeces[x_param]
-                    col = indeces[y_param]
-                    if cost < cost_image[row, col]:
-                        cost_image[row, col] = cost
-
-                plt.imshow(cost_image, cmap='Reds')
-                if args.save:
-                    plt.savefig("{:d}_{:d}_grid_img.png".format(x_param, y_param))
-
-        plt.show()
 
 
 if __name__ == "__main__":
