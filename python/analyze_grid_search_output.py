@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import numpy as np
 import os
@@ -26,6 +26,12 @@ def main():
     params = np.zeros((args.resolution ** 6, 6))
     for grid_search_output_filename in args.grid_search_outputs:
         f = np.genfromtxt(grid_search_output_filename, skip_header=True)
+        if f.shape[0] == 0:
+            to_delete.append(grid_search_output_filename)
+            continue
+        elif len(f.shape) == 1:
+            f = np.expand_dims(f, axis=0)
+
         first_param_idx = int(f[0, 0])
         last_param_idx = int(f[-1, 0])
         costs[first_param_idx:last_param_idx + 1] = np.mean(f[:, 7:], axis=1)
