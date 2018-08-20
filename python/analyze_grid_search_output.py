@@ -15,6 +15,7 @@ def main():
     parser.add_argument("--best-n", type=int, default=10)
     parser.add_argument("--ignore-known-controllers", action="store_true")
     parser.add_argument("--no-plot", action="store_true")
+    parser.add_argument("--save", action="store_true")
 
     args = parser.parse_args()
 
@@ -74,10 +75,6 @@ def main():
         unknown_controllers += 1
         print(p, "{:d}th {:0.4f}".format(i, costs[i]))
 
-    idx_of_worst_controller_that_segregates = np.argmax(costs > -2700)
-    print(idx_of_worst_controller_that_segregates)
-    print(params[idx_of_worst_controller_that_segregates])
-
     if not args.no_plot:
         for x_param in range(6):
             for y_param in range(x_param + 1, 6):
@@ -99,7 +96,8 @@ def main():
                         cost_image[row, col] = cost
 
                 plt.imshow(cost_image, cmap='Reds')
-                plt.savefig("{:d}_{:d}_grid_img.png".format(x_param, y_param))
+                if args.save:
+                    plt.savefig("{:d}_{:d}_grid_img.png".format(x_param, y_param))
 
         plt.show()
 
