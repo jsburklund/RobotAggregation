@@ -20,6 +20,9 @@ public:
 
   SegregationLoopFunction();
 
+  /** This was causing bugs so we explicitly delete it **/
+  SegregationLoopFunction(SegregationLoopFunction &/*other*/) = delete;
+
   void Init(TConfigurationNode &t_node) override;
 
   void Reset() override;

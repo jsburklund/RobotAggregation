@@ -33,6 +33,7 @@ int main(int argc, const char **argv) {
   args::Flag params_as_str_flag(parser, "params_as_string", "the params input is actually a string of numbers",
                                 {"params-as-string"}, false);
   args::Flag print_mean_flag(parser, "print_mean", "print mean of costs", {'m', "mean"}, false);
+  args::Flag quiet_flag(parser, "quiet", "don't print cost at each time step", {'q', "quiet"}, false);
 
   try {
     parser.ParseCLI(argc, argv);
@@ -57,7 +58,7 @@ int main(int argc, const char **argv) {
   auto print_mean = args::get(print_mean_flag);
   auto params_str = args::get(params_filename_flag);
   auto const params_as_str = args::get(params_as_str_flag);
-  unsigned int const N = args::get(trials_flag);
+  unsigned int const num_trials = args::get(trials_flag);
 
   auto position = library_path.rfind('/') + 4;
   auto library_label = library_path.substr(position, library_path.size() - position - 3);
@@ -106,7 +107,8 @@ int main(int argc, const char **argv) {
     argos::LOGERR << ex.what() << std::endl;
   }
 
-  auto loop_function = dynamic_cast<SegregationLoopFunction &>(simulator.GetLoopFunctions());
+  const auto ptr = &simulator.GetLoopFunctions();
+  auto loop_function = dynamic_cast<SegregationLoopFunction *>(ptr);
 
   if (params_as_str) {
     std::stringstream ss(params_str);
@@ -118,9 +120,9 @@ int main(int argc, const char **argv) {
     while (ss >> param) {
       params[++i] = param;
     }
-    loop_function.LoadParameters(n_params, params);
+    loop_function->LoadParameters(n_params, params);
   } else {
-    loop_function.LoadFromFile(params_str);
+    loop_function->LoadFromFile(params_str);
   }
 
   nlohmann::json j;
@@ -140,14 +142,14 @@ int main(int argc, const char **argv) {
   }
 
   Real cost_sum = 0;
-  for (unsigned int i = 0u; i < N; ++i) {
+  for (unsigned int i = 0u; i < num_trials; ++i) {
     simulator.Reset();
-    loop_function.Reset();
+    loop_function->Reset();
     simulator.Execute();
-    Real cost = loop_function.Cost();
+    Real cost = loop_function->Cost();
     nlohmann::json trial_j;
     if (generate_poses) {
-      for (const auto &class_at_time_t : loop_function.classes_over_time) {
+      for (const auto &class_at_time_t : loop_function->classes_over_time) {
         // print all the X, Y positions of the robots at each time step
         nlohmann::json j_t;
         for (const auto &p : class_at_time_t) {
@@ -163,13 +165,13 @@ int main(int argc, const char **argv) {
       j.push_back(trial_j);
     }
     if (!generate_poses) {
-      std::cout << i << " " << cost << '\n';
+      std::cout << cost << '\n';
       cost_sum += cost;
     }
   }
 
   if (print_mean) {
-    std::cout << "mean: " << cost_sum / N << '\n';
+    std::cout << "mean: " << cost_sum / num_trials << '\n';
   }
 
   if (generate_poses) {

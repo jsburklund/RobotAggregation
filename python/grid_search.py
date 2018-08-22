@@ -34,20 +34,18 @@ def evaluate_params(args):
         print(output)
         return -1
 
-    sum = 0
+    cost = -999
     output = output.stdout.decode("UTF-8").split("\n")[8:-1]
-    costs = []
+    # Find the last line in the output which is a number
+    print(output)
     for line in output:
         try:
             cost = float(line.split(" ")[-1])
         except ValueError:
             continue
-        costs.append(cost)
-        sum += float(cost)
-    mean = sum / len(costs)
     if verbose:
-        print("{:d} {:s} {:E}".format(param_idx, cmd_str, mean))
-    return mean
+        print("{:d} {:s} {:E}".format(param_idx, cmd_str, cost))
+    return cost
 
 
 def main():

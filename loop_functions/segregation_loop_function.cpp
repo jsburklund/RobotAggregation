@@ -228,8 +228,7 @@ void SegregationLoopFunction::PostStep() {
     argos::LOG << e.what() << std::endl;
     m_cost = -999;
   }
-  // This is actually neccesary since many python script ingest this, it's not just for debugging.
-  argos::LOG << m_cost << '\n';
+
   ++m_step;
 }
 
