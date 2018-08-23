@@ -24,7 +24,7 @@ def evaluate_params(args):
     # Execute evaluate and save the poses of time
     param_idx, params, argos_file, library_path, trials, verbose = args
     params_str = "\"6 " + " ".join([str(p) for p in params]) + "\""
-    cmd = ["./build/bin/evaluate", "--params-as-string", "-t", str(trials), argos_file, library_path, params_str]
+    cmd = ["./build/bin/evaluate", "-s", "100", "--params-as-string", "-t", str(trials), argos_file, library_path, params_str]
     cmd_str = " ".join(cmd)
     output = subprocess.run(cmd_str, stdout=subprocess.PIPE, shell=True)
     if output.returncode != 0:
@@ -37,7 +37,6 @@ def evaluate_params(args):
     cost = -999
     output = output.stdout.decode("UTF-8").split("\n")[8:-1]
     # Find the last line in the output which is a number
-    print(output)
     for line in output:
         try:
             cost = float(line.split(" ")[-1])

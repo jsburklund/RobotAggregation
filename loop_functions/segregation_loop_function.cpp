@@ -222,8 +222,8 @@ void SegregationLoopFunction::PostStep() {
     }
     classes_over_time.push_back(class_pos);
 
-     m_cost += m_step * centroid_of_centroids(class_pos);
-//    m_cost += m_step * cluster_metric(class_pos);
+//     m_cost += m_step * centroid_of_centroids(class_pos);
+    m_cost += m_step * cluster_metric(class_pos);
   } catch (argos::CARGoSException &e) {
     argos::LOG << e.what() << std::endl;
     m_cost = -999;
