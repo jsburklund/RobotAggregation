@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH -N 1
-#SBATCH -n 36
-#SBATCH -t 1:00:00
+#SBATCH -n 38
+#SBATCH -t 12:00:00
 #SBATCH -J grid_search
 
 # Stop execution after any error
@@ -24,20 +24,23 @@ WORKDIR=$LOCALDIR/$MYUSER/$THISJOB
 rm -rf $WORKDIR && mkdir -p $WORKDIR && cd $WORKDIR
 
 # setup the directories and files we expect
+cp -r $PROJDIR/venv .
 cp -r $PROJDIR/bin .
+cp -r $PROJDIR/python .
 cp -r $PROJDIR/build .
 cp -r $PROJDIR/controllers .
 cp -r $PROJDIR/loop_functions .
 cp -r $PROJDIR/experiments .
 cp $PROJDIR/CMakeLists.txt .
-cp $PROJDIR/bin/grid_search.py .
+cp $PROJDIR/python/grid_search.py .
 
 # Execute program (this also writes files in work dir)
 echo $WORKDIR
-./grid_search.py --resolution=7 --pool-size=36 --trials 1 --skip=0 --stop-at=256 experiments/1_class/*.argos experiments/2_class/*.argos experiments/4_class/*.argos build/loop_functions/libcluster_metric.so
+source venv/bin/activate
+./grid_search.py --resolution=7 --pool-size=38 --trials 1 --skip=0 --stop-at=8000 experiments/1_class/*.argos experiments/2_class/*.argos experiments/4_class/*.argos build/loop_functions/libsegregation_loop_function.so
 
 # Transfer generated files into home directory
-cp grid_search_output* $DATADIR
+cp grid_search_output* $DATADIR/centroid_of_centroids_grid_search/
 
 # Cleanup
 rm -r $WORKDIR
