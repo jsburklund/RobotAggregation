@@ -57,7 +57,9 @@ def main():
     args = parser.parse_args()
 
     outfile = open("cma_evolve_output_{:d}.txt".format(int(time.time())), 'w')
-    es = cma.CMAEvolutionStrategy(np.zeros(6), 0.72, {'seed': args.cma_seed, 'popsize': args.popsize, 'bounds': [-1, 1]})
+    initial_params = np.array([1, -0.666667, 0.333333, 1, 1, 0])
+    # 0.72 was taken from Gauci et al, on aggregation.
+    es = cma.CMAEvolutionStrategy(initial_params, 0.72, {'seed': args.cma_seed, 'popsize': args.popsize, 'bounds': [-1, 1]})
     generation_idx = 0
     pool = Pool(processes=args.pool_size)
     while not es.stop() and generation_idx < args.generations:
@@ -79,7 +81,7 @@ def main():
     print("finished in {:d} iterations".format(es.result.iterations))
     print("final population, cost")
 
-    outfile.write("vl0 vr0 vl1 vr1 vl2 vr2 cost")
+    outfile.write("vl0 vr0 vl1 vr1 vl2 vr2 cost\n")
     pop_and_costs = sorted(zip(pop, costs_per_genome), key=lambda pair: pair[1])
     for p, c in pop_and_costs:
         print(p, c)
