@@ -66,9 +66,9 @@ def main():
     plt.style.use(style)
 
     fig, ax = plt.subplots()
-    my_boxplot(ax, proportion_to_max, data, width=0.01)
-    plt.xlabel("Sensing range, proportion of maximum")
-    plt.ylabel("Cluster Metric Cost")
+    my_boxplot(ax, proportion_to_max, data, width=1)
+    plt.xlabel("Sensing range, percentage of maximum")
+    plt.ylabel("Cost")
     plt.plot([0, 0.6], [-720, -720], color='b')
     plt.show()
 
