@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH -N 1
 #SBATCH -n 38
-#SBATCH -t 4:00:00
+#SBATCH -t 12:00:00
 #SBATCH --mem 64GB
 #SBATCH -J evolve
 
@@ -38,7 +38,7 @@ cp $PROJDIR/python/cma_evolve.py .
 # Execute program (this also writes files in work dir)
 echo $WORKDIR
 source venv/bin/activate
-./cma_evolve.py -p 38 -t 1 experiments/1_class/*.argos experiments/2_class/*.argos experiments/4_class/*.argos build/loop_functions/libsegregation_loop_function.so -g 100
+./cma_evolve.py -p 38 -t 1 experiments/4_class/*.argos build/loop_functions/libsegregation_loop_function.so -g 50
 
 # Transfer generated files into home directory
 cp cma_evolve_output_*.txt $DATADIR
