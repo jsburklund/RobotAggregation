@@ -31,11 +31,11 @@ cp -r $PROJDIR/loop_functions .
 cp -r $PROJDIR/experiments .
 cp -r $PROJDIR/params .
 cp $PROJDIR/CMakeLists.txt .
-cp $PROJDIR/bin/analyze_num_classes.py .
+cp $PROJDIR/python/analyze_num_classes.py .
 
 # Execute program (this also writes files in work dir)
 echo $WORKDIR
-./bin/analyze_num_classes.py evaluate experiments/n_classes/10_per_class/* build/loop_functions/libcluster_metric.so params/grid_search_winner.dat -p 25 -t 100
+./analyze_num_classes.py evaluate experiments/n_classes/10_per_class/* build/loop_functions/libsegregation_loop_function.so params/cluster_metric_grid_search.dat -p 25 -t 100
 
 # Transfer generated files into home directory
 cp n_classes_* $DATADIR
