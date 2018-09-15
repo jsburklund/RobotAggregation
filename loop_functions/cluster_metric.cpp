@@ -6,7 +6,7 @@
 namespace argos {
 
 size_t find_largest_component(int **A, const size_t n) {
-  // use BFS to find components and count their size
+  // use DFS to find components and count their size
   unsigned int largest_componenet_size = 0;
   bool visited[n];
   for (size_t i = 0; i < n; ++i) {
