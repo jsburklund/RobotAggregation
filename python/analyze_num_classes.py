@@ -8,7 +8,6 @@ import subprocess
 import sys
 import time
 
-import matplotlib.pyplot as plt
 from multiprocessing import Pool
 import numpy as np
 
@@ -60,6 +59,7 @@ def eval_func(args):
 
 
 def plot_func(args):
+    import matplotlib.pyplot as plt
     style_dir = os.path.dirname(os.path.realpath(__file__))
     style = os.path.join(style_dir, "mpl.style")
     plt.style.use(style)
