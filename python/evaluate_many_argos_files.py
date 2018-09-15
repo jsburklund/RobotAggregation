@@ -8,15 +8,14 @@ import subprocess
 import sys
 import time
 
-import matplotlib.pyplot as plt
 from multiprocessing import Pool
 import numpy as np
 
-
-def evaluate(args):
+def evaluate_params(args):
     # Execute evaluate and save the poses of time
-    params_file, argos_file, library_path, trials, verbose = args
-    cmd = ["./build/bin/evaluate", "-t", str(trials), argos_file, library_path, params_file]
+    param_idx, params, argos_file, library_path, trials, verbose = args
+    params_str = "\"6 " + " ".join([str(p) for p in params]) + "\""
+    cmd = ["./build/bin/evaluate", "-s", "100", "--params-as-string", "-t", str(trials), argos_file, library_path, params_str]
     cmd_str = " ".join(cmd)
     output = subprocess.run(cmd_str, stdout=subprocess.PIPE, shell=True)
     if output.returncode != 0:
@@ -26,26 +25,20 @@ def evaluate(args):
         print(output)
         return -1
 
-    sum = 0
-    costs = []
+    cost = -999
     output = output.stdout.decode("UTF-8").split("\n")[8:-1]
+    # Find the last line in the output which is a number
     for line in output:
         try:
             cost = float(line.split(" ")[-1])
         except ValueError:
             continue
-        costs.append(cost)
-        sum += float(cost)
-    mean = sum / len(costs)
     if verbose:
-        print(cmd_str, costs)
-    else:
-        print(argos_file, costs)
-    return mean
-
+        print("{:d} {:s} {:E}".format(param_idx, cmd_str, cost))
+    return cost
 
 def main():
-    parser = argparse.ArgumentParser("Evaluate cost over the beam angle argos files.")
+    parser = argparse.ArgumentParser("Evaluate cost over the argos files.")
     parser.add_argument("argos_files", help="the argos files you want to run evaluate with", nargs="+")
     parser.add_argument("library_path", help="the path to the loop function *.so library to use")
     parser.add_argument("params", help="params file to evaluate")
@@ -58,10 +51,11 @@ def main():
     params = np.genfromtxt(args.params)[1:]
     if args.verbose:
         print(params)
+        pass
 
     with Pool(processes=args.pool_size) as pool:
-        pool_args = [(args.params, f, args.library_path, args.trials, args.verbose) for f in args.argos_files]
-        costs = pool.map(evaluate, pool_args)
+        pool_args = [(-1, params, f, args.library_path, args.trials, args.verbose) for f in args.argos_files]
+        costs = pool.map(evaluate_params, pool_args)
         print("mean", np.mean(costs))
 
 
