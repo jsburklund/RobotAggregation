@@ -47,7 +47,7 @@ def my_boxplot(ax, positions, values, width=None, color=None, label=None):
     plt.setp(bp['fliers'], visible=False)
 
     ax.plot(positions, np.median(values, axis=1), linewidth=2, label=label)
-    ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+    ax.xaxis.set_major_formatter(FormatStrFormatter('%d%%'))
 
 
 def main():
@@ -58,7 +58,7 @@ def main():
 
     data = np.genfromtxt(args.csv, skip_header=True, delimiter=',')
     range_meters = data[:,0] / 100
-    proportion_to_max = range_meters / np.sqrt(2 * 5 ** 2)
+    proportion_to_max = [int(r*100) for r in range_meters / np.sqrt(2 * 5 ** 2)]
     data = data[:,1:]
 
     style_dir = os.path.dirname(os.path.realpath(__file__))

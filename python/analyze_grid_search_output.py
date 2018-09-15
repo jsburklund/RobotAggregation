@@ -14,7 +14,7 @@ def main():
     parser.add_argument("--resolution", type=int, default=7)
     parser.add_argument("--best-n", type=int, default=10)
     parser.add_argument("--ignore-known-controllers", action="store_true")
-    parser.add_argument("--no-plot", action="store_true")
+    parser.add_argument("--plot", action="store_true")
     parser.add_argument("--save", action="store_true")
 
     args = parser.parse_args()
@@ -44,13 +44,14 @@ def main():
             if c != 0:
                 writer.writerow([i, c])
 
-    if not args.no_plot:
+    if args.plot or args.save:
+        axes_titles = [r'$v_{l_0}$', r'$v_{r_0}$', r'$v_{l_1}$', r'$v_{r_1}$', r'$v_{l_2}$', r'$v_{r_2}$']
         for x_param in range(6):
             for y_param in range(x_param + 1, 6):
 
                 plt.figure()
-                plt.xlabel("param {:d}".format(x_param), fontsize=32)
-                plt.ylabel("param {:d}".format(y_param), fontsize=32)
+                plt.xlabel(axes_titles[x_param], fontsize=32)
+                plt.ylabel(axes_titles[y_param], fontsize=32, rotation=0)
                 labels = ['-1.0', '', '', '', '', '', '1.0']
                 plt.xticks(np.arange(7), labels, fontsize=24)
                 plt.yticks(np.arange(7), labels, fontsize=24)
@@ -68,7 +69,8 @@ def main():
                 if args.save:
                     plt.savefig("{:d}_{:d}_grid_img.png".format(x_param, y_param))
 
-        plt.show()
+        if args.plot:
+            plt.show()
 
     # Sorting messes up plotting so we have to do this after
     sorted_cost_indeces = costs.argsort(axis=0)
