@@ -67,13 +67,25 @@ def plot_func(args):
     reader = csv.reader(open(args.n_classes_output, 'r'), delimiter=' ')
     costs = []
     n_classes = []
+    max_costs = []
+    # TODO this is kind of hacky and hardcoded
+    T = 180
     for row in reader:
         m = re.search("(\d+)_class", row[0])
         n_class = float(m.groups()[0])
         n_classes.append(n_class)
         costs.append(float(row[1]))
+        # NOTE only use one of the below statements.
+        C = 10
+        #C = 100 / n_class
+        max_costs.append(-(T-1)*T/(2*C))
+
+    # Sort both lists based on n_classes
+    costs = [i[1] for i in sorted(zip(n_classes, costs), key=lambda pair: pair[0])]
+    n_classes = sorted(n_classes)
 
     plt.figure()
+    plt.plot(n_classes, max_costs, linewidth=4)
     plt.plot(n_classes, costs, linewidth=4)
     plt.scatter(n_classes, costs, s=100)
     plt.xlabel("number of classes")
