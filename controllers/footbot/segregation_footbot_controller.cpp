@@ -164,7 +164,7 @@ SegregationFootbotController::SensorState SegregationFootbotController::GetTrueK
 void SegregationFootbotController::ControlStep() {
 
   if (viz) {
-    switch (m_class) {
+    switch (m_class % 8) {
       case 0:
         m_pcLEDs->SetAllColors(CColor::GREEN);
         break;
@@ -187,17 +187,6 @@ void SegregationFootbotController::ControlStep() {
         m_pcLEDs->SetAllColors(CColor::MAGENTA);
         break;
       case 7:
-        m_pcLEDs->SetAllColors(CColor::BROWN);
-        break;
-      case 8:
-        m_pcLEDs->SetAllColors(CColor::PURPLE);
-        break;
-      case 9:
-        m_pcLEDs->SetAllColors(CColor::ORANGE);
-        break;
-      case 10:
-        m_pcLEDs->SetAllColors(CColor(246, 36, 89));
-        break;
       default:
         m_pcLEDs->SetAllColors(CColor::BLACK);
         break;
