@@ -2,9 +2,11 @@
 
 Code to accompany [this paper](https://github.com/PeterMitrano/paper-segregation-without-computation) (currently preprint)
 
-## Build Everything
+## Building
 
-  mkdir build
-  cd build
-  cmake ..
-  make
+We use CMake
+
+    mkdir build
+    cd build
+    cmake ..
+    make
