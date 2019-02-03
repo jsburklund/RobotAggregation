@@ -1,3 +1,7 @@
+/**
+ * THIS IS THE ACTUAL METRIC WE USED IN OUR PAPER
+ * SEE EQUATION (4)
+ */
 #include <stack>
 
 #include "cluster_metric.h"
