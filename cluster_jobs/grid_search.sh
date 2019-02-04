@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #SBATCH -N 1
-#SBATCH -n 38
+#SBATCH -n 35
 #SBATCH -t 12:00:00
 #SBATCH -J grid_search
 
@@ -37,7 +37,7 @@ cp $PROJDIR/python/grid_search.py .
 # Execute program (this also writes files in work dir)
 echo $WORKDIR
 source venv/bin/activate
-./grid_search.py --resolution=7 --pool-size=38 --trials 1 --skip=0 --stop-at=8000 experiments/1_class/*.argos experiments/2_class/*.argos experiments/4_class/*.argos build/loop_functions/libsegregation_loop_function.so
+./grid_search.py --resolution=7 --pool-size=35 --trials 1 --skip=0 --stop-at=10000 experiments/1_class/*.argos experiments/2_class/*.argos experiments/4_class/*.argos build/loop_functions/libsegregation_loop_function.so
 
 # Transfer generated files into home directory
 cp grid_search_output* $DATADIR/centroid_of_centroids_grid_search/
