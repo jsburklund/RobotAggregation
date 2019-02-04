@@ -115,7 +115,6 @@ def main():
                 outfile.write("\n")
 
     print("Finished evaluting paramaters #{:d} to #{:d}".format(args.skip, param_idx))
-    open("")
     return 0
 
 
