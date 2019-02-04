@@ -35,6 +35,8 @@ int main(int argc, const char **argv) {
   args::Flag print_mean_flag(parser, "print_mean", "print mean of costs", {'m', "mean"}, false);
   args::Flag quiet_flag(parser, "quiet", "don't print cost at each time step", {'q', "quiet"}, false);
 
+  std::cout << "Make sure you run this from the root of the project, not within a build directory\n\n";
+
   try {
     parser.ParseCLI(argc, argv);
   }

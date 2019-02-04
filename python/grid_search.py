@@ -4,6 +4,7 @@ import argparse
 import subprocess
 import sys
 import time
+# import git
 
 import numpy as np
 from multiprocessing import Pool
@@ -79,6 +80,9 @@ def main():
 
     outfile_name = "grid_search_output_{:d}.txt".format(int(time.time()))
     with open(outfile_name, 'w')  as outfile:
+        # repo = git.Repo(search_parent_directories=True)
+        # sha = repo.head.object.hexsha
+        # outfile.write("GIT HASH: {}\n".format(sha)))
         outfile.write("- - - - - - - ")
         for argos_file in args.argos_files:
             outfile.write("{:s} ".format(argos_file))

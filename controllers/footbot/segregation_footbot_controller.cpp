@@ -131,7 +131,7 @@ SegregationFootbotController::KinFirstSensor(const CCI_RangeAndBearingSensor::TR
 
 SegregationFootbotController::SensorState SegregationFootbotController::GetTrueKinSensorVal() {
   const CCI_RangeAndBearingSensor::TReadings &tMsgs = m_pcRABSens->GetReadings();
-  SensorState sens_state = SensorState::NOTHING;
+  SensorState sens_state;
   switch (sensor_impl) {
     case SensorImpl::KIN_FIRST: {
       sens_state = KinFirstSensor(tMsgs);

@@ -77,8 +77,8 @@ def plot_func(args):
         costs.append(float(row[1]))
         # NOTE only use one of the below statements.
         C = 10
-        #C = 100 / n_class
-        max_costs.append(-(T-1)*T/(2*C))
+        # C = 100 / n_class
+        max_costs.append(-(T - 1) * T / (2 * C))
 
     # Sort both lists based on n_classes
     costs = [i[1] for i in sorted(zip(n_classes, costs), key=lambda pair: pair[0])]
