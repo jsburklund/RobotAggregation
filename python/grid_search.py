@@ -5,7 +5,6 @@ import subprocess
 import socket
 import sys
 import time
-import git
 
 import numpy as np
 from multiprocessing import Pool
@@ -79,13 +78,10 @@ def main():
     else:
         minimum = [-1] * 6
 
-    meta_outfile_name = "grid_search_output_meta{:d}.txt".format(int(time.time()))
-    with open(meta_outfile_name) as metafile:
+    meta_outfile_name = "grid_search_output_meta_{:d}.txt".format(int(time.time()))
+    with open(meta_outfile_name, 'w') as metafile:
         metafile.write(str(dir(args)) + '\n')
         metafile.write(str("".join(sys.argv)) + '\n')
-        repo = git.Repo(search_parent_directories=True)
-        sha = repo.head.object.hexsha
-        metafile.write("GIT HASH: {}\n".format(sha)))
         metafile.write(socket.gethostname())
 
     outfile_name = "grid_search_output_{:d}.txt".format(int(time.time()))
