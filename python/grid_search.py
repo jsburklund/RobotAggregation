@@ -2,6 +2,7 @@
 
 import argparse
 import subprocess
+import socket
 import sys
 import time
 # import git
@@ -78,11 +79,17 @@ def main():
     else:
         minimum = [-1] * 6
 
-    outfile_name = "grid_search_output_{:d}.txt".format(int(time.time()))
-    with open(outfile_name, 'w')  as outfile:
+    meta_outfile_name = "grid_search_output_meta{:d}.txt".format(int(time.time()))
+    with open(meta_outfile_name) as metafile:
+        metafile.write(str(dir(args)) + '\n')
+        metafile.write(str("".join(sys.argv)) + '\n')
         # repo = git.Repo(search_parent_directories=True)
         # sha = repo.head.object.hexsha
-        # outfile.write("GIT HASH: {}\n".format(sha)))
+        metafile.write("GIT HASH: {}\n".format(sha)))
+        metafile.write(socket.gethostname())
+
+    outfile_name = "grid_search_output_{:d}.txt".format(int(time.time()))
+    with open(outfile_name, 'w') as outfile:
         outfile.write("- - - - - - - ")
         for argos_file in args.argos_files:
             outfile.write("{:s} ".format(argos_file))
@@ -108,6 +115,7 @@ def main():
                 outfile.write("\n")
 
     print("Finished evaluting paramaters #{:d} to #{:d}".format(args.skip, param_idx))
+    open("")
     return 0
 
 
