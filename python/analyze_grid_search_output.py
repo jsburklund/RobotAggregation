@@ -77,7 +77,8 @@ def main():
     costs.sort()
     params = params[sorted_cost_indeces]
     print("Best Params, Index, Cost")
-    print(params[0], costs[0])
+    print("{} {:0.2f}".format(params[0], costs[0]))
+    print("="*80)
 
     print("Good params")
     unknown_controllers = 0
@@ -102,7 +103,7 @@ def main():
                         #slow clustering segregation?
                         continue
         unknown_controllers += 1
-        print(p, "{:d}th {:0.4f}".format(i, costs[i]))
+        print(p, "{:d}th {:0.2f}".format(i, costs[i]))
 
 
 

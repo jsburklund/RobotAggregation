@@ -120,7 +120,8 @@ int main(int argc, const char **argv) {
     Real param;
     auto i = 0u;
     while (ss >> param) {
-      params[++i] = param;
+      params[i] = param;
+      i++;
     }
     loop_function->LoadParameters(n_params, params);
   } else {
