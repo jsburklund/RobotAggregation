@@ -3,7 +3,6 @@
 import numpy as np
 import os
 import csv
-import matplotlib.pyplot as plt
 import argparse
 
 

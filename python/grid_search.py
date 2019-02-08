@@ -78,7 +78,7 @@ def main():
     else:
         minimum = [-1] * 6
 
-    meta_outfile_name = "grid_search_output_meta_{:d}.txt".format(int(time.time()))
+    meta_outfile_name = "grid_search_output_{:d}.meta".format(int(time.time()))
     with open(meta_outfile_name, 'w') as metafile:
         metafile.write(str(dir(args)) + '\n')
         metafile.write(str("".join(sys.argv)) + '\n')
