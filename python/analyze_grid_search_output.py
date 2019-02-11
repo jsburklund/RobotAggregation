@@ -16,6 +16,7 @@ def main():
     parser.add_argument("--ignore-known-controllers", action="store_true")
     parser.add_argument("--plot", action="store_true")
     parser.add_argument("--save", action="store_true")
+    parser.add_argument("--exclude-one-class", action="store_true")
 
     args = parser.parse_args()
 
@@ -35,7 +36,13 @@ def main():
 
         first_param_idx = int(f[0, 0])
         last_param_idx = int(f[-1, 0])
-        costs[first_param_idx:last_param_idx + 1] = np.mean(f[:, 7:], axis=1)
+        env_start_idx = 7
+        costs_in_environments = f[:, env_start_idx:]
+        if args.exclude_one_class:
+            # skip the first 8 environments, they are for the 1-class scenarios
+            costs_in_environments = costs_in_environments[:, 8:]
+        mean_over_environments = np.mean(costs_in_environments, axis=1)
+        costs[first_param_idx:last_param_idx + 1] = mean_over_environments
         params[first_param_idx:last_param_idx + 1, :] = f[:, 1:7]
 
     if args.outfile:
