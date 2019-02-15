@@ -3,7 +3,6 @@
 import numpy as np
 import os
 import csv
-import matplotlib.pyplot as plt
 import argparse
 
 
@@ -20,9 +19,11 @@ def main():
 
     args = parser.parse_args()
 
-    style_dir = os.path.dirname(os.path.realpath(__file__))
-    style = os.path.join(style_dir, "mpl.style")
-    plt.style.use(style)
+    if args.plot:
+      style_dir = os.path.dirname(os.path.realpath(__file__))
+      style = os.path.join(style_dir, "mpl.style")
+      import matplotlib.pyplot as plt
+      plt.style.use(style)
 
     costs = np.zeros((args.resolution ** 6))
     params = np.zeros((args.resolution ** 6, 6))
