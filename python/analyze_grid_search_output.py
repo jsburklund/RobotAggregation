@@ -26,6 +26,7 @@ def main():
       plt.style.use(style)
 
     costs = np.zeros((args.resolution ** 6))
+    stds = np.zeros((args.resolution ** 6))
     params = np.zeros((args.resolution ** 6, 6))
     for grid_search_output_filename in args.grid_search_outputs:
         f = np.genfromtxt(grid_search_output_filename, skip_header=True)
@@ -43,14 +44,15 @@ def main():
             # skip the first 8 environments, they are for the 1-class scenarios
             costs_in_environments = costs_in_environments[:, 8:]
         mean_over_environments = np.mean(costs_in_environments, axis=1)
+        std_over_environments = np.std(costs_in_environments, axis=1)
         costs[first_param_idx:last_param_idx + 1] = mean_over_environments
+        stds[first_param_idx:last_param_idx + 1] = std_over_environments
         params[first_param_idx:last_param_idx + 1, :] = f[:, 1:7]
 
     if args.outfile:
         writer = csv.writer(open(args.outfile, 'w'), delimiter=',')
-        for i, c in enumerate(costs):
-            if c != 0:
-                writer.writerow([i, c])
+        for i, (p, c, s) in enumerate(zip(params, costs, stds)):
+            writer.writerow([i, p, c, s])
 
     if args.plot or args.save:
         axes_titles = [r'$v_{l_0}$', r'$v_{r_0}$', r'$v_{l_1}$', r'$v_{r_1}$', r'$v_{l_2}$', r'$v_{r_2}$']
@@ -84,9 +86,10 @@ def main():
     sorted_cost_indeces = costs.argsort(axis=0)
     costs.sort()
     params = params[sorted_cost_indeces]
+    stds = stds[sorted_cost_indeces]
     print("Best Params, Index, Cost")
-    print("{} {:0.2f}".format(params[0], costs[0]))
-    print("="*80)
+    print("{} {:0.0f} {:0.0f}".format(params[0], costs[0], stds[0]))
+    print("="*85)
 
     print("Good params")
     unknown_controllers = 0
@@ -111,7 +114,7 @@ def main():
                         #slow clustering segregation?
                         continue
         unknown_controllers += 1
-        print(p, "{:d}th {:0.2f}".format(i, costs[i]))
+        print(p, "{:d}th {:0.0f} {:0.0f}".format(i, costs[i], stds[i]))
 
 
 
