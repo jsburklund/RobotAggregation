@@ -37,10 +37,10 @@ cp $PROJDIR/python/grid_search.py .
 # Execute program (this also writes files in work dir)
 echo $WORKDIR
 source venv/bin/activate
-./grid_search.py --resolution=7 --pool-size=35 --trials 1 --skip=115000 --stop-at=130000 experiments/1_class/*.argos experiments/2_class/*.argos experiments/4_class/*.argos build/loop_functions/libsegregation_loop_function.so
+./grid_search.py --resolution=7 --pool-size=36 --trials 1 --skip=105000 --stop-at=120000 experiments/1_class/*.argos experiments/2_class/*.argos experiments/4_class/*.argos build/loop_functions/libsegregation_loop_function.so
 
 # Transfer generated files into home directory
-cp grid_search_output* $DATADIR/new_cluster_metric_grid_search
+cp grid_search_output* $DATADIR/no_time_cluster_metric_grid_search
 
 # Cleanup
 rm -r $WORKDIR
