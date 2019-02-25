@@ -14,12 +14,13 @@ def main():
     parser.add_argument("--best-n", type=int, default=10)
     parser.add_argument("--ignore-known-controllers", action="store_true")
     parser.add_argument("--plot", action="store_true")
+    parser.add_argument("--viz", action="store_true")
     parser.add_argument("--save", action="store_true")
     parser.add_argument("--exclude-one-class", action="store_true")
 
     args = parser.parse_args()
 
-    if args.plot:
+    if args.plot or args.viz:
       style_dir = os.path.dirname(os.path.realpath(__file__))
       style = os.path.join(style_dir, "mpl.style")
       import matplotlib.pyplot as plt
@@ -54,7 +55,7 @@ def main():
         for i, (p, c, s) in enumerate(zip(params, costs, stds)):
             writer.writerow([i, p, c, s])
 
-    if args.plot or args.save:
+    if args.viz or args.save:
         axes_titles = [r'$v_{l_0}$', r'$v_{r_0}$', r'$v_{l_1}$', r'$v_{r_1}$', r'$v_{l_2}$', r'$v_{r_2}$']
         for x_param in range(6):
             for y_param in range(x_param + 1, 6):
@@ -78,9 +79,6 @@ def main():
                 plt.imshow(cost_image, cmap='Reds')
                 if args.save:
                     plt.savefig("{:d}_{:d}_grid_img.png".format(x_param, y_param))
-
-        if args.plot:
-            plt.show()
 
     # Sorting messes up plotting so we have to do this after
     sorted_cost_indeces = costs.argsort(axis=0)
@@ -116,6 +114,17 @@ def main():
         unknown_controllers += 1
         print(p, "{:d}th {:0.0f} {:0.0f}".format(i, costs[i], stds[i]))
 
+    if args.plot:
+        plt.figure()
+        c = costs[::1000]
+        N = len(c)
+        plt.bar(np.arange(N), c, yerr=stds[::1000])
+        plt.ylabel("cost")
+        plt.title("every 1000th parameter set, sorted from best to worst")
+        plt.gca().set_xticklabels([])
+
+    if args.plot or args.viz:
+        plt.show()
 
 
 if __name__ == "__main__":
