@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
+from scipy import stats
 import os
 import csv
 import argparse
@@ -8,7 +9,7 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser("Visualize a set of output files from grid search")
-    parser.add_argument("grid_search_outputs", nargs="+")
+    parser.add_argument("merged_grid_search_outputs")
     parser.add_argument("--outfile")
     parser.add_argument("--resolution", type=int, default=7)
     parser.add_argument("--best-n", type=int, default=10)
@@ -26,33 +27,21 @@ def main():
       import matplotlib.pyplot as plt
       plt.style.use(style)
 
-    costs = np.zeros((args.resolution ** 6))
-    stds = np.zeros((args.resolution ** 6))
-    params = np.zeros((args.resolution ** 6, 6))
-    for grid_search_output_filename in args.grid_search_outputs:
-        f = np.genfromtxt(grid_search_output_filename, skip_header=True)
-        if f.shape[0] == 0:
-            to_delete.append(grid_search_output_filename)
-            continue
-        elif len(f.shape) == 1:
-            f = np.expand_dims(f, axis=0)
+    std_costs = np.zeros((args.resolution ** 6))
+    f = np.genfromtxt(args.merged_grid_search_outputs, skip_header=True)
 
-        first_param_idx = int(f[0, 0])
-        last_param_idx = int(f[-1, 0])
-        env_start_idx = 7
-        costs_in_environments = f[:, env_start_idx:]
-        if args.exclude_one_class:
-            # skip the first 8 environments, they are for the 1-class scenarios
-            costs_in_environments = costs_in_environments[:, 8:]
-        mean_over_environments = np.mean(costs_in_environments, axis=1)
-        std_over_environments = np.std(costs_in_environments, axis=1)
-        costs[first_param_idx:last_param_idx + 1] = mean_over_environments
-        stds[first_param_idx:last_param_idx + 1] = std_over_environments
-        params[first_param_idx:last_param_idx + 1, :] = f[:, 1:7]
+    env_start_idx = 7
+    all_costs = f[:, env_start_idx:]
+    if args.exclude_one_class:
+        # skip the first 8 environments, they are for the 1-class scenarios
+        all_costs = all_costs[:, 8:]
+    mean_costs = np.mean(all_costs, axis=1)
+    std_costs = np.std(all_costs, axis=1)
+    params = f[:, 1:7]
 
     if args.outfile:
         writer = csv.writer(open(args.outfile, 'w'), delimiter=',')
-        for i, (p, c, s) in enumerate(zip(params, costs, stds)):
+        for i, (p, c, s) in enumerate(zip(params, mean_costs, std_costs)):
             writer.writerow([i, p, c, s])
 
     if args.viz or args.save:
@@ -69,7 +58,7 @@ def main():
 
                 shape = tuple([args.resolution] * 6)
                 cost_image = np.ones((args.resolution, args.resolution)) * 1e24
-                for parameter_idx, cost in enumerate(costs):
+                for parameter_idx, cost in enumerate(mean_costs):
                     indeces = np.unravel_index(parameter_idx, shape)
                     row = indeces[x_param]
                     col = indeces[y_param]
@@ -81,12 +70,13 @@ def main():
                     plt.savefig("{:d}_{:d}_grid_img.png".format(x_param, y_param))
 
     # Sorting messes up plotting so we have to do this after
-    sorted_cost_indeces = costs.argsort(axis=0)
-    costs.sort()
+    sorted_cost_indeces = mean_costs.argsort(axis=0)
+    mean_costs.sort()
     params = params[sorted_cost_indeces]
-    stds = stds[sorted_cost_indeces]
+    std_costs = std_costs[sorted_cost_indeces]
+    all_costs = all_costs[sorted_cost_indeces]
     print("Best Params, Index, Cost")
-    print("{} {:0.0f} {:0.0f}".format(params[0], costs[0], stds[0]))
+    print("{} {:0.0f} {:0.0f}".format(params[0], mean_costs[0], std_costs[0]))
     print("="*85)
 
     print("Good params")
@@ -112,13 +102,31 @@ def main():
                         #slow clustering segregation?
                         continue
         unknown_controllers += 1
-        print(p, "{:d}th {:0.0f} {:0.0f}".format(i, costs[i], stds[i]))
+        print(p, "{:d}th {:0.0f} {:0.0f}".format(i, mean_costs[i], std_costs[i]))
+
+    best_costs = all_costs[0]
+    inconclusive = True
+    found_og_params = False
+    for i, costs in enumerate(all_costs):
+        t_value, p_value = stats.ttest_ind(best_costs, costs, equal_var=False)
+        if np.allclose(params[i], [1, -2/3, 1/3, 1, 1, 0]):
+            print("P value of old params: ", i, p_value, mean_costs[i], std_costs[i], mean_costs[0], std_costs[0], params[i])
+            found_og_params = True
+            break
+        if p_value < 0.05 and inconclusive:
+            inconclusive = False
+            print("top {} params are not statistically significantly different".format(i))
+        if found_og_params and not inconclusive:
+            break
+    if inconclusive:
+        print("cannot conclude that the worst params are not identical mean to the best params...")
+
 
     if args.plot:
         plt.figure()
-        c = costs[::1000]
+        c = mean_costs[::1000]
         N = len(c)
-        plt.bar(np.arange(N), c, yerr=stds[::1000])
+        plt.bar(np.arange(N), c, yerr=std_costs[::1000])
         plt.ylabel("cost")
         plt.title("every 1000th parameter set, sorted from best to worst")
         plt.gca().set_xticklabels([])
