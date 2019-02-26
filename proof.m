@@ -16,3 +16,4 @@ assumeAlso(thetai < pi)
 D = sqrt(d^2 + (-r)^2);
 D_hat = sqrt((d + 1/5*Ri*sin(thetai)*sin(5/4*thetai) - sin(thetai)*Ri)^2 + (-r-1/5*Ri*cos(thetai)*sin(5/4*thetai) - (Ri - cos(thetai)*Ri))^2);
 D_hat = simplify(D_hat);
+latex(D_hat <= D)
