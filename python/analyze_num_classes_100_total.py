@@ -11,12 +11,11 @@ import time
 from multiprocessing import Pool
 import numpy as np
 
-from myboxplot import my_boxplot
 
 
 def evaluate(args):
     params_file, argos_file, library_path, trials, verbose = args
-    cmd = ["./build/bin/evaluate", "-t", str(trials), argos_file, library_path, params_file]
+    cmd = ["../build/bin/evaluate", "-t", str(trials), argos_file, library_path, params_file]
     cmd_str = " ".join(cmd)
     output = subprocess.run(cmd_str, stdout=subprocess.PIPE, shell=True)
     if output.returncode != 0:
@@ -26,7 +25,6 @@ def evaluate(args):
         print(output)
         return -1
 
-    sum = 0
     costs = []
     output = output.stdout.decode("UTF-8").split("\n")[8:-1]
     for line in output:
@@ -35,11 +33,9 @@ def evaluate(args):
         except ValueError:
             continue
         costs.append(cost)
-        sum += float(cost)
-    mean = sum / len(costs)
     if verbose:
         print(cmd_str, costs)
-    return mean
+    return costs
 
 
 def eval_func(args):
@@ -53,15 +49,13 @@ def eval_func(args):
             pool_args = [(args.params, f, args.library_path, args.trials, args.verbose) for f in args.argos_files]
             costs = pool.map(evaluate, pool_args)
 
-            for (argos_file, cost) in zip(args.argos_files, costs):
-                outfile.write(argos_file)
-                outfile.write(" ")
-                outfile.write("{:.3f} ".format(cost))
-                outfile.write("\n")
+            for (argos_file, costs) in zip(args.argos_files, costs):
+                writer.writerow([argos_file] + costs)
 
 
 def plot_func(args):
     import matplotlib.pyplot as plt
+    from myboxplot import my_boxplot
     style_dir = os.path.dirname(os.path.realpath(__file__))
     style = os.path.join(style_dir, "mpl.style")
     plt.style.use(style)

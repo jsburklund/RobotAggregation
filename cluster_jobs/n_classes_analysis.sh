@@ -24,21 +24,22 @@ WORKDIR=$LOCALDIR/$MYUSER/$THISJOB
 rm -rf $WORKDIR && mkdir -p $WORKDIR && cd $WORKDIR
 
 # setup the directories and files we expect
+cp -r $PROJDIR/venv .
 cp -r $PROJDIR/bin .
+cp -r $PROJDIR/python .
 cp -r $PROJDIR/build .
 cp -r $PROJDIR/controllers .
 cp -r $PROJDIR/loop_functions .
 cp -r $PROJDIR/experiments .
 cp -r $PROJDIR/params .
 cp $PROJDIR/CMakeLists.txt .
-cp $PROJDIR/python/analyze_num_classes.py .
 
 # Execute program (this also writes files in work dir)
 echo $WORKDIR
-./analyze_num_classes.py evaluate experiments/n_classes/10_per_class/* build/loop_functions/libsegregation_loop_function.so params/cluster_metric_grid_search.dat -p 25 -t 100
+./python/analyze_num_classes_100_total.py evaluate experiments/n_classes/100_total/* build/loop_functions/libsegregation_loop_function.so params/new_grid_search.dat -p 25 -t 100
 
 # Transfer generated files into home directory
-cp n_classes_* $DATADIR
+cp n_classes_* $DATADIR/100_total
 
 # Cleanup
 rm -r $WORKDIR

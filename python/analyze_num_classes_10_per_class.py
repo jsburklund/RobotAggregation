@@ -11,13 +11,9 @@ import time
 from multiprocessing import Pool
 import numpy as np
 
-from myboxplot import my_boxplot
 
 
 def evaluate(args):
-    ## TESTING
-    return [1,2,3,4,5]
-    ## TESTING
     params_file, argos_file, library_path, trials, verbose = args
     cmd = ["./build/bin/evaluate", "-t", str(trials), argos_file, library_path, params_file]
     cmd_str = " ".join(cmd)
@@ -59,6 +55,7 @@ def eval_func(args):
 
 def plot_func(args):
     import matplotlib.pyplot as plt
+    from myboxplot import my_boxplot
     style_dir = os.path.dirname(os.path.realpath(__file__))
     style = os.path.join(style_dir, "mpl.style")
     plt.style.use(style)
