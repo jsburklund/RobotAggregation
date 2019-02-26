@@ -84,7 +84,7 @@ def plot_func(args):
 
     fig, ax = plt.subplots()
     ax.plot(n_classes, max_costs, linewidth=4)
-    ax.plot(n_classes, mean_costs, linewidth=4)
+    #ax.plot(n_classes, mean_costs, linewidth=4)
     my_boxplot(ax, n_classes, costs, width=0.5)
     plt.xlabel("number of classes")
     plt.ylabel("Cost")
