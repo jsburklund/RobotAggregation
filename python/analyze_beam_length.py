@@ -25,7 +25,6 @@ def evaluate(args):
         print(output)
         return -1
 
-    sum = 0
     costs = []
     output = output.stdout.decode("UTF-8").split("\n")[8:-1]
     for line in output:
@@ -44,7 +43,7 @@ def eval_func(args):
     if args.verbose:
         print(params)
 
-    outfile_name = "beam_angle_analysis_{:d}.txt".format(int(time.time()))
+    outfile_name = "beam_length_analysis_{:d}.txt".format(int(time.time()))
     writer = csv.writer(open(outfile_name, 'w'))
     with Pool(processes=args.pool_size) as pool:
         pool_args = [(args.params, f, args.library_path, args.trials, args.verbose) for f in args.argos_files]
@@ -60,31 +59,31 @@ def plot_func(args):
     style = os.path.join(style_dir, "mpl.style")
     plt.style.use(style)
 
-    reader = csv.reader(open(args.beam_angle_output, 'r'), delimiter=',')
+    reader = csv.reader(open(args.beam_length_output, 'r'), delimiter=',')
     costs = []
-    degs = []
+    proportions_to_max = []
     for row in reader:
-        m = re.search("(\d+)_deg", row[0])
+        m = re.search("(\d+)_percent", row[0])
         deg = float(m.groups()[0])
-        degs.append(deg)
+        proportions_to_max.append(deg)
         costs.append(float(row[1]))
 
-    degs = np.array(degs)
+    proportions_to_max = np.array(proportions_to_max)
     costs = np.array(costs)
-    sorted_indeces = np.argsort(degs)
-    degs = degs[sorted_indeces]
+    sorted_indeces = np.argsort(proportions_to_max)
+    proportions_to_max = proportions_to_max[sorted_indeces]
     costs = costs[sorted_indeces]
 
     plt.figure()
-    plt.plot(degs, costs, linewidth=4)
-    plt.scatter(degs, costs, s=100)
-    plt.xlabel(r"Half Beam Angle ($\beta$, in degrees)")
+    plt.plot(proportions_to_max, costs, linewidth=4)
+    plt.scatter(proportions_to_max, costs, s=100)
+    plt.xlabel("Sensor Range, Percentage of Maximum")
     plt.ylabel("Cost")
     plt.show()
 
 
 def main():
-    parser = argparse.ArgumentParser("Evaluate cost over the beam angle argos files.")
+    parser = argparse.ArgumentParser("Evaluate cost over the beam length.")
     subparsers = parser.add_subparsers()
     evaluate = subparsers.add_parser('evaluate', help="run the simulations")
     evaluate.add_argument("argos_files", help="the argos files you want to run evaluate with", nargs="+")
@@ -95,7 +94,7 @@ def main():
     evaluate.add_argument("--verbose", "-v", help="print more shit", action="store_true")
     evaluate.set_defaults(func=eval_func)
     plot = subparsers.add_parser('plot', help="plot the output of \'evaluate\'")
-    plot.add_argument("beam_angle_output", help='file output by the evaluate subcommand')
+    plot.add_argument("beam_length_output", help='file output by the evaluate subcommand')
     plot.set_defaults(func=plot_func)
 
     args = parser.parse_args()

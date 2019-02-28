@@ -43,4 +43,5 @@ def my_boxplot(ax, positions, values, width=None, color=None, label=None):
     plt.setp(bp['fliers'], visible=False)
 
     ax.plot(positions, np.median(values, axis=1), linewidth=2, label=label)
-    ax.xaxis.set_major_formatter(FormatStrFormatter('%d%%'))
+    ax.grid(True)
+    plt.setp(ax.get_xticklabels()[1::2], visible=False)

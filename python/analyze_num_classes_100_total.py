@@ -77,15 +77,20 @@ def plot_func(args):
         max_costs.append(c_total)
 
     # Sort both lists based on n_classes
-    costs = [i[1] for i in sorted(zip(n_classes, costs), key=lambda pair: pair[0])]
+    n_classes = np.array(n_classes)
     costs = np.array(costs)
-    n_classes = sorted(n_classes)
+    max_costs = np.array(max_costs)
+    sorted_indeces = np.argsort(n_classes)
+    n_classes = n_classes[sorted_indeces]
+    costs = costs[sorted_indeces]
+    max_costs = max_costs[sorted_indeces]
+
+    # print("max costs:")
+    # print(max_costs)
 
     fig, ax = plt.subplots()
-    ax.plot(n_classes, max_costs, linewidth=4)
-    ax.plot(n_classes, costs, linewidth=4)
     my_boxplot(ax, n_classes, costs, width=0.5)
-    plt.xlabel("number of classes")
+    plt.xlabel("Number of Classes")
     plt.ylabel("Cost")
     plt.show()
 
