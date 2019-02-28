@@ -15,7 +15,7 @@ import numpy as np
 
 def evaluate(args):
     params_file, argos_file, library_path, trials, verbose = args
-    cmd = ["../build/bin/evaluate", "-t", str(trials), argos_file, library_path, params_file]
+    cmd = ["./build/bin/evaluate", "-t", str(trials), argos_file, library_path, params_file]
     cmd_str = " ".join(cmd)
     output = subprocess.run(cmd_str, stdout=subprocess.PIPE, shell=True)
     if output.returncode != 0:
@@ -44,13 +44,13 @@ def eval_func(args):
         print(params)
 
     outfile_name = "n_classes_analysis_{:d}.txt".format(int(time.time()))
-    with open(outfile_name, 'w')  as outfile:
-        with Pool(processes=args.pool_size) as pool:
-            pool_args = [(args.params, f, args.library_path, args.trials, args.verbose) for f in args.argos_files]
-            costs = pool.map(evaluate, pool_args)
+    writer = csv.writer(open(outfile_name, 'w'))
+    with Pool(processes=args.pool_size) as pool:
+        pool_args = [(args.params, f, args.library_path, args.trials, args.verbose) for f in args.argos_files]
+        costs = pool.map(evaluate, pool_args)
 
-            for (argos_file, costs) in zip(args.argos_files, costs):
-                writer.writerow([argos_file] + costs)
+        for (argos_file, costs) in zip(args.argos_files, costs):
+            writer.writerow([argos_file] + costs)
 
 
 def plot_func(args):
