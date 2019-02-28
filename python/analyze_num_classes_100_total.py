@@ -47,9 +47,9 @@ def eval_func(args):
     writer = csv.writer(open(outfile_name, 'w'))
     with Pool(processes=args.pool_size) as pool:
         pool_args = [(args.params, f, args.library_path, args.trials, args.verbose) for f in args.argos_files]
-        costs = pool.map(evaluate, pool_args)
+        all_costs = pool.map(evaluate, pool_args)
 
-        for (argos_file, costs) in zip(args.argos_files, costs):
+        for (argos_file, costs) in zip(args.argos_files, all_costs):
             writer.writerow([argos_file] + costs)
 
 

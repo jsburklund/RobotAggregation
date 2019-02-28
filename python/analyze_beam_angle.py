@@ -8,7 +8,6 @@ import subprocess
 import sys
 import time
 
-import matplotlib.pyplot as plt
 from multiprocessing import Pool
 import numpy as np
 
@@ -35,11 +34,9 @@ def evaluate(args):
         except ValueError:
             continue
         costs.append(cost)
-        sum += float(cost)
-    mean = sum / len(costs)
     if verbose:
         print(cmd_str, costs)
-    return mean
+    return costs
 
 
 def eval_func(args):
@@ -48,19 +45,17 @@ def eval_func(args):
         print(params)
 
     outfile_name = "beam_angle_analysis_{:d}.txt".format(int(time.time()))
-    with open(outfile_name, 'w')  as outfile:
-        with Pool(processes=args.pool_size) as pool:
-            pool_args = [(args.params, f, args.library_path, args.trials, args.verbose) for f in args.argos_files]
-            costs = pool.map(evaluate, pool_args)
+    writer = csv.writer(open(outfile_name, 'w'))
+    with Pool(processes=args.pool_size) as pool:
+        pool_args = [(args.params, f, args.library_path, args.trials, args.verbose) for f in args.argos_files]
+        all_costs = pool.map(evaluate, pool_args)
 
-            for (argos_file, cost) in zip(args.argos_files, costs):
-                outfile.write(argos_file)
-                outfile.write(" ")
-                outfile.write("{:.3f} ".format(cost))
-                outfile.write("\n")
+        for (argos_file, costs) in zip(args.argos_files, all_costs):
+            writer.writerow([argos_file] + costs)
 
 
 def plot_func(args):
+    import matplotlib.pyplot as plt
     style_dir = os.path.dirname(os.path.realpath(__file__))
     style = os.path.join(style_dir, "mpl.style")
     plt.style.use(style)
