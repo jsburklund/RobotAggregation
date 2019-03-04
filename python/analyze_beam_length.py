@@ -55,6 +55,7 @@ def eval_func(args):
 
 def plot_func(args):
     import matplotlib.pyplot as plt
+    from myboxplot import my_boxplot
     style_dir = os.path.dirname(os.path.realpath(__file__))
     style = os.path.join(style_dir, "mpl.style")
     plt.style.use(style)
@@ -64,9 +65,10 @@ def plot_func(args):
     proportions_to_max = []
     for row in reader:
         m = re.search("(\d+)_percent", row[0])
-        deg = float(m.groups()[0])
-        proportions_to_max.append(deg)
-        costs.append(float(row[1]))
+        p = float(m.groups()[0])
+        proportions_to_max.append(p)
+        costs_for_length = [float(i) for i in row[1:]]
+        costs.append(costs_for_length)
 
     proportions_to_max = np.array(proportions_to_max)
     costs = np.array(costs)
@@ -74,9 +76,10 @@ def plot_func(args):
     proportions_to_max = proportions_to_max[sorted_indeces]
     costs = costs[sorted_indeces]
 
-    plt.figure()
-    plt.plot(proportions_to_max, costs, linewidth=4)
-    plt.scatter(proportions_to_max, costs, s=100)
+    fig, ax = plt.subplots()
+    print(proportions_to_max.shape)
+    print(costs.shape)
+    my_boxplot(ax, proportions_to_max, costs, width=0.5)
     plt.xlabel("Sensor Range, Percentage of Maximum")
     plt.ylabel("Cost")
     plt.show()

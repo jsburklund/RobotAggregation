@@ -56,6 +56,7 @@ def eval_func(args):
 
 def plot_func(args):
     import matplotlib.pyplot as plt
+    from myboxplot import my_boxplot
     style_dir = os.path.dirname(os.path.realpath(__file__))
     style = os.path.join(style_dir, "mpl.style")
     plt.style.use(style)
@@ -67,7 +68,8 @@ def plot_func(args):
         m = re.search("(\d+)_deg", row[0])
         deg = float(m.groups()[0])
         degs.append(deg)
-        costs.append(float(row[1]))
+        costs_for_deg = [float(i) for i in row[1:]]
+        costs.append(costs_for_deg)
 
     degs = np.array(degs)
     costs = np.array(costs)
@@ -75,9 +77,8 @@ def plot_func(args):
     degs = degs[sorted_indeces]
     costs = costs[sorted_indeces]
 
-    plt.figure()
-    plt.plot(degs, costs, linewidth=4)
-    plt.scatter(degs, costs, s=100)
+    fig, ax = plt.subplots()
+    my_boxplot(ax, degs, costs, width=0.5)
     plt.xlabel(r"Half Beam Angle ($\beta$, in degrees)")
     plt.ylabel("Cost")
     plt.show()
