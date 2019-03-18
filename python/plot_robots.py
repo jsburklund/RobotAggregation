@@ -1,39 +1,38 @@
 #!/usr/bin/env python3
 import argparse
+import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.patches import Circle
-from matplotlib.collections import PatchCollection
 
-parser = argparse.ArgumentParser()
-parser.add_argument("infile")
-args = parser.parse_args()
 
-lines=open(args.infile).readlines()
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("infile")
+    parser.add_argument("--skip", type=int, default=1)
+    args = parser.parse_args()
 
-poses={}
-for l in lines:
-    s = l.split(',')
-    x=float(s[0])
-    y=-float(s[1])
-    c=float(s[2])
-    if c not in poses:
-        poses[c] = []
-    poses[c].append((x,y))
+    poses_over_time = np.genfromtxt(args.infile, delimiter=",")
+    poses_over_time = poses_over_time[:, :-1]  # chop off the last empty comma
 
-xs=[]
-ys=[]
-for group_poses in poses.values():
-    xs.extend([i[0] for i in group_poses])
-    ys.extend([i[1] for i in group_poses])
+    poses_by_robot = {}
+    for poses in poses_over_time:
+        pose_by_robot = poses.reshape(-1, 5)
+        for robot_data in pose_by_robot:
+            id = robot_data[0]
+            class_id = robot_data[1]
+            pose = robot_data[2:]
+            if id not in poses_by_robot:
+                poses_by_robot[id] = []
+            poses_by_robot[id].append(pose)
 
-patches=[]
-for c, (group, pts) in zip(['white','green','blue','red'], poses.items()):
-    patches.extend([Circle(pt, .085, color=c) for pt in pts])
+    fig, ax = plt.subplots()
+    s = 14
+    e = 100
+    for id, poses in poses_by_robot.items():
+        poses = np.array(poses)
+        plt.scatter(poses[s:e, 0], poses[s:e, 1], s=1)
+    ax.set_aspect("equal")
+    plt.show()
 
-p = PatchCollection(patches)
 
-fig, ax = plt.subplots()
-ax.add_collection(p)
-ax.scatter(xs,ys)
-ax.set_aspect('equal')
-plt.show()
+if __name__ == '__main__':
+    main()

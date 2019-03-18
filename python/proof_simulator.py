@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import numpy as np
 import pygame
 
@@ -5,7 +7,7 @@ import argparse
 
 
 def m2px(m):
-    return int(m * 200)
+    return int(m * 300)
 
 
 def fwd(x, y, theta, omega, R, dt):
@@ -61,12 +63,12 @@ def main():
     pygame.init()
 
     BLACK = (0, 0, 0)
-    WHITE = (255, 255, 255)
+    WHITE = (155, 155, 155)
     BLUE = (0, 0, 255)
     GREEN = (0, 255, 0)
     RED = (255, 0, 0)
 
-    W = 800
+    W = 600
     size = [W, W]
     screen = pygame.display.set_mode(size)
 
@@ -82,52 +84,69 @@ def main():
     j_theta = args.j_theta
     j_s = 0
 
-    ray_length_px = 400
+    ray_length_px = 700
 
-    initialized = False
+    poses = []
+    icc_poses = []
+    playing = False
     while not done:
+        step = False
 
-        clock.tick(10)
+        clock.tick(100)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
-            if not initialized or (event.type == pygame.KEYUP and event.key == pygame.K_RETURN):
-                initialized = True
+            elif event.type == pygame.KEYUP and event.key == pygame.K_p:
+                playing = not playing
+            elif playing or (event.type == pygame.KEYUP and event.key == pygame.K_RETURN):
+                step = True
 
-                i_s = sense(i_x, i_y, i_theta, j_x, j_y, args.r)
-                j_s = sense(j_x, j_y, j_theta, i_x, i_y, args.r)
+        i_s = sense(i_x, i_y, i_theta, j_x, j_y, args.r)
+        j_s = sense(j_x, j_y, j_theta, i_x, i_y, args.r)
 
-                i_x_px = W // 4 + m2px(i_x)
-                i_y_px = W // 2 + m2px(i_y)
-                j_x_px = W // 4 + m2px(j_x)
-                j_y_px = W // 2 + m2px(j_y)
-                i_ray_x = i_x_px + np.cos(i_theta) * ray_length_px
-                i_ray_y = i_y_px + np.sin(i_theta) * ray_length_px
-                j_ray_x = j_x_px + np.cos(j_theta) * ray_length_px
-                j_ray_y = j_y_px + np.sin(j_theta) * ray_length_px
+        i_x_px = m2px(args.r) + 20 + m2px(i_x)
+        i_y_px = W // 2 + m2px(i_y)
+        j_x_px = m2px(args.r) + 20 + m2px(j_x)
+        j_y_px = W // 2 + m2px(j_y)
+        i_ray_x = i_x_px + np.cos(i_theta) * ray_length_px
+        i_ray_y = i_y_px + np.sin(i_theta) * ray_length_px
+        j_ray_x = j_x_px + np.cos(j_theta) * ray_length_px
+        j_ray_y = j_y_px + np.sin(j_theta) * ray_length_px
+        i_icc_x_px = m2px(args.r) + 20 + m2px(i_x + np.cos(i_theta + np.pi / 2) * -args.l / 4)
+        i_icc_y_px = W // 2 + m2px(i_y + np.sin(i_theta + np.pi / 2) * -args.l / 4)
 
-                screen.fill(WHITE)
-                pygame.draw.circle(screen, BLUE, [i_x_px, W - i_y_px], m2px(args.r))
-                if i_s == 0:
-                    pygame.draw.line(screen, BLACK, [i_x_px, W - i_y_px], [i_ray_x, W - i_ray_y])
-                else:
-                    pygame.draw.line(screen, GREEN, [i_x_px, W - i_y_px], [i_ray_x, W - i_ray_y])
-                pygame.draw.circle(screen, RED, [j_x_px, W - j_y_px], m2px(args.r))
-                if j_s == 0:
-                    pygame.draw.line(screen, BLACK, [j_x_px, W - j_y_px], [j_ray_x, W - j_ray_y])
-                else:
-                    pygame.draw.line(screen, GREEN, [j_x_px, W - j_y_px], [j_ray_x, W - j_ray_y])
+        screen.fill(WHITE)
+        poses.append([i_x_px, W - i_y_px])
+        poses.append([j_x_px, W - j_y_px])
+        icc_poses.append([i_icc_x_px, W - i_icc_y_px])
+        pygame.draw.circle(screen, BLUE, [i_x_px, W - i_y_px], m2px(args.r))
+        if i_s == 0:
+            pygame.draw.line(screen, BLACK, [i_x_px, W - i_y_px], [i_ray_x, W - i_ray_y])
+        else:
+            pygame.draw.line(screen, GREEN, [i_x_px, W - i_y_px], [i_ray_x, W - i_ray_y])
+        pygame.draw.circle(screen, RED, [j_x_px, W - j_y_px], m2px(args.r))
+        if j_s == 0:
+            pygame.draw.line(screen, BLACK, [j_x_px, W - j_y_px], [j_ray_x, W - j_ray_y])
+        else:
+            pygame.draw.line(screen, GREEN, [j_x_px, W - j_y_px], [j_ray_x, W - j_ray_y])
 
-                if i_s == 1:
-                    i_x, i_y, i_theta = fwd_1(i_x, i_y, i_theta, args.V, args.l, args.dt)
-                else:
-                    i_x, i_y, i_theta = fwd_0(i_x, i_y, i_theta, args.V, args.l, args.dt)
+        for pose in icc_poses:
+            pygame.draw.circle(screen, RED, [pose[0], pose[1]], 0)
 
-                if j_s == 1:
-                    j_x, j_y, j_theta = fwd_1(j_x, j_y, j_theta, args.V, args.l, args.dt)
-                else:
-                    j_x, j_y, j_theta = fwd_0(j_x, j_y, j_theta, args.V, args.l, args.dt)
+        for pose in poses:
+            pygame.draw.circle(screen, BLACK, [pose[0], pose[1]], 0)
+
+        if step or playing:
+            if i_s == 1:
+                i_x, i_y, i_theta = fwd_1(i_x, i_y, i_theta, args.V, args.l, args.dt)
+            else:
+                i_x, i_y, i_theta = fwd_0(i_x, i_y, i_theta, args.V, args.l, args.dt)
+
+            if j_s == 1:
+                j_x, j_y, j_theta = fwd_1(j_x, j_y, j_theta, args.V, args.l, args.dt)
+            else:
+                j_x, j_y, j_theta = fwd_0(j_x, j_y, j_theta, args.V, args.l, args.dt)
 
         pygame.display.flip()
 
