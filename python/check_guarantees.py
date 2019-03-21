@@ -20,13 +20,14 @@ def main():
     lhs = (2 * V) / (3 * l) * dt
     rhs = pi - 2 * atan2(-r - 5 * l / 4, sqrt(3) * r) - 2 * asin((l / 4) / sqrt(3 * r ** 2 + (5 * l / 4 - r) ** 2))
     kin_aggregation_phase_2 = (lhs <= rhs)
+    print("Kin Aggregation, #2", kin_aggregation_phase_2)
+    print("{} <= {}".format(lhs, rhs))
 
     lhs = (2 * V) / (3 * l) * dt
     rhs = atan2(sqrt(3) * r, r - 2 * l)
     kin_aggregation_phase_3 = (lhs <= rhs)
-
-    print("Kin Aggregation, #2", kin_aggregation_phase_2)
     print("Kin Aggregation, #3", kin_aggregation_phase_3)
+    print("{} <= {}".format(lhs, rhs))
 
 
 if __name__ == '__main__':
