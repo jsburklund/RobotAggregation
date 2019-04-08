@@ -24,15 +24,9 @@
 
   </controllers>
 
-  <loop_functions random_seed="0" num_classes="8">
-    <single center="-2,-.2" class="0" />
-    <single center="-2.2,0" class="1" />
-    <single center="-2,1" class="2" />
-    <single center="-2.2,.2" class="3" />
-    <single center="2.2,0" class="4" />
-    <single center="2,.2" class="5" />
-    <single center="2,-.2" class="6" />
-    <single center="2.2,0" class="7" />
+  <loop_functions random_seed="0" num_classes="6">
+    <cluster center="0,0" robot_num="40" robot_density="0.10" />
+
   </loop_functions>
 
   <arena size="6, 6, 2" center="0,0,1">
@@ -42,11 +36,11 @@
     </box>
 
     <box id="wall_south" size="5,0.1,0.5" movable="false">
-      <body position="0,-2.5,0" orientation="0,0,0"/>
+      <body position=",-2.5,0" orientation="0,0,0"/>
     </box>
 
     <box id="wall_east" size="0.1,5,0.5" movable="false">
-      <body position="-2.5,0,0" orientation="0,0,0"/>
+      <body position="-2.5,,0" orientation="0,0,0"/>
     </box>
 
     <box id="wall_west" size="0.1,5,0.5" movable="false">
@@ -64,7 +58,7 @@
     <range_and_bearing id="rab" grid_size="1,1,1"/>
   </media>
 
-  <!-- We don't want nor need a visualization during evolution -->
   <visualization/>
+
 
 </argos-configuration>
